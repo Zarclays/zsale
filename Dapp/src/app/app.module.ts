@@ -8,9 +8,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { HttpClientModule } from '@angular/common/http';
 import { ServicesModule } from './modules/services/services.module';
 
-import { MdbFormsModule } from 'mdb-angular-ui-kit/forms';
-import { MdbTooltipModule } from 'mdb-angular-ui-kit/tooltip';
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -21,9 +18,7 @@ import { MdbTooltipModule } from 'mdb-angular-ui-kit/tooltip';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    ServicesModule,
-    MdbFormsModule,
-    MdbTooltipModule
+    ServicesModule
   ],
   providers: [],
   bootstrap: [AppComponent]

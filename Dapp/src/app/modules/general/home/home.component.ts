@@ -68,7 +68,7 @@ export class HomeComponent implements OnInit {
 
     this.loadScript('assets/params/js/index.js');
 
-    this.titleService.setTitle('angular.ganatan: Une Application Web avec Angular');
+    this.titleService.setTitle(environment.application.name);
     this.meta.addTag({
       name: 'author',
       content: 'danny ganatan'

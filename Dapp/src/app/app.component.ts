@@ -8,8 +8,8 @@ import { Renderer2 } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'angular-starter';
-  version = 'Angular version 12.2.12';
+  title = 'ZSales';
+  version = 'NG version 12.2.12';
   items = [
     {
       name: 'bootstrap', link: 'bootstrap',

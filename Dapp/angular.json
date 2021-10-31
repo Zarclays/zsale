@@ -32,16 +32,13 @@
             "styles": [
               "src/styles.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
-              "node_modules/mdb-angular-ui-kit/assets/scss/mdb.scss",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "node_modules/animate.css/animate.css",
               "src/assets/params/css/navbar.css"
             ],
             "scripts": [
               "node_modules/chart.js/dist/Chart.js",
               "node_modules/hammerjs/hammer.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/chart.js/dist/chart.js"
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ],
             "serviceWorker": true,
             "ngswConfigPath": "ngsw-config.json"
