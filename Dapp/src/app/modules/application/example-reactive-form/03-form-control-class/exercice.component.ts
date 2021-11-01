@@ -6,7 +6,7 @@ import { Movie } from './movie';
 @Component({
   selector: 'app-form-control-class',
   templateUrl: './exercice.component.html',
-  styleUrls: ['./exercice.component.css'],
+  styleUrls: ['./exercice.component.scss'],
 })
 export class ExerciceComponent implements OnInit {
 

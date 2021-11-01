@@ -4,7 +4,7 @@ import { FormBuilder } from '@angular/forms';
 @Component({
   selector: 'app-form-builder-nested',
   templateUrl: './exercice.component.html',
-  styleUrls: ['./exercice.component.css'],
+  styleUrls: ['./exercice.component.scss'],
 })
 export class ExerciceComponent implements OnInit {
 

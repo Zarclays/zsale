@@ -4,7 +4,7 @@ import { FormBuilder, FormArray, FormGroup, FormControl } from '@angular/forms';
 @Component({
   selector: 'app-form-appli',
   templateUrl: './exercice.component.html',
-  styleUrls: ['./exercice.component.css'],
+  styleUrls: ['./exercice.component.scss'],
 })
 export class ExerciceComponent implements OnInit {
 

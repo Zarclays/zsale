@@ -4,7 +4,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 @Component({
   selector: 'app-form-group',
   templateUrl: './exercice.component.html',
-  styleUrls: ['./exercice.component.css'],
+  styleUrls: ['./exercice.component.scss'],
 })
 export class ExerciceComponent implements OnInit {
 

@@ -5,7 +5,7 @@ import { FormArray } from '@angular/forms';
 @Component({
   selector: 'app-form-array',
   templateUrl: './exercice.component.html',
-  styleUrls: ['./exercice.component.css'],
+  styleUrls: ['./exercice.component.scss'],
 })
 export class ExerciceComponent implements OnInit {
 

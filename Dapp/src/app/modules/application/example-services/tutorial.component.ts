@@ -7,7 +7,7 @@ import { SongService } from './song/song.service';
 @Component({
   selector: 'app-example-services',
   templateUrl: './tutorial.component.html',
-  styleUrls: ['./tutorial.component.css']
+  styleUrls: ['./tutorial.component.scss']
 })
 export class TutorialComponent implements OnInit {
 

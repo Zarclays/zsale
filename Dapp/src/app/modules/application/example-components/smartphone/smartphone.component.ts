@@ -5,7 +5,7 @@ import { Smartphone } from './smartphone';
 @Component({
   selector: 'app-smartphone',
   templateUrl: './smartphone.component.html',
-  styleUrls: ['./smartphone.component.css']
+  styleUrls: ['./smartphone.component.scss']
 })
 export class SmartphoneComponent implements OnInit {
 

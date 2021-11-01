@@ -65,12 +65,14 @@ import 'zone.js';  // Included with Angular CLI.
  */
  
 
-//  import * as process from 'process';
+ import * as process from 'process';
  import { Buffer } from 'buffer';
- 
-//  window.process = process;
+ // @ts-ignore
+ window.process = process;
  (window as any).global = window;
 //  global.Buffer = global.Buffer || Buffer;
 
 // @ts-ignore
 window.Buffer = window.Buffer || require('buffer').Buffer;
+// @ts-ignore
+// window.Web3Modal = window.Web3Modal || Web3Modal;

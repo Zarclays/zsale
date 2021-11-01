@@ -2,10 +2,18 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { Renderer2 } from '@angular/core';
 
+import { ModalComponent } from './modal/modal.component';
+import { MdbModalRef, MdbModalService } from 'mdb-angular-ui-kit/modal';
+import Web3 from "web3";
+import Web3Modal from "web3modal";
+
+
+
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
   title = 'ZSales';
@@ -54,15 +62,118 @@ export class AppComponent {
     },
   ];
 
+  modalRef: MdbModalRef<ModalComponent> | undefined;
+
   constructor(
     public router: Router,
-    public renderer: Renderer2) { }
+    public renderer: Renderer2, 
+    private modalService: MdbModalService) { }
+
+  async openModal() {
+    // this.modalRef = this.modalService.open(ModalComponent)
+
+    // @ts-ignore
+    const WalletConnectProvider = window.WalletConnectProvider.default;
+    const providerOptions = {
+      /* See Provider Options Section */
+      walletconnect: {
+        package: WalletConnectProvider,
+        options: {
+          // Mikko's test key - don't copy as your mileage may vary
+          infuraId: "8043bb2cf99347b1bfadfb233c5325c0",
+        }
+      },
+    };
+    
+    const web3Modal = new Web3Modal({
+      network: "mainnet", // optional
+      cacheProvider: true, // optional
+      providerOptions // required
+    });
+    
+    const provider = await web3Modal.connect();
+    await provider.enable();
+    const web3 = new Web3(provider);
+
+
+
+    const accounts = await web3.eth.getAccounts();
+
+    const address = accounts[0];
+
+    const networkId = await web3.eth.net.getId();
+
+    const chainId = await web3.eth.getChainId();
+
+    console.log(` add: ${address} - chain: ${chainId}`)
+
+    // // @ts-ignore
+    // const Web3Modal = window.Web3Modal.default;
+
+    // // @ts-ignore
+    // const WalletConnectProvider = window.WalletConnectProvider.default;
+
+    // // @ts-ignore
+    // const Fortmatic = window.Fortmatic;
+    // // Tell Web3modal what providers we have available.
+    // // Built-in web browser provider (only one can exist as a time)
+    // // like MetaMask, Brave or Opera is added automatically by Web3modal
+    // const providerOptions = {
+    //   walletconnect: {
+    //     package: WalletConnectProvider,
+    //     options: {
+    //       // Mikko's test key - don't copy as your mileage may vary
+    //       infuraId: "8043bb2cf99347b1bfadfb233c5325c0",
+    //     }
+    //   },
+
+    //   fortmatic: {
+    //     package: Fortmatic,
+    //     options: {
+    //       // Mikko's TESTNET api key
+    //       key: "pk_test_391E26A3B43A3350"
+    //     }
+    //   }
+    // };
+
+    // const web3Modal = new Web3Modal({
+    //   //network: "mainnet", // optional
+    //   cacheProvider: true, // optional
+    //   providerOptions // required
+    // });
+
+    // const provider = await web3Modal.connect();
+  }
 
   onSelectMenu(link: any): void {
     const element = document.getElementById('bd-docs-nav');
     this.renderer.removeClass(element, 'show');
     const route = '/' + link;
     this.router.navigate([route]);
+  }
+
+  async subscribeProvider (provider: any) {
+    if (!provider.on) {
+      return;
+    }
+    // provider.on("close", () => this.resetApp());
+    // provider.on("accountsChanged", async (accounts: string[]) => {
+    //   await this.setState({ address: accounts[0] });
+    //   await this.getAccountAssets();
+    // });
+    // provider.on("chainChanged", async (chainId: number) => {
+    //   const { web3 } = this.state;
+    //   const networkId = await web3.eth.net.getId();
+    //   await this.setState({ chainId, networkId });
+    //   await this.getAccountAssets();
+    // });
+
+    // provider.on("networkChanged", async (networkId: number) => {
+    //   const { web3 } = this.state;
+    //   const chainId = await web3.eth.chainId();
+    //   await this.setState({ chainId, networkId });
+    //   await this.getAccountAssets();
+    // });
   }
 
 
