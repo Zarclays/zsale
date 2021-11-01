@@ -1,0 +1,152 @@
+{
+	"compiler": {
+		"version": "0.8.7+commit.e28d00a7"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "contract TokenExample",
+						"name": "_tokenContract",
+						"type": "address"
+					}
+				],
+				"name": "CampaignSales",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "tokencontract",
+				"outputs": [
+					{
+						"internalType": "contract TokenExample",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/CampaignSale.sol": "CampaignSale"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@openzeppelin/contracts/finance/PaymentSplitter.sol": {
+			"keccak256": "0x6b00d7dc8fa234c125be94378f44354efc303e32212b9334c7b05ee07ae3266c",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://87c5298696016d7fe9552f944ddefdbf9fa6436a34356e06b1502467d1676478",
+				"dweb:/ipfs/QmTetzQbfrPJzaENR2iUEG6VbZH7EQw7C7myyTeMwj3fkU"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/ERC20.sol": {
+			"keccak256": "0x662b9a3e9f233baae6d71604c754d64e83b830619c1a6d884bf6d580f721cfa9",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://1e5aaa93fe5e2323d13497939edb1bcb495762c9d54ee71305e7b9d838252216",
+				"dweb:/ipfs/QmZCPqXXMMXyNRREaeKRZ8uZg4g4WjGoyMHZSr6He4vpMG"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+			"keccak256": "0x86c14973ef3c7c92e70f12a3ac006b493b6c1113ce1da734ab42bbc0a6b513e2",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://1782d170cef01249659816b77815d16efb0685a2645d0fac8594f9a7e4ad7dc1",
+				"dweb:/ipfs/QmdrNnPxe2WydfDCUgufK2SkuesSttiAxCaBni6uVmML6Y"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol": {
+			"keccak256": "0x750e44d21c2a68e37d0a653708ab407fa686a9913954315acb5b8ee62b13ede2",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://63caf25854fdac2eac3e447b680ed3731a5f91c694060e4f4c740f6dec77515d",
+				"dweb:/ipfs/QmS8KSxahitmgbYrsMFmwQwQguRn2Li1bcj9o881N6UEpL"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol": {
+			"keccak256": "0xa445340238c3cbec8e82693c9709f5877d8c9e82c969562d0e6bc63fa0f30961",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6dc5ea56d1569df883046733ae90eb331e93623a59152a0d029300afb49b0a71",
+				"dweb:/ipfs/QmaMSW63iqPVZJUPjiBV5kxYhUrWbrqrm838KEe2kcj7Fv"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/utils/TokenTimelock.sol": {
+			"keccak256": "0x819d59ff155356123a6d63463fcbdf329ff5fd8cb03c059190d9b41bf257e10c",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://4c8bf6943bf35da1c303b03bf80123c3356aa9035d45740b02597fe34cbf5fec",
+				"dweb:/ipfs/QmTWDgEtHU5j5KcoLkZm3XQtHskKTd5fZKRXTbsKjS5KDj"
+			]
+		},
+		"@openzeppelin/contracts/utils/Address.sol": {
+			"keccak256": "0x85c79373fa21bb27e0c79326fc64f28d37fc09f85ac7742afe55405c4c3cf274",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://7c1dcc8d5faab1747f83c9a8179a1e8477ba25473506ee153a949a0d511b8486",
+				"dweb:/ipfs/QmVJ8RgJr7Wi6gCkoZnNJ9nfM4fcdF9kwGa7mswM3QtFwz"
+			]
+		},
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0x2e2ac762cc60af55c199a4926f4c360aa00cec4af6dfed7475fc866353ea6c58",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://98f72b227c30903022ee8a898b55dacbbcc73d633e10022edcaeea61e4ef312e",
+				"dweb:/ipfs/QmedXrqXE7r6Pazs4aBfwDJNPdiw25ovisBiWZ3EACFQFh"
+			]
+		},
+		"@openzeppelin/contracts/utils/math/SafeMath.sol": {
+			"keccak256": "0xb4978d0030a3586e9df254340fdaeb6feafd04f2f0c25058e71b573bda9012ce",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://03544bd906446e796a53bb20182510e05916971db0943d43371a1da2f9375813",
+				"dweb:/ipfs/QmXDscVEBmzasfLt6azg8zksXRuzEE2XfEyuuUPP4NiK4X"
+			]
+		},
+		"contracts/CampaignSale.sol": {
+			"keccak256": "0x5d79dc75b4a2014fe82d9cdb455fb3ad768fb246f67203e24f36b870d394a276",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://a1a36b52999cf38a7ff9f48cbb85e797ad9079bab1dfe9d0125933afd41ddbb6",
+				"dweb:/ipfs/QmehknbC4L7yL48RiEWQDZRDtdi6bUS8FfmegakKyKqu8B"
+			]
+		},
+		"contracts/TokenExample.sol": {
+			"keccak256": "0xec50a5e28f4358233cc7352dc7dd62956a1feb53fa22ea3f9b45b2630853b541",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://5ffab77546e0adbd2aa3b380b700f27db42ba07a0899ce23cf7b4088975d4f9f",
+				"dweb:/ipfs/QmNM9Xqkt3MzUghm8eqAXKp47ccbr6MYmzEXpA8FHgVsLw"
+			]
+		}
+	},
+	"version": 1
+}

@@ -1,0 +1,218 @@
+{
+	"compiler": {
+		"version": "0.8.7+commit.e28d00a7"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_adnin",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "_creatorName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "_coinName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "_coinSymbol",
+						"type": "string"
+					}
+				],
+				"stateMutability": "payable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "previousOwner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferred",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "coin_amount_to_1Ether",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getCampaignInfo",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "renounceOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {
+				"owner()": {
+					"details": "Returns the address of the current owner."
+				},
+				"renounceOwnership()": {
+					"details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+				},
+				"transferOwnership(address)": {
+					"details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+				}
+			},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/CampaignCreate.sol": "CampaignCreate"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@openzeppelin/contracts/access/Ownable.sol": {
+			"keccak256": "0xa6f2be28404e8f1c7490b55ca772b22e2b4ba82beb2148d8bdf24785e02485cf",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://50e704dbe12ffe90b0a5ebbaa58c844bc491bb9bafc24d2168e0cb38fb775175",
+				"dweb:/ipfs/QmVcc8xvfRnqNbnZB8iHZgnBiqo6mkAD8F8iGYPLWiTqGr"
+			]
+		},
+		"@openzeppelin/contracts/finance/PaymentSplitter.sol": {
+			"keccak256": "0x6b00d7dc8fa234c125be94378f44354efc303e32212b9334c7b05ee07ae3266c",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://87c5298696016d7fe9552f944ddefdbf9fa6436a34356e06b1502467d1676478",
+				"dweb:/ipfs/QmTetzQbfrPJzaENR2iUEG6VbZH7EQw7C7myyTeMwj3fkU"
+			]
+		},
+		"@openzeppelin/contracts/utils/Address.sol": {
+			"keccak256": "0x85c79373fa21bb27e0c79326fc64f28d37fc09f85ac7742afe55405c4c3cf274",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://7c1dcc8d5faab1747f83c9a8179a1e8477ba25473506ee153a949a0d511b8486",
+				"dweb:/ipfs/QmVJ8RgJr7Wi6gCkoZnNJ9nfM4fcdF9kwGa7mswM3QtFwz"
+			]
+		},
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0x2e2ac762cc60af55c199a4926f4c360aa00cec4af6dfed7475fc866353ea6c58",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://98f72b227c30903022ee8a898b55dacbbcc73d633e10022edcaeea61e4ef312e",
+				"dweb:/ipfs/QmedXrqXE7r6Pazs4aBfwDJNPdiw25ovisBiWZ3EACFQFh"
+			]
+		},
+		"@openzeppelin/contracts/utils/math/SafeMath.sol": {
+			"keccak256": "0xb4978d0030a3586e9df254340fdaeb6feafd04f2f0c25058e71b573bda9012ce",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://03544bd906446e796a53bb20182510e05916971db0943d43371a1da2f9375813",
+				"dweb:/ipfs/QmXDscVEBmzasfLt6azg8zksXRuzEE2XfEyuuUPP4NiK4X"
+			]
+		},
+		"contracts/CampaignCreate.sol": {
+			"keccak256": "0x7718ea4965cb6a1547242a8b4310edee1c89b596cbea27c166b5299466836365",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://90a925b6130b8eb0be7cb3aa95abf33914b7ea5838b164d60ca2ec06c2307096",
+				"dweb:/ipfs/QmScPaixqr3hDqqw8z3KiFD5bBi6WUa8nfcqYgLesjzovk"
+			]
+		},
+		"contracts/ConfirmAddress.sol": {
+			"keccak256": "0xb32a31d9f84db98306e6985f5f8f3aac1aca609c43259f2e52268d1f962cdf6e",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://be99265cbb8abc71d29c470297a9d91808d9af874639a850b8c3d519c75d9102",
+				"dweb:/ipfs/QmSKGPp4Pug7kSGRSsQab33uXbUfWcHK8Kd1Afk9o3VHvt"
+			]
+		}
+	},
+	"version": 1
+}
