@@ -354,35 +354,35 @@
 	},
 	"sources": {
 		"@openzeppelin/contracts/token/ERC20/ERC20.sol": {
-			"keccak256": "0xb03df8481a954604ad0c9125680893b2e3f7ff770fe470e38b89ac61b84e8072",
+			"keccak256": "0x662b9a3e9f233baae6d71604c754d64e83b830619c1a6d884bf6d580f721cfa9",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://b34655953d18ba3a45b762fb6bdbb6549af69a27435e10ece178742bf70baf45",
-				"dweb:/ipfs/QmcqjUoFLLMyx7dbwSHUnDBH6aphkVHXWQvQRRev5EAWEh"
+				"bzz-raw://1e5aaa93fe5e2323d13497939edb1bcb495762c9d54ee71305e7b9d838252216",
+				"dweb:/ipfs/QmZCPqXXMMXyNRREaeKRZ8uZg4g4WjGoyMHZSr6He4vpMG"
 			]
 		},
 		"@openzeppelin/contracts/token/ERC20/IERC20.sol": {
-			"keccak256": "0x027b891937d20ccf213fdb9c31531574256de774bda99d3a70ecef6e1913ed2a",
+			"keccak256": "0x86c14973ef3c7c92e70f12a3ac006b493b6c1113ce1da734ab42bbc0a6b513e2",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://087318b21c528119f649899f5b5580566dd8d7b0303d4904bd0e8580c3545f14",
-				"dweb:/ipfs/Qmbn5Mj7aUn8hJuQ8VrQjjEXRsXyJKykgnjR9p4C3nfLtL"
+				"bzz-raw://1782d170cef01249659816b77815d16efb0685a2645d0fac8594f9a7e4ad7dc1",
+				"dweb:/ipfs/QmdrNnPxe2WydfDCUgufK2SkuesSttiAxCaBni6uVmML6Y"
 			]
 		},
 		"@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol": {
-			"keccak256": "0x83fe24f5c04a56091e50f4a345ff504c8bff658a76d4c43b16878c8f940c53b2",
+			"keccak256": "0x750e44d21c2a68e37d0a653708ab407fa686a9913954315acb5b8ee62b13ede2",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://d4c3df1a7ca104b633a7d81c6c6f5192367d150cd5a32cba81f7f27012729013",
-				"dweb:/ipfs/QmSim72e3ZVsfgZt8UceCvbiSuMRHR6WDsiamqNzZahGSY"
+				"bzz-raw://63caf25854fdac2eac3e447b680ed3731a5f91c694060e4f4c740f6dec77515d",
+				"dweb:/ipfs/QmS8KSxahitmgbYrsMFmwQwQguRn2Li1bcj9o881N6UEpL"
 			]
 		},
 		"@openzeppelin/contracts/utils/Context.sol": {
-			"keccak256": "0x90565a39ae45c80f0468dc96c7b20d0afc3055f344c8203a0c9258239f350b9f",
+			"keccak256": "0x2e2ac762cc60af55c199a4926f4c360aa00cec4af6dfed7475fc866353ea6c58",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://26e8b38a7ac8e7b4463af00cf7fff1bf48ae9875765bf4f7751e100124d0bc8c",
-				"dweb:/ipfs/QmWcsmkVr24xmmjfnBQZoemFniXjj3vwT78Cz6uqZW1Hux"
+				"bzz-raw://98f72b227c30903022ee8a898b55dacbbcc73d633e10022edcaeea61e4ef312e",
+				"dweb:/ipfs/QmedXrqXE7r6Pazs4aBfwDJNPdiw25ovisBiWZ3EACFQFh"
 			]
 		},
 		"contracts/TokenExample.sol": {

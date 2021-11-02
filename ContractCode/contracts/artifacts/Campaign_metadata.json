@@ -9,7 +9,7 @@
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "_adnin",
+						"name": "_admin",
 						"type": "address"
 					},
 					{
@@ -26,6 +26,11 @@
 						"internalType": "string",
 						"name": "_coinSymbol",
 						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_coin_to_ether",
+						"type": "uint256"
 					}
 				],
 				"stateMutability": "payable",
@@ -64,23 +69,19 @@
 				"type": "function"
 			},
 			{
-				"inputs": [],
-				"name": "getCampaignInfo",
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "isContract",
 				"outputs": [
 					{
-						"internalType": "string",
+						"internalType": "bool",
 						"name": "",
-						"type": "string"
-					},
-					{
-						"internalType": "string",
-						"name": "",
-						"type": "string"
-					},
-					{
-						"internalType": "string",
-						"name": "",
-						"type": "string"
+						"type": "bool"
 					}
 				],
 				"stateMutability": "view",
@@ -143,7 +144,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/CampaignCreate.sol": "CampaignCreate"
+			"contracts/Campaign.sol": "Campaign"
 		},
 		"evmVersion": "london",
 		"libraries": {},
@@ -189,6 +190,14 @@
 				"dweb:/ipfs/QmedXrqXE7r6Pazs4aBfwDJNPdiw25ovisBiWZ3EACFQFh"
 			]
 		},
+		"@openzeppelin/contracts/utils/Strings.sol": {
+			"keccak256": "0xd2f5a48a2733d28b75fe2e72d2d529daedd929a15fa7352d9ac20f6cd3e669fb",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://2a9f46eba504744121b3bc97804c93cda7aef861cc56ea5f760f25fb280f71c9",
+				"dweb:/ipfs/QmbszNNUMg9FwjjrJUJBZa3wmiQFMJ6rtBWbaNXrZyf8pF"
+			]
+		},
 		"@openzeppelin/contracts/utils/math/SafeMath.sol": {
 			"keccak256": "0xb4978d0030a3586e9df254340fdaeb6feafd04f2f0c25058e71b573bda9012ce",
 			"license": "MIT",
@@ -197,20 +206,28 @@
 				"dweb:/ipfs/QmXDscVEBmzasfLt6azg8zksXRuzEE2XfEyuuUPP4NiK4X"
 			]
 		},
-		"contracts/CampaignCreate.sol": {
-			"keccak256": "0x7718ea4965cb6a1547242a8b4310edee1c89b596cbea27c166b5299466836365",
+		"contracts/Campaign.sol": {
+			"keccak256": "0x615c901a71fa3384d9e2635e62256392949d9caf3f116dec49240446c7414696",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://90a925b6130b8eb0be7cb3aa95abf33914b7ea5838b164d60ca2ec06c2307096",
-				"dweb:/ipfs/QmScPaixqr3hDqqw8z3KiFD5bBi6WUa8nfcqYgLesjzovk"
+				"bzz-raw://ffacf720ca0e7ada691e2e108a5af6d4bbc55df1474b65a0310dbaca074ef357",
+				"dweb:/ipfs/QmVvj7YndGLGCoXCXXHoSSQZcHoRUT17xJ7Mjk5bjZ2ecS"
 			]
 		},
 		"contracts/ConfirmAddress.sol": {
-			"keccak256": "0xb32a31d9f84db98306e6985f5f8f3aac1aca609c43259f2e52268d1f962cdf6e",
+			"keccak256": "0xbbc004795dff27cf022432dc81bf72a92f6cfa2beae089f44c9d59382df55831",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://be99265cbb8abc71d29c470297a9d91808d9af874639a850b8c3d519c75d9102",
-				"dweb:/ipfs/QmSKGPp4Pug7kSGRSsQab33uXbUfWcHK8Kd1Afk9o3VHvt"
+				"bzz-raw://5365c77a9b018d90a2e1d125e4426276fe3544caed62e969a2abc2235ab1fa44",
+				"dweb:/ipfs/QmQWVRW7LRTWZTxyBG9XLAbYm29ENzMaHT8W8KNBfeFm4L"
+			]
+		},
+		"contracts/StorageSlot.sol": {
+			"keccak256": "0x00cd660fb6829dab4a5a54538f99fe90e6963c07c8f130b2f740056f8bf4bbaf",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://32ec101de2057ab49582550f362f1249459432d193191c1df1785f78834f7315",
+				"dweb:/ipfs/QmaP3er6Y4wiL3Tyac3cXp9HiJdMvAxbuidFbhKtMSkwYG"
 			]
 		}
 	},
