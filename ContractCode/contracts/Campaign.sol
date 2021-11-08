@@ -31,6 +31,7 @@ contract Campaign is Ownable, ConfirmAddress{
      mapping(address => ProjectDetails) creatorsproj;
      address[] public creatorsAccts;
      address[] public projectsaccts;
+     address[] private Whitelist;
 
     // constructor for The creator address.
     constructor (address payable _CreatorsAddress) public {
@@ -81,4 +82,22 @@ contract Campaign is Ownable, ConfirmAddress{
         return(creatorsproj[ins].SoftCap, creatorsproj[ins].HardCap, creatorsproj[ins].StartSaleTime, creatorsproj[ins].EndSaleTime, creatorsproj[ins].Whitelist);
     }
     
+    // To add address to Whitelist
+    function addWhitelist(address _address) external {
+        require(_address != address(0), "Invalid address");
+        Whitelist.push(_address);
+    }
+    
+    // check the address in whitelist
+  function getWhitelist(address _address) public view returns(bool) {
+    uint i;
+    uint length = Whitelist.length; 
+    for (i = 0; i < length; i++) {
+      address _addressArr = Whitelist[i];
+      if (_addressArr == _address) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
