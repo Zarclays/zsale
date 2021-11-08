@@ -1,35 +1,84 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0;
+pragma solidity 0.8.9;
 
-// import "@openzeppelin/contracts/utils/StorageSlot.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
+import "./Authority/Ownable.sol";
+import "./Storing/StorageSlot.sol";
+import "./Confirmations/ConfirmAddress.sol";
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
-import "./ConfirmAddress.sol";
-import "./StorageSlot.sol";
+contract Campaign is Ownable, ConfirmAddress{
+     
+     // Creator Address.
+     address payable public CreatorAddress;
+     
+     // Struct Creator data using calldata
+     struct CreatorDetails{
+         string FirstName;
+         string LastName;
+         string Country;
+         string CoinName;
+         string CoinSymbol;
+     }
+     
+     struct ProjectDetails{
+         uint256 SoftCap;
+         uint256 HardCap;
+         uint256 StartSaleTime;
+         uint256 EndSaleTime;
+         bool Whitelist;
+     }
+     
+     mapping(address => CreatorDetails) creators;
+     mapping(address => ProjectDetails) creatorsproj;
+     address[] public creatorsAccts;
+     address[] public projectsaccts;
 
-contract Campaign is ConfirmAddress, Ownable{
-    
-     using StorageSlot for *;
-    
-    address admin;
-    
-    string private creatorName;
-    string private coinName;
-    string private coinSymbol;
-    
-    uint256 private totalCoinAvailable;
-    uint256 public coin_amount_to_1Ether = 100000001;
-    
-    
-    constructor(address _admin, string memory _creatorName, string memory _coinName, string memory _coinSymbol, uint256 _coin_to_ether) public payable{
-        admin = _admin;
-        creatorName = _creatorName;
-        coinName = _coinName;
-        coinSymbol = _coinSymbol;
-        coin_amount_to_1Ether = _coin_to_ether;
+    // constructor for The creator address.
+    constructor (address payable _CreatorsAddress) public {
+        CreatorAddress = _CreatorsAddress;
+    }
+
+    // this is for the creatorDetails to fill Names, Country, Coinname andCoinSymbol. 
+    function creatorDetails(address CreatorAddress_, string calldata FirstName_, string calldata LastName_, string calldata Country_, string calldata CoinName_, string calldata CoinSymbol_ ) public {
+        
+        CreatorDetails storage creation = creators[CreatorAddress_];
+        creation.FirstName = FirstName_;
+        creation.LastName = LastName_;
+        creation.Country = Country_;
+        creation.CoinName = CoinName_;
+        creation.CoinSymbol = CoinSymbol_;
+        
+        creatorsAccts.push(CreatorAddress_);
     }
     
+    function getCreatorDetails()  public view returns (address[] memory) {
+        return creatorsAccts;
+    }
+    
+    function getCreatordetails(address ins) public view returns(string memory, string memory, string memory, string memory, string memory ){
+        return(creators[ins].FirstName, creators[ins].LastName, creators[ins].Country, creators[ins].CoinName, creators[ins].CoinSymbol);
+    }
+    
+    // This is for When the project will start and end and other things that has to do with the sale.
+    function CreateSaleDetails(address TokenAddress_, uint256 SoftCap_, uint256 HardCap_, uint256 SaleStart_, uint256 SaleEnd_, bool Whitelist_) public {
+        
+        ProjectDetails storage salecreate = creatorsproj[TokenAddress_];
+        salecreate.SoftCap = SoftCap_;
+        salecreate.HardCap = HardCap_;
+        salecreate.StartSaleTime = block.timestamp + SaleStart_;
+        salecreate.EndSaleTime = block.timestamp + SaleEnd_;
+        salecreate.Whitelist = Whitelist_;
+        
+        projectsaccts.push(TokenAddress_);
+        
+        // To compare SoftCap is higher than HardCap.
+        
+    }
+    function getSaleDetails() public view returns(address[] memory){
+        return projectsaccts;
+    }
+    
+    function getSaleDetails(address ins) public view returns(uint256, uint256, uint256, uint256, bool){
+        return(creatorsproj[ins].SoftCap, creatorsproj[ins].HardCap, creatorsproj[ins].StartSaleTime, creatorsproj[ins].EndSaleTime, creatorsproj[ins].Whitelist);
+    }
     
 }
