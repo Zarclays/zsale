@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.9;
+pragma solidity 0.8.10;
 
 import "./Authority/Ownable.sol";
 import "./Storing/StorageSlot.sol";
 import "./Confirmations/ConfirmAddress.sol";
+import "./OtherSaleDetails.sol";
 
-contract Campaign is Ownable, ConfirmAddress{
+contract Campaign is Ownable, ConfirmAddress, OtherSaleDetails{
      
      // Creator Address.
      address payable public CreatorAddress;
@@ -19,19 +20,19 @@ contract Campaign is Ownable, ConfirmAddress{
          string CoinSymbol;
      }
      
-     struct ProjectDetails{
-         uint256 SoftCap;
-         uint256 HardCap;
-         uint256 StartSaleTime;
-         uint256 EndSaleTime;
-         bool Whitelist;
-     }
+    //  struct ProjectDetails{
+    //      uint256 SoftCap;
+    //      uint256 HardCap;
+    //      uint256 StartSaleTime;
+    //      uint256 EndSaleTime;
+    //      bool Whitelist;
+    //  }
      
      mapping(address => CreatorDetails) creators;
-     mapping(address => ProjectDetails) creatorsproj;
+    //  mapping(address => ProjectDetails) creatorsproj;
      address[] public creatorsAccts;
      address[] public projectsaccts;
-     address[] private Whitelist;
+    //  address[] private Whitelist;
 
     // constructor for The creator address.
     constructor (address payable _CreatorsAddress) public {
@@ -60,44 +61,58 @@ contract Campaign is Ownable, ConfirmAddress{
     }
     
     // This is for When the project will start and end and other things that has to do with the sale.
-    function CreateSaleDetails(address TokenAddress_, uint256 SoftCap_, uint256 HardCap_, uint256 SaleStart_, uint256 SaleEnd_, bool Whitelist_) public {
+    // function CreateSaleDetails(address TokenAddress_, uint256 SoftCap_, uint256 HardCap_, uint256 SaleStart_, uint256 SaleEnd_, bool Whitelist_) public {
         
-        ProjectDetails storage salecreate = creatorsproj[TokenAddress_];
-        salecreate.SoftCap = SoftCap_;
-        salecreate.HardCap = HardCap_;
-        salecreate.StartSaleTime = block.timestamp + SaleStart_;
-        salecreate.EndSaleTime = block.timestamp + SaleEnd_;
-        salecreate.Whitelist = Whitelist_;
+        // // ProjectDetails storage salecreate = creatorsproj[TokenAddress_];
+        // salecreate.SoftCap = SoftCap_;
+        // salecreate.HardCap = HardCap_;
+        // salecreate.StartSaleTime = block.timestamp + SaleStart_;
+        // salecreate.EndSaleTime = block.timestamp + SaleEnd_;
+        // salecreate.Whitelist = Whitelist_;
         
-        projectsaccts.push(TokenAddress_);
+        // projectsaccts.push(TokenAddress_);
         
         // To compare SoftCap is higher than HardCap.
-        
+        // but the code has not been confirmed yet
     }
-    function getSaleDetails() public view returns(address[] memory){
-        return projectsaccts;
-    }
+    // function getSaleDetails() public view returns(address[] memory){
+    //     return projectsaccts;
+    // }
     
-    function getSaleDetails(address ins) public view returns(uint256, uint256, uint256, uint256, bool){
-        return(creatorsproj[ins].SoftCap, creatorsproj[ins].HardCap, creatorsproj[ins].StartSaleTime, creatorsproj[ins].EndSaleTime, creatorsproj[ins].Whitelist);
-    }
+    // function getSaleDetails(address ins) public view returns(uint256, uint256, uint256, uint256, bool){
+    //     return(creatorsproj[ins].SoftCap, creatorsproj[ins].HardCap, creatorsproj[ins].StartSaleTime, creatorsproj[ins].EndSaleTime, creatorsproj[ins].Whitelist);
+    // }
     
     // To add address to Whitelist
-    function addWhitelist(address _address) external {
-        require(_address != address(0), "Invalid address");
-        Whitelist.push(_address);
-    }
+//     function addWhitelist(address _address) external {
+//         require(_address != address(0), "Invalid address");
+//         Whitelist.push(_address);
+//     }
     
-    // check the address in whitelist
-  function getWhitelist(address _address) public view returns(bool) {
-    uint i;
-    uint length = Whitelist.length; 
-    for (i = 0; i < length; i++) {
-      address _addressArr = Whitelist[i];
-      if (_addressArr == _address) {
-        return true;
-      }
-    }
-    return false;
+//     // check the address in whitelist
+//   function getWhitelist(address _address) public view returns(bool) {
+//     uint i;
+//     uint length = Whitelist.length; 
+//     for (i = 0; i < length; i++) {
+//       address _addressArr = Whitelist[i];
+//       if (_addressArr == _address) {
+//         return true;
+//       }
+//     }
+//     return false;
+//   }
+
+  //To send Value to other address
+  function sendValue(address payable recipient, uint256 amount) internal {
+      require(address(this).balance >= amount, "Address:Insufficient balance");
+
+     // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
+        (bool success, ) = recipient.call{ value: amount }("");
+        require(success, "Address: unable to send value, recipient may have reverted");
+  }
+
+  // To send bnb to the contract address
+  function recieve() external payable{
+      
   }
 }
