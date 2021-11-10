@@ -20,6 +20,45 @@
 			},
 			{
 				"inputs": [],
+				"name": "MaximumBuy",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "MinimumBuy",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "PresaleRate",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
 				"name": "SoftCap",
 				"outputs": [
 					{
@@ -61,11 +100,30 @@
 				"inputs": [
 					{
 						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "contributions",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
 						"name": "_address",
 						"type": "address"
 					}
 				],
-				"name": "getWhitelistOne",
+				"name": "getWhitelist",
 				"outputs": [
 					{
 						"internalType": "bool",
@@ -74,6 +132,29 @@
 					}
 				],
 				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_presalerate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_minbuy",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_maxbuy",
+						"type": "uint256"
+					}
+				],
+				"name": "getsaleDetails",
+				"outputs": [],
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -102,6 +183,11 @@
 						"internalType": "bool",
 						"name": "_WhiteListEnabled",
 						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_goal",
+						"type": "uint256"
 					}
 				],
 				"name": "getsaleDetails",
@@ -112,6 +198,19 @@
 			{
 				"inputs": [],
 				"name": "maxCap",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "raisedAmount",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -162,6 +261,19 @@
 						"internalType": "address",
 						"name": "",
 						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "totalBnb",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -228,11 +340,11 @@
 	},
 	"sources": {
 		"contracts/OtherSaleDetails.sol": {
-			"keccak256": "0xaf8d5a7e42f4fe9299e2102ffda41db0521a56b122e465cd4fcd2d439ad6227b",
+			"keccak256": "0xe979d3f5406f94df8a3fb50364475582319d55ff01d130a4420d00d7b5565f8e",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://29c821cb5430eaa3098c73fd070de755feee20f52d21117f0d2cadf98ba4de5f",
-				"dweb:/ipfs/QmagrPvQLoFfG41HPpx9pubBqZLLPVP6EibbsudB9QV6YG"
+				"bzz-raw://c55354192b54498954e4897c7039da1ce76084dc27e6bf419a03bf594233c0f9",
+				"dweb:/ipfs/QmWwxPvQQzvk95k2e1r3hHghKyqtXiJ5uf2aCcs7ociCY7"
 			]
 		}
 	},

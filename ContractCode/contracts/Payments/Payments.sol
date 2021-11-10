@@ -31,8 +31,8 @@ contract Payments is Ownable, ConfirmAddress, OtherSaleDetails{
 
 // To Contribute To the Sale
 function contribute() public payable{
-    require(block.number < saleEndTime);
-    require(block.number > saleStartTime);
+    require(block.number < saleEndTime, "Sale Has Ended");
+    require(block.number > saleStartTime, "Sale Has Not Began");
 }
 // To get refund when the requirement not ment
 // function getRefund() public {
@@ -48,4 +48,6 @@ function contribute() public payable{
 // function createSpendingReuest(string memory _description, address _address, uint _value) public onlyOwner{
     
 // }
+
+
 }
