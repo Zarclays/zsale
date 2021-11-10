@@ -4,21 +4,24 @@ pragma solidity 0.8.10;
 // This is where to store other details like SaleTime, WhiteList e.t.c.
 contract OtherSaleDetails{
 
-    uint256 public saleStartTime;
-    uint256 public saleEndTime;
-    uint256 public SoftCap;
-    uint256 public HardCap;
+    uint256 public immutable saleStartTime;
+    uint256 public immutable saleEndTime;
+    uint256 public immutable SoftCap;
+    uint256 public immutable HardCap;
+    uint256 public totalParticipant;
     bool public WhitelistEnabled;
 
     address[] private whitelist;
+    mapping(address => uint) buy;
+    address[] public totaParticipants;
 
 
-    function getDetails(uint256 _saleStartTime, uint256 _saleEndTime, uint256 _SoftCap, uint256 _HardCap, bool _WhiteListEnable) public {
-        saleStartTime = _saleStartTime;
-        saleEndTime = _saleEndTime;
-        SoftCap = _SoftCap;
-        HardCap = _HardCap;
-        WhitelistEnabled = _WhiteListEnable;
-    }
+   constructor(uint256 __saleStartTime, uint256 _saleEndTime, uint256 _softCap, uint256 _Hardcap) public {
+       saleStartTime = __saleStartTime;
+       saleEndTime = _saleEndTime;
+       SoftCap = _softCap;
+       HardCap = _Hardcap;
+       totalParticipant = totaParticipants;
+   }
 
 }
