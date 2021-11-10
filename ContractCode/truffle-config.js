@@ -136,6 +136,13 @@ module.exports = {
        timeoutBlocks: 200,
        skipDryRun: true
      }
+    celomainnet:{
+     provider: () => new HDWalletProvider(mnemonic, "https://forno.celo.org"),
+       network_id: 42220,
+       confirmations: 10,
+       timeoutBlocks: 200,
+       skipDryRun: true
+    },
   },
 
   // Set default mocha options here, use special reporters etc.
