@@ -71,7 +71,6 @@ module.exports = {
     // network_id: 2111,   // This network is yours, in the cloud.
     // production: true    // Treats this network as if it was a public net. (default: false)
     // }
-<<<<<<< Updated upstream
     ropsten: {
       provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161`),
       network_id: 3,       // Ropsten's id
@@ -136,7 +135,7 @@ module.exports = {
        confirmations: 10,
        timeoutBlocks: 200,
        skipDryRun: true
-     }
+     },
     celomainnet:{
      provider: () => new HDWalletProvider(mnemonic, "https://forno.celo.org"),
        network_id: 42220,
@@ -144,8 +143,6 @@ module.exports = {
        timeoutBlocks: 200,
        skipDryRun: true
     },
-=======
->>>>>>> Stashed changes
   },
 
   // Set default mocha options here, use special reporters etc.
