@@ -8,7 +8,7 @@ contract OtherSaleDetails{
     uint256 public immutable saleEndTime;
     uint256 public immutable SoftCap;
     uint256 public immutable HardCap;
-    uint256 public totalParticipant;
+    address[] public totalParticipant;
     bool public WhitelistEnabled;
 
     address[] private whitelist;
@@ -16,12 +16,17 @@ contract OtherSaleDetails{
     address[] public totaParticipants;
 
 
-   constructor(uint256 __saleStartTime, uint256 _saleEndTime, uint256 _softCap, uint256 _Hardcap) public {
+   constructor(uint256 __saleStartTime, uint256 _saleEndTime, uint256 _softCap, uint256 _Hardcap, bool _whiteListEnabled) public {
        saleStartTime = __saleStartTime;
        saleEndTime = _saleEndTime;
        SoftCap = _softCap;
        HardCap = _Hardcap;
+       WhitelistEnabled = _whiteListEnabled;
        totalParticipant = totaParticipants;
+   }
+
+   function addWhiteList(address _address) external {
+       require(WhitelistEnabled == true, "WhiteList is not Enabled");
    }
 
 }
