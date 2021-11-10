@@ -7,6 +7,20 @@ import "../Authority/Ownable.sol";
 import "../Confirmations/ConfirmAddress.sol";
 
 contract Payments is Ownable, ConfirmAddress, OtherSaleDetails{
+    
+    
+    // For spending request
+    struct Request{
+        string description;
+        uint value;
+        address recipient;
+        bool completed;
+        uint numberOfVoters;
+        mapping(address => bool) voters;
+    }
+
+    Request[] public request;
+
     // To send Value
   function senValue(address payable recipient, uint256 amount) internal {
       require(address(this).balance >= amount, "Address: Insufficient balance");
@@ -15,22 +29,23 @@ contract Payments is Ownable, ConfirmAddress, OtherSaleDetails{
       (bool success,) = recipient.call{value: amount}("");require(success, "Address: unable to send value, recipient may have reverted");
   }
 
-// To send Bnb to the contract
-//  function receive() external payable  {
-//      require(block.timestamp >= saleStartTime, "The sale is not started yet "); // solhint-disable
-//      require(block.timestamp <= saleEndTime, "The sale is closed"); // solhint-disable
-//      require(totalBnbRecieved + msg.value <= maxCap, "buyTokens: purchase would exceed max cap");
+// To Contribute To the Sale
+function contribute() public payable{
+    require(block.number < saleEndTime);
+    require(block.number > saleStartTime);
+}
+// To get refund when the requirement not ment
+// function getRefund() public {
+//     require(block.number > saleEndTime);
+//     require(block.number >= saleStartTime);
+//     require(contributions[msg.sender] > 0);
 
-//      if (getWhitelist(msg.sender)) { 
-//       require(totalBnbRecieved + msg.value <= maxCap, "buyTokens: purchase would exceed Tier one max cap");
-//       require(buy[msg.sender] + msg.value <= maxAllocaPerUserTierOne ,"buyTokens:You are investing more than your tier-1 limit!");
-//       buy[msg.sender] += msg.value;
-//       totalBnbReceived += msg.value;
-//       totalBnbInTierOne += msg.value;
-//       sendValue(projectOwner, address(this).balance);
-//      } else {
-//          revert();
-//      }
-//  }
-     
+//     msg.sender.transfer(contributions[msg.sender]);
+//     contributions[msg.sender] = 0;
+// }
+
+// Spending Request
+// function createSpendingReuest(string memory _description, address _address, uint _value) public onlyOwner{
+    
+// }
 }

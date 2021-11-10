@@ -77,6 +77,55 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "contribute",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "contributions",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_description",
+						"type": "string"
+					},
+					{
+						"internalType": "address",
+						"name": "_address",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_value",
+						"type": "uint256"
+					}
+				],
+				"name": "createSpendingReuest",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -84,7 +133,7 @@
 						"type": "address"
 					}
 				],
-				"name": "getWhitelistOne",
+				"name": "getWhitelist",
 				"outputs": [
 					{
 						"internalType": "bool",
@@ -121,6 +170,11 @@
 						"internalType": "bool",
 						"name": "_WhiteListEnabled",
 						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_goal",
+						"type": "uint256"
 					}
 				],
 				"name": "getsaleDetails",
@@ -156,9 +210,54 @@
 			},
 			{
 				"inputs": [],
-				"name": "receive",
-				"outputs": [],
-				"stateMutability": "payable",
+				"name": "raisedAmount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "request",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "description",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "value",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "recipient",
+						"type": "address"
+					},
+					{
+						"internalType": "bool",
+						"name": "completed",
+						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "numberOfVoters",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -201,6 +300,19 @@
 						"internalType": "address",
 						"name": "",
 						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "totalBnb",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -296,27 +408,27 @@
 			]
 		},
 		"contracts/Confirmations/ConfirmAddress.sol": {
-			"keccak256": "0xdd8b407c9958c79ed1189f5721cfb1c3674476dc8c7ed25652dab4a2e7d15c6b",
+			"keccak256": "0x29f713d366756f469bb266ebcae9408186d4b9d946945238fc9d2ffc456204a8",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://4234245bfd8a8b831c7aefa5d8625c50eac6abb508a1a9df24fbfadda0720b7c",
-				"dweb:/ipfs/QmQE8k5eLqXsDXnS1T3TMAvTMK6V2kV6gZvcqckHnmMC9E"
+				"bzz-raw://4442b04c676f842b1ccc04791ae88e9f292ac8bbbbc98028a2bbb8fdb4ac67e3",
+				"dweb:/ipfs/QmWxuofb2tvW1CU5NPFUAfXPSiv26tbQWPwg2RALyPV9w6"
 			]
 		},
 		"contracts/OtherSaleDetails.sol": {
-			"keccak256": "0xaf8d5a7e42f4fe9299e2102ffda41db0521a56b122e465cd4fcd2d439ad6227b",
+			"keccak256": "0x5f2274a00588f9d8dac6e6ef804c42fd8831d9cc109518b21b1fa01ed3c585a5",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://29c821cb5430eaa3098c73fd070de755feee20f52d21117f0d2cadf98ba4de5f",
-				"dweb:/ipfs/QmagrPvQLoFfG41HPpx9pubBqZLLPVP6EibbsudB9QV6YG"
+				"bzz-raw://f1017da212a05727f24b57cfe54dea13f17092b16053668b1470abe5de720dff",
+				"dweb:/ipfs/Qmaq2AzjmEwKF1caXSirZ2y5gHnWoKQibCUEcXpwfeNkEZ"
 			]
 		},
 		"contracts/Payments/Payments.sol": {
-			"keccak256": "0x4bd3daa1854253a83651130a9d333ef65f9281a926ea67772b091ca3617c381a",
+			"keccak256": "0x60404533ba0561adbb9c53fb415539ec273bb867cd1c5d1b888e98e0e3b98fbb",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://56a0fe0472929de4cc48afd42388c9ee97321ba628e8be0b308dae611d023d0a",
-				"dweb:/ipfs/QmbXdsNrtXCm5MFPY8BsWeyc1eTZk1nNaMVVeLfagjyFc6"
+				"bzz-raw://faa22886049c7e60a5dfadd9370838a54c033c335eaa27e7661c67312a779664",
+				"dweb:/ipfs/QmYyDPBfQP8o5RJPXNNwEhxp6LnXtCmzhmksy8cBcs1NPX"
 			]
 		}
 	},
