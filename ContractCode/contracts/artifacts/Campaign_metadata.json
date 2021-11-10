@@ -1,0 +1,424 @@
+{
+	"compiler": {
+		"version": "0.8.10+commit.fc410830"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address payable",
+						"name": "_creatorsadrress",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "previousOwner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferred",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "CreatorAddress",
+				"outputs": [
+					{
+						"internalType": "address payable",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "HardCap",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "SoftCap",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "WhitelistEnabled",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_address",
+						"type": "address"
+					}
+				],
+				"name": "addWhitelist",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "CreatorAddress_",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "FirstName_",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "LastName_",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "Country_",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "CoinName_",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "CoinSymbol_",
+						"type": "string"
+					}
+				],
+				"name": "creatorDetails",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "creatorsAccts",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getCreatorDetails",
+				"outputs": [
+					{
+						"internalType": "address[]",
+						"name": "",
+						"type": "address[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "ins",
+						"type": "address"
+					}
+				],
+				"name": "getCreatordetails",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_address",
+						"type": "address"
+					}
+				],
+				"name": "getWhitelistOne",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_saleStartTime",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_saleEndTime",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_hardCap",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_softCap",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "_WhiteListEnabled",
+						"type": "bool"
+					}
+				],
+				"name": "getsaleDetails",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "saleEndTime",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "saleStartTime",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "totaParticipants",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "totalParticipant",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/Campaign.sol": "Campaign"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/Authority/Ownable.sol": {
+			"keccak256": "0x67e845ba2ff6515b01bc04fd66cb7fbe76674fe19b531a73d94bfe99f87591f4",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://bc192305faf272b9df487f01011b9cae5c54aa6a7707924b666e199a5e39bcb4",
+				"dweb:/ipfs/QmTV1SgRGr9jXDijaQMeQ7kowg3aeX3xNjFHbtLswUqfvS"
+			]
+		},
+		"contracts/Campaign.sol": {
+			"keccak256": "0x34ced15e6db7196a2264c8a60d7bacf353002b948adb73111eb404721928722d",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://629939d27d5da1127996da20df607e12ce6cb69738f679eb29487080eb106e10",
+				"dweb:/ipfs/QmNfZQrHDXG1guQ2JL9EcUaot7zXPPCnq3bq2nrZpGavvn"
+			]
+		},
+		"contracts/Confirmations/ConfirmAddress.sol": {
+			"keccak256": "0xdd8b407c9958c79ed1189f5721cfb1c3674476dc8c7ed25652dab4a2e7d15c6b",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://4234245bfd8a8b831c7aefa5d8625c50eac6abb508a1a9df24fbfadda0720b7c",
+				"dweb:/ipfs/QmQE8k5eLqXsDXnS1T3TMAvTMK6V2kV6gZvcqckHnmMC9E"
+			]
+		},
+		"contracts/OtherSaleDetails.sol": {
+			"keccak256": "0x2a9cac6a02b53624a8197f06567def3ee1cae13a2c66c1c746050601e8540a09",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ec5809f87500bf27a48c02ab41f1e48efe421653cb5ddff822361681bb4bee3c",
+				"dweb:/ipfs/QmYoZsWY2cqnKndY5vg3Z3tQUc9f8xT3vMXFTdxnDVhvGD"
+			]
+		},
+		"contracts/Payments/Payments.sol": {
+			"keccak256": "0xae5e616ee97ec56752f334f1190b1f7ef6177277a4c4b40dd63549912f62da1f",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://e4de88a189ae47e32e67dcf37ca8aed1f290594f6824443b9f1417d6cabb9728",
+				"dweb:/ipfs/Qmc4AE1R9L6HD1F99NyZMqivjwx2XNs3zhASgi7thiQ6iR"
+			]
+		}
+	},
+	"version": 1
+}

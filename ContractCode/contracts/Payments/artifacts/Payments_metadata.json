@@ -6,6 +6,25 @@
 	"output": {
 		"abi": [
 			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "previousOwner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferred",
+				"type": "event"
+			},
+			{
 				"inputs": [],
 				"name": "HardCap",
 				"outputs": [
@@ -124,6 +143,26 @@
 			},
 			{
 				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "receive",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
 				"name": "saleEndTime",
 				"outputs": [
 					{
@@ -198,6 +237,19 @@
 				],
 				"stateMutability": "view",
 				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
 			}
 		],
 		"devdoc": {
@@ -213,7 +265,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/OtherSaleDetails.sol": "OtherSaleDetails"
+			"contracts/Payments/Payments.sol": "Payments"
 		},
 		"evmVersion": "london",
 		"libraries": {},
@@ -227,12 +279,44 @@
 		"remappings": []
 	},
 	"sources": {
+		"contracts/Authority/Ownable.sol": {
+			"keccak256": "0x67e845ba2ff6515b01bc04fd66cb7fbe76674fe19b531a73d94bfe99f87591f4",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://bc192305faf272b9df487f01011b9cae5c54aa6a7707924b666e199a5e39bcb4",
+				"dweb:/ipfs/QmTV1SgRGr9jXDijaQMeQ7kowg3aeX3xNjFHbtLswUqfvS"
+			]
+		},
+		"contracts/Campaign.sol": {
+			"keccak256": "0x34ced15e6db7196a2264c8a60d7bacf353002b948adb73111eb404721928722d",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://629939d27d5da1127996da20df607e12ce6cb69738f679eb29487080eb106e10",
+				"dweb:/ipfs/QmNfZQrHDXG1guQ2JL9EcUaot7zXPPCnq3bq2nrZpGavvn"
+			]
+		},
+		"contracts/Confirmations/ConfirmAddress.sol": {
+			"keccak256": "0xdd8b407c9958c79ed1189f5721cfb1c3674476dc8c7ed25652dab4a2e7d15c6b",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://4234245bfd8a8b831c7aefa5d8625c50eac6abb508a1a9df24fbfadda0720b7c",
+				"dweb:/ipfs/QmQE8k5eLqXsDXnS1T3TMAvTMK6V2kV6gZvcqckHnmMC9E"
+			]
+		},
 		"contracts/OtherSaleDetails.sol": {
 			"keccak256": "0xaf8d5a7e42f4fe9299e2102ffda41db0521a56b122e465cd4fcd2d439ad6227b",
 			"license": "MIT",
 			"urls": [
 				"bzz-raw://29c821cb5430eaa3098c73fd070de755feee20f52d21117f0d2cadf98ba4de5f",
 				"dweb:/ipfs/QmagrPvQLoFfG41HPpx9pubBqZLLPVP6EibbsudB9QV6YG"
+			]
+		},
+		"contracts/Payments/Payments.sol": {
+			"keccak256": "0x4bd3daa1854253a83651130a9d333ef65f9281a926ea67772b091ca3617c381a",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://56a0fe0472929de4cc48afd42388c9ee97321ba628e8be0b308dae611d023d0a",
+				"dweb:/ipfs/QmbXdsNrtXCm5MFPY8BsWeyc1eTZk1nNaMVVeLfagjyFc6"
 			]
 		}
 	},

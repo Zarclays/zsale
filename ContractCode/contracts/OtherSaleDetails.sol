@@ -4,29 +4,44 @@ pragma solidity 0.8.10;
 // This is where to store other details like SaleTime, WhiteList e.t.c.
 contract OtherSaleDetails{
 
-    uint256 public immutable saleStartTime;
-    uint256 public immutable saleEndTime;
-    uint256 public immutable SoftCap;
-    uint256 public immutable HardCap;
+    uint256 public saleStartTime;
+    uint256 public saleEndTime;
+    uint256 public SoftCap;
+    uint256 public HardCap;
     address[] public totalParticipant;
+    uint256 public totalBnbRecieved;
     bool public WhitelistEnabled;
+    uint public  maxCap;
 
-    address[] private whitelist;
+    address[] private Whitelist;
     mapping(address => uint) buy;
     address[] public totaParticipants;
 
 
-   constructor(uint256 __saleStartTime, uint256 _saleEndTime, uint256 _softCap, uint256 _Hardcap, bool _whiteListEnabled) public {
-       saleStartTime = __saleStartTime;
-       saleEndTime = _saleEndTime;
-       SoftCap = _softCap;
-       HardCap = _Hardcap;
-       WhitelistEnabled = _whiteListEnabled;
-       totalParticipant = totaParticipants;
-   }
-
-   function addWhiteList(address _address) external {
-       require(WhitelistEnabled == true, "WhiteList is not Enabled");
-   }
-
+// To store Sale Details
+  function getsaleDetails(uint256 _saleStartTime, uint256 _saleEndTime, uint256 _hardCap, uint256 _softCap, bool _WhiteListEnabled) public {
+      saleStartTime = _saleStartTime;
+      saleEndTime = _saleEndTime;
+      SoftCap = _softCap;
+      HardCap = _hardCap;
+      WhitelistEnabled = _WhiteListEnabled;
+  }
+// Add Address into The Whitelist
+  function addWhitelist(address _address) external {
+    require(_address != address(0), "Invalid address");
+     require(WhitelistEnabled == true, "WhiteList is not Enabled");
+    Whitelist.push(_address);
+  }
+// Check the address in the WhiteList
+ function getWhitelistOne(address _address) public view returns(bool) {
+    uint i;
+    uint length = Whitelist.length;
+    for (i = 0; i < length; i++) {
+      address _addressArr = Whitelist[i];
+      if (_addressArr == _address) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
