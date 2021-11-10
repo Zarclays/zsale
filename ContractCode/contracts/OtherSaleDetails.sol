@@ -10,6 +10,7 @@ contract OtherSaleDetails{
     uint256 public HardCap;
     address[] public totalParticipant;
     uint256 public totalBnbRecieved;
+    uint256 public taotalBnb;
     bool public WhitelistEnabled;
     uint public  maxCap;
 
@@ -33,7 +34,7 @@ contract OtherSaleDetails{
     Whitelist.push(_address);
   }
 // Check the address in the WhiteList
- function getWhitelistOne(address _address) public view returns(bool) {
+ function getWhitelist(address _address) public view returns(bool) {
     uint i;
     uint length = Whitelist.length;
     for (i = 0; i < length; i++) {
