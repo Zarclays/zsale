@@ -115,6 +115,78 @@ module.exports = {
     // network_id: 2111,   // This network is yours, in the cloud.
     // production: true    // Treats this network as if it was a public net. (default: false)
     // }
+    ropsten: {
+      provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161`),
+      network_id: 3,       // Ropsten's id
+     // gas: 5500000,        // Ropsten has a lower block limit than mainnet
+      confirmations: 10,    // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
+     // },
+     // Useful for private networks
+     // private: {
+     // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
+     // network_id: 2111,   // This network is yours, in the cloud.
+     // production: true    // Treats this network as if it was a public net. (default: false)
+      },
+ 
+      testnet: {
+       provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s1.binance.org:8545`),
+       network_id: 97,
+       confirmations: 10,
+       timeoutBlocks: 200,
+       skipDryRun: true
+     },
+     bsc: {
+       provider: () => new HDWalletProvider(mnemonic, `https://bsc-dataseed1.binance.org`),
+       network_id: 56,
+       confirmations: 10,
+       timeoutBlocks: 200,
+       skipDryRun: true
+     },
+      gorli: {
+        provider: () => new HDWalletProvider(mnemonic, "https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"),
+        network_id: 5,
+        confirmations: 10,
+        timeoutBlocks: 200,
+        skipDryRun: true
+ 
+      },
+      rinkbery: {
+        provider: () => new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/a078a649555c418ba0a3d39c2b0f5ec8"),
+        network_id: 4,
+        confirmations: 10,
+        timeoutBlocks: 200,
+        skipDryRun: true
+      },
+      etheriummainnet: {
+       provider: () => new HDWalletProvider(mnemonic, "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"),
+       network_id: 1,
+       confirmations: 10,
+       timeoutBlocks: 200,
+       skipDryRun: true
+     },
+     celotestnet: {
+       provider: () => new HDWalletProvider(mnemonic, "https://alfajores-forno.celo-testnet.org"),
+       network_id: 44787,
+       confirmations: 10,
+       timeoutBlocks: 200,
+       skipDryRun: true
+     },
+     kovantestnet: {
+       provider: () => new HDWalletProvider(mnemonic, "https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"),
+       network_id: 42,
+       confirmations: 10,
+       timeoutBlocks: 200,
+       skipDryRun: true
+     },
+    celomainnet:{
+     provider: () => new HDWalletProvider(mnemonic, "https://forno.celo.org"),
+       network_id: 42220,
+       confirmations: 10,
+       timeoutBlocks: 200,
+       skipDryRun: true
+    },
   },
 
   // Set default mocha options here, use special reporters etc.
@@ -125,7 +197,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.8.9",    // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.8.10",    // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
       // settings: {          // See the solidity docs for advice about optimization and evmVersion
       //  optimizer: {
