@@ -11,6 +11,7 @@ import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "./Campaign.sol";
 
 
 
@@ -24,24 +25,44 @@ contract CampaignFactory is Context,Ownable, ReentrancyGuard {
 
     Counters.Counter private _counter;
 
-    event CampaignCreated(address creator, address createdCampaignAddress, address tokenAddress);
+    mapping(address => mapping (address => uint256 )) public ownersCampaign;
+
+    event CampaignCreated(address indexed creator,uint256 indexed index, address createdCampaignAddress);
     
-    //  uint ethPrice = 0.15; 
+    uint public campaignCreationPrice = 0.0001 ether; 
+
+    constructor()  {      
+
+    }
+
+    function setCampaignCreationPrice(uint256 newPrice) public onlyOwner{
+        campaignCreationPrice=newPrice;
+    }
 
     
-    function createNewCampaign(uint256 _loanAmount,address _loanedCurrency, uint _interestRate, uint128 _duration, address _collateralAddress, uint _collateralRatio) public returns(address _loanContractAddress) {
+    function createNewCampaign(address _tokenAddress,uint _softCap,uint _hardCap, uint256 _saleStartTime, uint256 _saleEndTime,   bool _useWhiteList, Campaign.RefundType _refundType, address _dexRouterAddress,uint _liquidityPercent, uint _listRate, uint _dexListRate) public payable returns(address newCampaignAddress) {
 
-            
-            address newCampaign  = address (new CampaignContract(_loanAmount,_loanedCurrency, _duration, _interestRate , _collateralAddress,  _collateralRatio, address(0), msg.sender, LoanContract.LoanStatus.OFFER));
+            require(msg.value >= campaignCreationPrice, 'Requires CampaignCreation Price' );
+        // address newCampaignAddress  = address (new CampaignContract(_loanAmount,_loanedCurrency, _duration, _interestRate , _collateralAddress,  _collateralRatio, address(0), msg.sender, LoanContract.LoanStatus.OFFER));
+        // _tierOneValue, _tierTwoValue, _tierThreeValue, _tierOneUsersValue, _tierTwoUsersValue, _tierThreeUsersValue,
 
-            _counter.increment();
-            uint256 ix = _counter.current();
+         address newCampaign = address(new Campaign(_tokenAddress, _softCap,_hardCap, _saleStartTime, _saleEndTime,   _useWhiteList, _refundType, _dexRouterAddress,_liquidityPercent, _listRate, _dexListRate));
 
-            bool result = _campaigns.set(ix, newCampaign);
-            
-            emit CampaignCreated(msg.sender, newCampaign, tokenAddress);
+        _counter.increment();
+        uint256 ix = _counter.current();
 
-            return _loanContractAddress;
+        bool result = _campaigns.set(ix, newCampaign);        
+
+        ownersCampaign[msg.sender][newCampaign] = ix;
+
+        
+        emit CampaignCreated(msg.sender, ix,newCampaign);
+
+        
+    }
+
+    function allCampaigns() public view returns (uint256) {
+        return _campaigns.length();
     }
 
     

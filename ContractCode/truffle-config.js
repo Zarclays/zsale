@@ -74,22 +74,6 @@ module.exports = {
       defaultEtherBalance: 500,
       blockTime: 3
     },
-    alfajores: {
-      provider: client.connection.web3.currentProvider, // CeloProvider
-      network_id: 44787  // latest Alfajores network id
-    },
-    BinanceTestnet: {
-      networkCheckTimeout: 10000, 
-      provider: ()=> new HDWalletProvider({
-        //  privateKeys: [process.env.BSC_PRIVATE_KEY, process.env.BSC_PRIV_2, process.env.BSC_PRIV_3],
-         privateKeys: [ '0x8d3158f330d95475cde8c03c592dc85a20fdc8aae3a9bf5cb71292bd2a86cf33'],
-         providerOrUrl: 'https://data-seed-prebsc-2-s2.binance.org:8545'
-       }),
-      
-      network_id: "97",       // Any network (default: none)
-      gas: 10000000,
-      gasPrice: 20000000000,  // 20 gwei (in wei) (default: 100 gwei)
-    }
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
@@ -115,6 +99,37 @@ module.exports = {
     // network_id: 2111,   // This network is yours, in the cloud.
     // production: true    // Treats this network as if it was a public net. (default: false)
     // }
+    alfajores: {
+      provider: client.connection.web3.currentProvider, // CeloProvider
+      network_id: 44787  // latest Alfajores network id
+    },
+    celoMainnet:{
+      provider: client.connection.web3.currentProvider, // CeloProvider  () => new HDWalletProvider(mnemonic, "https://forno.celo.org"),
+      network_id: 42220,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
+    BinanceTestnet: {
+      networkCheckTimeout: 10000, 
+      provider: ()=> new HDWalletProvider({
+        //  privateKeys: [process.env.BSC_PRIVATE_KEY, process.env.BSC_PRIV_2, process.env.BSC_PRIV_3],
+         privateKeys: [ '0x8d3158f330d95475cde8c03c592dc85a20fdc8aae3a9bf5cb71292bd2a86cf33'],
+         providerOrUrl: 'https://data-seed-prebsc-2-s2.binance.org:8545'
+       }),
+      
+      network_id: "97",       // Any network (default: none)
+      gas: 10000000,
+      gasPrice: 20000000000,  // 20 gwei (in wei) (default: 100 gwei)
+    },
+    Bsc: {
+      provider: () => new HDWalletProvider(mnemonic, `https://bsc-dataseed1.binance.org`),
+      network_id: 56,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
+    
     ropsten: {
       provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161`),
       network_id: 3,       // Ropsten's id
@@ -128,65 +143,47 @@ module.exports = {
      // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
      // network_id: 2111,   // This network is yours, in the cloud.
      // production: true    // Treats this network as if it was a public net. (default: false)
-      },
- 
-      testnet: {
-       provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s1.binance.org:8545`),
-       network_id: 97,
-       confirmations: 10,
-       timeoutBlocks: 200,
-       skipDryRun: true
-     },
-     bsc: {
-       provider: () => new HDWalletProvider(mnemonic, `https://bsc-dataseed1.binance.org`),
-       network_id: 56,
-       confirmations: 10,
-       timeoutBlocks: 200,
-       skipDryRun: true
-     },
-      gorli: {
-        provider: () => new HDWalletProvider(mnemonic, "https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"),
-        network_id: 5,
-        confirmations: 10,
-        timeoutBlocks: 200,
-        skipDryRun: true
- 
-      },
-      rinkbery: {
-        provider: () => new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/a078a649555c418ba0a3d39c2b0f5ec8"),
-        network_id: 4,
-        confirmations: 10,
-        timeoutBlocks: 200,
-        skipDryRun: true
-      },
-      etheriummainnet: {
-       provider: () => new HDWalletProvider(mnemonic, "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"),
-       network_id: 1,
-       confirmations: 10,
-       timeoutBlocks: 200,
-       skipDryRun: true
-     },
-     celotestnet: {
-       provider: () => new HDWalletProvider(mnemonic, "https://alfajores-forno.celo-testnet.org"),
-       network_id: 44787,
-       confirmations: 10,
-       timeoutBlocks: 200,
-       skipDryRun: true
-     },
-     kovantestnet: {
-       provider: () => new HDWalletProvider(mnemonic, "https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"),
-       network_id: 42,
-       confirmations: 10,
-       timeoutBlocks: 200,
-       skipDryRun: true
-     },
-    celomainnet:{
-     provider: () => new HDWalletProvider(mnemonic, "https://forno.celo.org"),
-       network_id: 42220,
-       confirmations: 10,
-       timeoutBlocks: 200,
-       skipDryRun: true
     },
+
+    testnet: {
+      provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s1.binance.org:8545`),
+      network_id: 97,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
+    
+    gorli: {
+      provider: () => new HDWalletProvider(mnemonic, "https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"),
+      network_id: 5,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+
+    },
+    rinkbery: {
+      provider: () => new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/a078a649555c418ba0a3d39c2b0f5ec8"),
+      network_id: 4,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
+    etheriumMainnet: {
+      provider: () => new HDWalletProvider(mnemonic, "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"),
+      network_id: 1,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
+    
+    kovanTestnet: {
+      provider: () => new HDWalletProvider(mnemonic, "https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"),
+      network_id: 42,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
+    
   },
 
   // Set default mocha options here, use special reporters etc.
