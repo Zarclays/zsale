@@ -1,1 +1,9 @@
 /notes.txt
+/ContractCode/build/contracts/Campaign.json
+/ContractCode/build/contracts/ConfirmAddress.json
+/ContractCode/build/contracts/Migration.json
+/ContractCode/build/contracts/Migrations.json
+/ContractCode/build/contracts/Ownable.json
+/ContractCode/build/contracts/StorageSlot.json
+/ContractCode/node_modules
+/Dapp/node_modules

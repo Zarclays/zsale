@@ -18,10 +18,31 @@
  *
  */
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
+require('dotenv').config();
+// require('dotenv').config({path: '.env'});
+
+const ContractKit = require('@celo/contractkit')
+const Web3 = require('web3');
+
+
+const web3 = new Web3(process.env.CELO_RPC_URL);
+const client = ContractKit.newKitFromWeb3(web3);  
+
+const getCeloAccount = require('./getCeloAccount').getAccount
+let account = getCeloAccount();
+console.log('address: ',account.address)
+console.log('PRVV: ',account.privateKey)
+client.connection.addAccount(account.privateKey)
+
+// async function awaitWrapper(){
+//     let account = await getCeloAccount();
+//     client.addAccount(account.privateKey)
+// }
+// awaitWrapper().then(()=>{})
 
 module.exports = {
   /**
@@ -46,6 +67,29 @@ module.exports = {
       port: 7545,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none)
      },
+     develop: {
+      port: 9545,
+      network_id: 20,
+      accounts: 5,
+      defaultEtherBalance: 500,
+      blockTime: 3
+    },
+    alfajores: {
+      provider: client.connection.web3.currentProvider, // CeloProvider
+      network_id: 44787  // latest Alfajores network id
+    },
+    BinanceTestnet: {
+      networkCheckTimeout: 10000, 
+      provider: ()=> new HDWalletProvider({
+        //  privateKeys: [process.env.BSC_PRIVATE_KEY, process.env.BSC_PRIV_2, process.env.BSC_PRIV_3],
+         privateKeys: [ '0x8d3158f330d95475cde8c03c592dc85a20fdc8aae3a9bf5cb71292bd2a86cf33'],
+         providerOrUrl: 'https://data-seed-prebsc-2-s2.binance.org:8545'
+       }),
+      
+      network_id: "97",       // Any network (default: none)
+      gas: 10000000,
+      gasPrice: 20000000000,  // 20 gwei (in wei) (default: 100 gwei)
+    }
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
@@ -91,7 +135,7 @@ module.exports = {
       //  evmVersion: "byzantium"
       // }
     }
-  },
+  }
 
   // Truffle DB is currently disabled by default; to enable it, change enabled:
   // false to enabled: true. The default storage location can also be
