@@ -19,7 +19,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
 
     struct CampaignSaleInfo{
         //token attributes
-        address   tokenAddress;
+        address   tokenAddress; 
         uint256  softCap; // Soft cap in coin
         uint256  hardCap; // Max cap in coin
         uint256  saleStartTime; // start sale time
@@ -40,9 +40,9 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     }
 
 
-  CampaignSaleInfo saleInfo;
-  CampaignOtherInfo otherInfo;
-  address immutable  dexRouterAddress;
+  CampaignSaleInfo public  saleInfo;
+  CampaignOtherInfo public otherInfo;
+  address public immutable  dexRouterAddress;
   uint256 public totalCoinReceived; // total  received
   uint256 public totalCoinInTierOne; // total coin for tier one
   uint256 public totalCoinInTierTwo; // total coin for tier Tier
@@ -81,7 +81,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
 
   enum RefundType{ BURN, REFUND }
   
-  
+  bool public isCancelled=false;
 
   //mapping the user purchase per tier
   mapping(address => uint) public buyInOneTier;
@@ -91,7 +91,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   // CONSTRUCTOR  
   constructor(address  _tokenAddress,uint256 _softCap,uint256 _hardCap, uint256 _saleStartTime, uint256 _saleEndTime,   bool _useWhiteList, RefundType _refundType, address _dexRouterAddress,uint _liquidityPercent, uint _listRate, uint _dexListRate
   )  {
-      // //block scopin to avoid stack too deep
+      // //block scopin to avoid stack too deep 
       {
           saleInfo= CampaignSaleInfo(_tokenAddress,_softCap,_hardCap, _saleStartTime, _saleEndTime,_liquidityPercent,_listRate, _dexListRate );
       }
@@ -118,7 +118,6 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
         //     maxAllocationPerUserTierThree = tierThreehardCap / totalUserInTierThree;
         // }
         
-        
 
   }
 
@@ -137,7 +136,10 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   }
 
 
-  
+  function cancelCampaign() public onlyOwner{
+    require(block.timestamp< saleInfo.saleStartTime, 'Can only cancel before Sale StartTime');
+    isCancelled=true;
+  }
 
 
 
@@ -242,9 +244,9 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     // send coin to the contract address
     receive() external payable {
         uint256 bid = msg.value;
-        
-        require(block.timestamp >= saleInfo.saleStartTime, "The sale is not started yet "); // solhint-disable
-        require(block.timestamp <= saleInfo.saleEndTime, "The sale is closed"); // solhint-disable
+        require(!isCancelled, 'Campaign:: Sale Cancelled');
+        require(block.timestamp >= saleInfo.saleStartTime, "Campaign::The sale is not started yet "); // solhint-disable
+        require(block.timestamp <= saleInfo.saleEndTime, "Campaign::The sale is closed"); // solhint-disable
         require(totalCoinReceived + bid <= saleInfo.hardCap, "buyTokens: purchase would exceed max cap");
         
         if (getWhitelistOne(msg.sender)) { 
@@ -268,8 +270,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
             require(buyInThreeTier[msg.sender] + bid <= maxAllocationPerUserTierThree ,"buyTokens:You are investing more than your tier-3 limit!");
             buyInThreeTier[msg.sender] += bid;
             totalCoinReceived += bid;
-            totalCoinInTierThree += bid;
-        
+            totalCoinInTierThree += bid;        
         
         } else {
             revert();
@@ -278,11 +279,13 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
 
 
     function finalizeAndwithdraw () public onlyOwner  {
-
+      require(!isCancelled, 'Campaign:: Sale Cancelled');
     }
 
-    function withdrawRefund () public onlyOwner  {
-        
+    function withdrawRefund () public   {
+        require(isCancelled, 'Campaign:: Can only withdraw if Campaign Cancelled');
+        require(msg.sender!= owner() );
+
     }
 
 

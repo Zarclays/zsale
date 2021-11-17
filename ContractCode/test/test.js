@@ -78,38 +78,45 @@ contract("Campaign Factory Tests", async function(accounts) {
         // });
 
         token = await TokenArtifact.deployed();
-        campaignFactory = await CampaignFactoryArtifact.deployed();
-        console.log('deployed  campaignFactory');
+        campaignFactory = await CampaignFactoryArtifact.new();
         
-
-
-
     });
 
     it('Creates New Contracts successfully', async() => {
-        const now = new Date();
-        const twoHoursTime = now.setHours(now.getHours()+2);
-        const fourHoursLater = now.setHours(now.getHours()+2);
-        const router = '0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3';
+      const now = new Date();
+      const twoHoursTime = now.setHours(now.getHours()+2);
+      const fourHoursLater = now.setHours(now.getHours()+2);
+      const router = '0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3';
       await campaignFactory.createNewCampaign(token.address,100,200, twoHoursTime, fourHoursLater,false,0,router,60,1000,800, {
         from: owner,
         value: web3.utils.toWei('0.0001', 'ether')
       } );
+    
+      await advanceBlock();     
       
-        await advanceBlock();
+
+      let contractowner = await campaignFactory.owner.call();
+
+      console.log('Factory Owner: ', contractowner );
+
+      let length = await campaignFactory.campaignSize.call();
+      console.log('Length: ', length );
+      
+      var r = [];
+      for (let index = 0; index < length.toNumber(); index++) {
+        const element = await campaignFactory.campaignAt.call(index);
+        console.log('element: ', element );
+        r.push({key:element.key.toNumber(), value:element.value});
+      }
+      console.log('r: ', r );
+      try{
         
-        
-
-        let contractowner = await campaignFactory.owner.call();
-
-        console.log('Factory Owner: ', contractowner );
-
-        try{
           
           
         }catch(err){
-          // assert.fail('')
+          // 
           console.log('Error:', err);
+          // assert.fail('')
         }
         
 
@@ -125,8 +132,33 @@ contract("Campaign Factory Tests", async function(accounts) {
 
         // const instance = await MetaCoin.deployed();
         // const balance = await instance.getBalance.call(accounts[0]);
+        const now = new Date();
+        const twoHoursTime = now.setHours(now.getHours()+2);
+        const fourHoursLater = now.setHours(now.getHours()+2);
+        const router = '0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3';
+        let createError;
+        try{
+          await campaignFactory.createNewCampaign(token.address,100,200, twoHoursTime, fourHoursLater,false,0,router,60,1000,800, {
+            from: owner,
+            value: web3.utils.toWei('0.0001', 'ether')
+          } );
+        
+          await advanceBlock();
+        }catch(err){
+          createError=err;
+        }
+        assert.notEqual(createError, undefined, 'Transaction should be reverted');
 
-        assert.equal(1, 1);
+    });
+
+
+    it('only Token owners can create contract', async() => {
+
+      // const instance = await MetaCoin.deployed();
+      // const balance = await instance.getBalance.call(accounts[0]);
+      
+
+      assert.equal(1, 1);
 
     });
 

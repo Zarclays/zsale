@@ -25,7 +25,15 @@ contract CampaignFactory is Context,Ownable, ReentrancyGuard {
 
     Counters.Counter private _counter;
 
-    mapping(address => mapping (address => uint256 )) public ownersCampaign;
+    struct OwnerCampaign{
+        address addr;
+        uint256 amount;
+    }
+
+    mapping(address => uint256[]) public ownersCampaign; //owneraddress -> campaignIndex
+    
+
+    mapping(address => address payable ) public _tokenCampaigns; //tokenAddress=>Campaign
 
     event CampaignCreated(address indexed creator,uint256 indexed index, address createdCampaignAddress);
     
@@ -40,29 +48,49 @@ contract CampaignFactory is Context,Ownable, ReentrancyGuard {
     }
 
     
-    function createNewCampaign(address _tokenAddress,uint _softCap,uint _hardCap, uint256 _saleStartTime, uint256 _saleEndTime,   bool _useWhiteList, Campaign.RefundType _refundType, address _dexRouterAddress,uint _liquidityPercent, uint _listRate, uint _dexListRate) public payable returns(address newCampaignAddress) {
+    function createNewCampaign(address _tokenAddress,uint _softCap,uint _hardCap, uint256 _saleStartTime, uint256 _saleEndTime,   bool _useWhiteList, Campaign.RefundType _refundType, address _dexRouterAddress,uint _liquidityPercent, uint _listRate, uint _dexListRate) public payable returns(address nc) {
 
-            require(msg.value >= campaignCreationPrice, 'Requires CampaignCreation Price' );
-        // address newCampaignAddress  = address (new CampaignContract(_loanAmount,_loanedCurrency, _duration, _interestRate , _collateralAddress,  _collateralRatio, address(0), msg.sender, LoanContract.LoanStatus.OFFER));
-        // _tierOneValue, _tierTwoValue, _tierThreeValue, _tierOneUsersValue, _tierTwoUsersValue, _tierThreeUsersValue,
+        require(msg.value >= campaignCreationPrice, 'Requires CampaignCreation Price' );
 
-         address newCampaign = address(new Campaign(_tokenAddress, _softCap,_hardCap, _saleStartTime, _saleEndTime,   _useWhiteList, _refundType, _dexRouterAddress,_liquidityPercent, _listRate, _dexListRate));
+        hasCampaignRunningForToken(_tokenAddress);
+
+        address payable newCampaignAddress = payable( address(new Campaign(_tokenAddress, _softCap,_hardCap, _saleStartTime, _saleEndTime,   _useWhiteList, _refundType, _dexRouterAddress,_liquidityPercent, _listRate, _dexListRate)) );
 
         _counter.increment();
-        uint256 ix = _counter.current();
-
-        bool result = _campaigns.set(ix, newCampaign);        
-
-        ownersCampaign[msg.sender][newCampaign] = ix;
-
         
-        emit CampaignCreated(msg.sender, ix,newCampaign);
+        _campaigns.set(_counter.current(), newCampaignAddress);
 
+        //avoid stack too deep
+        {
+            ownersCampaign[msg.sender].push( _counter.current());        
+            _tokenCampaigns[_tokenAddress]= newCampaignAddress;
+            emit CampaignCreated(msg.sender, _counter.current(),newCampaignAddress);
+        }
         
+        
+    }
+
+    function hasCampaignRunningForToken(address _tokenAddress) public view {
+        if(_tokenCampaigns[_tokenAddress] != address(0) ){
+            Campaign c = Campaign(_tokenCampaigns[_tokenAddress]);
+            // Campaign.CampaignSaleInfo memory s = Campaign.CampaignSaleInfo(c.saleInfo() );
+            ( address   tokenAddress, , , uint256 saleStartTime,uint256 saleEndTime ,,, ) = c.saleInfo();
+
+            if( saleEndTime >= block.timestamp && c.isCancelled() == false)  {
+                // revert( concatenate('Pool already exists: ', tokenAddress ) );
+                revert( 'Pool already exists '  );
+                
+            }
+            
+        }
     }
 
     function allCampaigns() public view returns (uint256) {
         return _campaigns.length();
+    }
+
+    function allOwnersCampaigns() public view returns (uint256[] memory) {
+        return ownersCampaign[msg.sender];
     }
 
     
@@ -84,6 +112,15 @@ contract CampaignFactory is Context,Ownable, ReentrancyGuard {
 
     function tryGetCampaignByKey(uint256 key) public view returns (bool, address) {
         return _campaigns.tryGet(key);
+    }
+
+    //abi.encodePacked(x)
+    function concatenate(string memory s1, string memory s2) public pure returns (string memory) {
+        return string(abi.encodePacked(s1, s2));
+    }
+
+    function concatenate(string memory s1, address s2) public pure returns (string memory) {
+        return string(abi.encodePacked(s1, s2));
     }
 
 }
