@@ -27,7 +27,8 @@
       "http": ["./node_modules/stream-http"],
       "https": ["./node_modules/https-browserify"],
       "os": ["./node_modules/os-browserify"],
-      "process": ["./node_modules/process/browser"]
+      "process": ["./node_modules/process/browser"],
+      "path": ["./node_modules/path-browserify"]
     }
   },
   "angularCompilerOptions": {
@@ -37,3 +38,4 @@
     "strictTemplates": true
   }
 }
+

@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CampaignService, Web3Service } from '.';
 
 
 
@@ -7,6 +8,10 @@ import { CommonModule } from '@angular/common';
   declarations: [],
   imports: [
     CommonModule
+  ],
+  providers:[
+    CampaignService,
+    Web3Service
   ]
 })
 export class ServicesModule { }

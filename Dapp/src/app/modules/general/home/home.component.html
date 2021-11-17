@@ -3,32 +3,25 @@
     <h1 class="h5">
       <i class="fas fa-laptop fa-lg mr-1 text-primary"></i>
       {{ name }}
-      <i class="fas fa-mobile-alt fa-lg ml-1 mr-1 text-primary"></i>
+      
     </h1>
   </div> 
-  <div class="col-md-3 text-center text-danger">
-    <h2 class="h5">
-      {{ angular }}<i class="fab fa-angular fa-lg ml-1 mr-1 text-danger"></i>
-    </h2>
-  </div>
-  <div class="col-md-3 text-center text-primary">
-    <h2 class="h5">
-      {{ bootstrap }}<i class="fab fa-bootstrap fa-lg ml-1 mr-1 text-primary"></i>
-    </h2>
-  </div>
-  <div class="col-md-3 text-center text-success">
-    <h2 class="h5">
-      {{ fontawesome }}<i class="fab fa-font-awesome-flag fa-lg ml-1 mr-1 text-success"></i>
-    </h2>
+  <div class="col-md-6 text-left mb-2">
+    <h1 class="h5 text-success">
+      Crypto Launchpad for Celo Network
+    </h1>
   </div>
 </div>
 <hr>
 <div class="row mb-1">
-  <div class="col-md-12 text-center">
-    <h3 class="h6">Features&nbsp;&nbsp;<i class="fas fa-list"></i></h3>
+  <div class="col-md-12 text-left">
+    <h3 class="h6">Trending Campaigns <i class="fas fa-list"></i></h3>
   </div>
 </div>
 <div class="row pt-2 pb-4">
+
+  <launchpad-list></launchpad-list>
+
   <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 mb-4" *ngFor="let item of features">
     <div class="card card-cascade">
       <div class="card-img">

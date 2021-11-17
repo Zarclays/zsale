@@ -8,14 +8,14 @@ declare let window: any;
 
 @Injectable()
 export class Web3Service {
-  private web3: any;
+  public web3: any;
   private accounts: string[] = [];
   public ready = false;
 
   public accountsObservable = new Subject<string[]>();
 
   constructor() {
-    window.addEventListener('load', (event) => {
+    window.addEventListener('load', (event: any) => {
       this.bootstrapWeb3();
     });
   }
@@ -36,10 +36,10 @@ export class Web3Service {
       this.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
     }
 
-    setInterval(() => this.refreshAccounts(), 100);
+    setInterval(() => this.refreshAccounts(), 1000);
   }
 
-  public async artifactsToContract(artifacts) {
+  public async artifactsToContract(artifacts: any): Promise<any> {
     if (!this.web3) {
       const delay = new Promise(resolve => setTimeout(resolve, 100));
       await delay;
@@ -54,7 +54,7 @@ export class Web3Service {
 
   private async refreshAccounts() {
     const accs = await this.web3.eth.getAccounts();
-    console.log('Refreshing accounts');
+    // console.log('Refreshing accounts');
 
     // Get the initial account balance so it can be displayed.
     if (accs.length === 0) {
@@ -63,7 +63,7 @@ export class Web3Service {
     }
 
     if (!this.accounts || this.accounts.length !== accs.length || this.accounts[0] !== accs[0]) {
-      console.log('Observed new accounts');
+      // console.log('Observed new accounts');
 
       this.accountsObservable.next(accs);
       this.accounts = accs;

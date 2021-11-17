@@ -69,7 +69,7 @@ export class AppComponent {
     public renderer: Renderer2, 
     private modalService: MdbModalService) { }
 
-  async openModal() {
+  async openWeb3Modal() {
     // this.modalRef = this.modalService.open(ModalComponent)
 
     // @ts-ignore
@@ -80,14 +80,14 @@ export class AppComponent {
         package: WalletConnectProvider,
         options: {
           // Mikko's test key - don't copy as your mileage may vary
-          infuraId: "8043bb2cf99347b1bfadfb233c5325c0",
+          // infuraId: "8043bb2cf99347b1bfadfb233c5325c0",
         }
       },
     };
     
     const web3Modal = new Web3Modal({
       network: "mainnet", // optional
-      cacheProvider: true, // optional
+      cacheProvider: false, // optional
       providerOptions // required
     });
     

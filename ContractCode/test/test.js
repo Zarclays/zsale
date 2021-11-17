@@ -78,7 +78,9 @@ contract("Campaign Factory Tests", async function(accounts) {
         // });
 
         token = await TokenArtifact.deployed();
-        campaignFactory = await CampaignFactoryArtifact.new();
+        // campaignFactory = await CampaignFactoryArtifact.new();
+        campaignFactory = await CampaignFactoryArtifact.deployed();
+        console.log('Using Factory Deployed at  ', campaignFactory.address );
         
     });
 

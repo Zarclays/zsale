@@ -52,21 +52,7 @@
           <i class="fas fa-plus"></i> Create
         </a>
 
-        <!-- Notifications -->
-        <!-- <a
-          class="text-reset me-3 dropdown-toggle hidden-arrow"
-          href="#"
-          id="navbarDropdownMenuLink"
-          role="button"
-          data-mdb-toggle="dropdown"
-          aria-expanded="false"
-        >
-          <i class="fas fa-bell"></i>
-          <span class="badge rounded-pill badge-notification bg-danger">1</span>
-        </a> -->
-
-
-        
+               
 
         <!-- Networks -->
         <a class="text-reset me-3 btn btn-primary" href="#">
@@ -74,14 +60,8 @@
         </a>
 
         <!-- Connect to Wallet -->
-        <a class="text-reset me-3 btn btn-primary" href="#">
-          <!-- <img
-            src="https://mdbootstrap.com/img/new/avatars/2.jpg"
-            class="rounded-circle"
-            height="25"
-            alt=""
-            loading="lazy"
-          /> -->
+        <a class="text-reset me-3 btn btn-primary" (click)="openWeb3Modal()">
+          
           Connect
         </a>
 
@@ -142,21 +122,6 @@
 
   <main class="bd-main order-1">
     <div class="bd-content ps-lg-4">
-
-      <div class="container">
-        <div class="row">
-          <div class="col-12">
-            <button class="btn btn-primary" (click)="openModal()">Open modal</button>
-
-            <br/>
-            <p class="mb-0">
-              Hover the link to see the
-              <a href="#" mdbTooltip="Hi! I'm tooltip">tooltip</a>
-            </p>
-          </div>
-        </div>
-      </div>
-
       <router-outlet></router-outlet>
     </div>
   </main>
@@ -165,42 +130,6 @@
 
 
 
-<!--<main class="">
-  <div class="container-xxl bd-layout">
-    <div class="bd-sidebar">
-      <nav class="collapse bd-links pt-4" id="bd-docs-nav">
-        <ul class="list-unstyled mb-0">
-          <li class="my-1 active d-lg-none">
-            <a class="d-inline-flex align-items-center rounded" data-bs-toggle="collapse" href="#ganatan-collapse"
-              role="button" aria-expanded="true" aria-current="true">
-              About Ganatan
-            </a>
-            <ul class="list-unstyled font-weight-normal mb-2 collapse" id="ganatan-collapse">
-              <li><a (click)="onSelectMenu('about')" class="d-inline-flex align-items-center rounded active"
-                  aria-current="page">About</a>
-              </li>
-              <li><a (click)="onSelectMenu('contact')" class="d-inline-flex align-items-center rounded">Contact</a></li>
-            </ul>
-          </li>
-          <li *ngFor="let item of items" class="my-1 active">
-            <a class="d-inline-flex align-items-center rounded" data-bs-toggle="collapse" href="#{{ item.link }}-collapse"
-              role="button" aria-expanded="true" aria-current="true">
-              {{ item.name }}
-            </a>
-            <ul class="list-unstyled font-weight-normal mb-2 collapse" id="{{ item.link }}-collapse">
-              <li *ngFor="let element of item.elements"><a (click)="onSelectMenu(element.link)"
-                  class="d-inline-flex align-items-center rounded">{{ element.name }}</a>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </nav>
-    </div>
-    <div class="bd-content pt-4">
-      <router-outlet></router-outlet>
-    </div>
-  </div>
-</main> -->
 
 <div class="footer" style="background-color:#1976d2">
   <div class="container">

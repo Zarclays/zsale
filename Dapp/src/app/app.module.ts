@@ -23,6 +23,7 @@ import { MdbTabsModule } from 'mdb-angular-ui-kit/tabs';
 import { MdbTooltipModule } from 'mdb-angular-ui-kit/tooltip';
 import { MdbValidationModule } from 'mdb-angular-ui-kit/validation';
 import { ModalComponent } from './modal/modal.component';
+import { LaunchpadsModule } from './modules/application/launchpads/launchpads.module';
 
 @NgModule({
   declarations: [
@@ -39,9 +40,10 @@ import { ModalComponent } from './modal/modal.component';
     MdbDropdownModule,
     MdbCollapseModule,
     MdbTooltipModule,
-    MdbValidationModule
+    MdbValidationModule,
+    LaunchpadsModule
   ],
-  providers: [],
+  providers: [], 
   bootstrap: [AppComponent]
 })
 export class AppModule { }
