@@ -1,1 +1,28 @@
-<p>launchpad-list works!</p>
+<div class="row" *ngIf="loadingList">
+    <div class="col-12 text-center">
+        <h3>... Loading ... </h3>
+    </div>
+</div>
+
+<div class="row" *ngIf="!loadingList">
+    <div class="col-4 col-xl-4 mb-4" *ngFor="let item of list">
+        <div class="card card-cascade">
+            <div class="card-img">
+              <a  [routerLink]="['/launchpads', item.index]"> <!-- routerLink="/launchpad/{{ item.index }}" -->
+                <img class="img-fluid card-img-top" src="{{ item.logoUrl }}" alt="logo">
+              </a>
+            </div>
+            <div class="card-body pt-0">
+              <h4 class="h6 card-title">
+                <span style="font-size: 14px;">
+                    <strong>{{ item.name }} {{ item.symbol }}</strong>
+                </span>
+              </h4>
+
+              <h4 class="h6 card-title">
+                <strong style="font-size: 14px;">{{ item.totalSupply }} {{ item.symbol }}</strong>
+              </h4>
+            </div>
+          </div>
+    </div>
+</div>

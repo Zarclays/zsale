@@ -33,6 +33,11 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
         bool   hasKYC;
         bool   isAudited;  
         RefundType  refundType;
+        string logoUrl;
+        string desc;
+        string website;
+        string twitter;
+        string telegram;
         
 
         
@@ -47,7 +52,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   uint256 public totalCoinInTierOne; // total coin for tier one
   uint256 public totalCoinInTierTwo; // total coin for tier Tier
   uint256 public totalCoinInTierThree; // total coin for tier Three
-  uint public totalparticipants; // total participants in ido
+  uint public totalParticipants; // total participants in ido
   
   
   // max cap per tier
@@ -255,7 +260,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
             buyInOneTier[msg.sender] += bid;
             totalCoinReceived += bid;
             totalCoinInTierOne += bid;
-        
+            totalParticipants++;
         
         } else if (getWhitelistTwo(msg.sender)) {
             require(totalCoinInTierTwo + bid <= tierTwohardCap, "buyTokens: purchase would exceed Tier two max cap");
@@ -263,7 +268,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
             buyInTwoTier[msg.sender] += bid;
             totalCoinReceived += bid;
             totalCoinInTierTwo += bid;
-        
+            totalParticipants++;
         
         } else if (getWhitelistThree(msg.sender)) { 
             require(totalCoinInTierThree + bid <= tierThreehardCap, "buyTokens: purchase would exceed Tier three max cap");
@@ -271,7 +276,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
             buyInThreeTier[msg.sender] += bid;
             totalCoinReceived += bid;
             totalCoinInTierThree += bid;        
-        
+            totalParticipants++;
         } else {
             revert();
         }
@@ -289,10 +294,12 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     }
 
 
-    function getCampaignInfo() public view returns(address _tokenAddress, uint256 softcap, uint256 hardcap,uint256 saleStartTim, uint256 ,uint256 , uint256 ){
-        return (saleInfo.tokenAddress, saleInfo.softCap, saleInfo.hardCap,saleInfo.saleStartTime, saleInfo.saleEndTime,totalCoinReceived,totalparticipants );
+    function getCampaignInfo() public view returns(address _tokenAddress, uint256 softcap, uint256 hardcap,uint256 saleStartTim, uint256 saleEndTime,uint256 listRate, uint256 dexListRate ,uint256 totalCoins, uint256 totalParticipant, bool useWhiteList, bool hasKYC, bool isAuduited ){
+        return (saleInfo.tokenAddress, saleInfo.softCap, saleInfo.hardCap,saleInfo.saleStartTime, saleInfo.saleEndTime, saleInfo.listRate, saleInfo.dexListRate,totalCoinReceived,totalParticipants, otherInfo.useWhiteList,otherInfo.hasKYC, otherInfo.isAudited );
     }
 
+    
+  
     // //To get refund when the requirement not ment
     // function getRefund() public {
     //     require(block.number > saleEndTime, 'salenedtime ......');

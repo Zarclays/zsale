@@ -6,11 +6,11 @@ import { NotFoundComponent } from './modules/general/not-found/not-found.compone
 
 const routes: Routes = [
   { path: '', component: HomeComponent, },
-  {
-    path: 'httpclient',
-    loadChildren: () => import('./modules/application/items/items.module')
-      .then(mod => mod.ItemsModule)
-  },  
+  // {
+  //   path: 'httpclient',
+  //   loadChildren: () => import('./modules/application/items/items.module')
+  //     .then(mod => mod.ItemsModule)
+  // },  
   {
     path: 'template-driven-forms',
     loadChildren: () => import('./modules/application/example-template-driven-forms/tutorial.module')
@@ -31,11 +31,11 @@ const routes: Routes = [
     loadChildren: () => import('./modules/application/example-reactive-form/tutorial.module')
       .then(mod => mod.TutorialModule)
   },    
-  {
-    path: 'bootstrap',
-    loadChildren: () => import('./modules/application/example-bootstrap/tutorial.module')
-      .then(mod => mod.TutorialModule)
-  },  
+  // {
+  //   path: 'bootstrap',
+  //   loadChildren: () => import('./modules/application/example-bootstrap/tutorial.module')
+  //     .then(mod => mod.TutorialModule)
+  // },  
   {
     path: 'contact',
     loadChildren: () => import('./modules/general/contact/contact.module')
@@ -46,10 +46,15 @@ const routes: Routes = [
     loadChildren: () => import('./modules/general/about/about.module')
       .then(mod => mod.AboutModule)
   },
+  // {
+  //   path: 'signin',
+  //   loadChildren: () => import('./modules/general/signin/signin.module')
+  //     .then(mod => mod.SigninModule)
+  // },
   {
-    path: 'signin',
-    loadChildren: () => import('./modules/general/signin/signin.module')
-      .then(mod => mod.SigninModule)
+    path: 'launchpads',
+    loadChildren: () => import('./modules/application/launchpads/launchpads.module')
+      .then(mod => mod.LaunchpadsModule)
   },
   { path: '**', component: NotFoundComponent }
 ];

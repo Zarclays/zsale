@@ -43,6 +43,7 @@ advanceBlock = () => {
 
 var CampaignFactoryArtifact = artifacts.require("CampaignFactory");
 var TokenArtifact = artifacts.require("Token");
+var CampaignArtifact = artifacts.require("Campaign");
 
 
 contract("Campaign Factory Tests", async function(accounts) {
@@ -78,8 +79,8 @@ contract("Campaign Factory Tests", async function(accounts) {
         // });
 
         token = await TokenArtifact.deployed();
-        // campaignFactory = await CampaignFactoryArtifact.new();
-        campaignFactory = await CampaignFactoryArtifact.deployed();
+        campaignFactory = await CampaignFactoryArtifact.new();
+        //campaignFactory = await CampaignFactoryArtifact.at('0xd12d5237c15ae556dA3564A9F9F8beCAfE85C617');
         console.log('Using Factory Deployed at  ', campaignFactory.address );
         
     });
@@ -102,67 +103,57 @@ contract("Campaign Factory Tests", async function(accounts) {
       console.log('Factory Owner: ', contractowner );
 
       let length = await campaignFactory.campaignSize.call();
-      console.log('Length: ', length );
+      console.log('Campaigns Length: ', length );
       
       var r = [];
       for (let index = 0; index < length.toNumber(); index++) {
         const element = await campaignFactory.campaignAt.call(index);
-        console.log('element: ', element );
+        
         r.push({key:element.key.toNumber(), value:element.value});
+        
+
+        // const campaign = await CampaignArtifact.at(element.value);
+        // // myContract.methods.myMethod([arguments]).call()
+        // console.log('campaign is null : ', campaign );
+        // let info = await campaign.saleInfo.call();
+        // console.log('info: ', info );
       }
-      console.log('r: ', r );
-      try{
-        
-          
-          
-        }catch(err){
-          // 
-          console.log('Error:', err);
-          // assert.fail('')
-        }
-        
-
-        
-
-        // await wPBTToken.burn(60000000, {
-        //   from: admin
-        // });
-
+      
   });
 
-    it('stops duplicates contract for the same token', async() => {
+    // it('stops duplicates contract for the same token', async() => {
 
-        // const instance = await MetaCoin.deployed();
-        // const balance = await instance.getBalance.call(accounts[0]);
-        const now = new Date();
-        const twoHoursTime = now.setHours(now.getHours()+2);
-        const fourHoursLater = now.setHours(now.getHours()+2);
-        const router = '0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3';
-        let createError;
-        try{
-          await campaignFactory.createNewCampaign(token.address,100,200, twoHoursTime, fourHoursLater,false,0,router,60,1000,800, {
-            from: owner,
-            value: web3.utils.toWei('0.0001', 'ether')
-          } );
+    //     // const instance = await MetaCoin.deployed();
+    //     // const balance = await instance.getBalance.call(accounts[0]);
+    //     const now = new Date();
+    //     const twoHoursTime = now.setHours(now.getHours()+2);
+    //     const fourHoursLater = now.setHours(now.getHours()+2);
+    //     const router = '0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3';
+    //     let createError;
+    //     try{
+    //       await campaignFactory.createNewCampaign(token.address,100,200, twoHoursTime, fourHoursLater,false,0,router,60,1000,800, {
+    //         from: owner,
+    //         value: web3.utils.toWei('0.0001', 'ether')
+    //       } );
         
-          await advanceBlock();
-        }catch(err){
-          createError=err;
-        }
-        assert.notEqual(createError, undefined, 'Transaction should be reverted');
+    //       await advanceBlock();
+    //     }catch(err){
+    //       createError=err;
+    //     }
+    //     assert.notEqual(createError, undefined, 'Transaction should be reverted');
 
-    });
+    // });
 
 
-    it('only Token owners can create contract', async() => {
+    // it('only Token owners can create contract', async() => {
 
-      // const instance = await MetaCoin.deployed();
-      // const balance = await instance.getBalance.call(accounts[0]);
+    //   // const instance = await MetaCoin.deployed();
+    //   // const balance = await instance.getBalance.call(accounts[0]);
       
 
-      assert.equal(1, 1);
+    //   assert.equal(1, 1);
 
-    });
+    // });
 
     
 
