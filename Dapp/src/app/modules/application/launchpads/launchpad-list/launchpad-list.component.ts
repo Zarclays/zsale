@@ -11,7 +11,13 @@ import { CampaignService } from 'src/app/modules/services/campaign.service';
 export class LaunchpadListComponent implements OnInit {
   list: any[] = [];
   loadingList = true;
-  constructor(private campaignService: CampaignService) { }
+  //ts-ignore
+  baseTokenSymbol :string;
+
+  constructor(private campaignService: CampaignService) {
+
+    this.baseTokenSymbol = this.campaignService.web3Service.baseTokenSymbol;
+  }
 
   ngOnInit() {
     setTimeout(async ()=>{

@@ -3,6 +3,7 @@ import {Subject} from 'rxjs';
 declare let require: any;
 const Web3 = require('web3');
 const contract = require('@truffle/contract');
+const ERC20AbiJSON = require('../../../assets/ERC20.json');
 
 declare let window: any;
 
@@ -11,6 +12,8 @@ export class Web3Service {
   public web3: any;
   private accounts: string[] = [];
   public ready = false;
+
+  public baseTokenSymbol = 'CELO';
 
   public accountsObservable = new Subject<string[]>();
 
@@ -71,4 +74,30 @@ export class Web3Service {
 
     this.ready = true;
   }
+
+  public getERC20Contract (address: string) {
+    const web3 = this.web3;
+    const cContract = new web3.eth.Contract(
+      ERC20AbiJSON.abi,
+      address
+    );
+    return cContract;
+  }
+
+  public async getERC20Details(address: string){
+    
+    let tokenInfo = await this.getERC20Contract(address);
+    
+    let result = { 
+      name: await tokenInfo.methods.name().call(),
+      symbol: await tokenInfo.methods.symbol().call(), 
+      decimals: await tokenInfo.methods.decimals().call(), 
+      totalSupply: await tokenInfo.methods.totalSupply().call() 
+    }
+    
+
+    return result;
+  }
+
+
 }

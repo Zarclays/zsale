@@ -48,15 +48,15 @@
       <!-- Right elements -->
       <div class="d-flex align-items-center text-white">
         <!-- Icon -->
-        <a class="text-reset me-3" href="#">
+        <a class="text-reset me-3" [routerLink]="['/launchpads']">
           <i class="fas fa-plus"></i> Create
         </a>
 
                
 
         <!-- Networks -->
-        <a class="text-reset me-3 btn btn-primary" href="#">
-          <i class="fas fa-plus"></i> <span class="d-none ">Select network</span>
+        <a class="text-reset me-3 btn btn-primary" >
+          <i class="fas fa-gem"></i> <span class="d-none ">Select network</span>
         </a>
 
         <!-- Connect to Wallet -->
@@ -88,8 +88,8 @@
             About ZSales
           </a>
           <ul class="list-unstyled font-weight-normal mb-2 collapse" id="ganatan-collapse">
-            <li><a (click)="onSelectMenu('about')" class="d-inline-flex align-items-center rounded active"
-                aria-current="page">About</a>
+            <li><a [routerLink]="['/launchpads']" class="d-inline-flex align-items-center rounded active"
+                aria-current="page">Create  IDO/Launchpad</a>
             </li>
             <li><a (click)="onSelectMenu('contact')" class="d-inline-flex align-items-center rounded">Contact</a></li>
           </ul>
@@ -122,6 +122,7 @@
 
   <main class="bd-main order-1">
     <div class="bd-content ps-lg-4">
+
       <router-outlet></router-outlet>
     </div>
   </main>

@@ -1,74 +1,271 @@
 <div class="row">
 
-  <div class="col-xs-12">
+  <div class="col-xs-12 create-content">
 
-    <form name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm"  novalidate>
-        <div class="form-row">
-            <div class="form-group col-5">
-                <label>Token Contract Address</label>
-                <input type="text" name="tokenAddress" class="form-control" [(ngModel)]="model.tokenAddress" #tokenAddress="ngModel" [ngClass]="{ 'is-invalid': f.submitted && tokenAddress.invalid }" required>
-                <div *ngIf="f.submitted && tokenAddress.invalid" class="invalid-feedback">
-                    <div *ngIf="tokenAddress.errors?.required">Token Contract Address is required</div>
-                </div>
-            </div>
+    <mat-horizontal-stepper [linear]="isLinear" #stepper>
 
-            <div class="form-group col">
-                <label>Title</label>
-                <select name="title" class="form-control" [(ngModel)]="model.title" #title="ngModel" [ngClass]="{ 'is-invalid': f.submitted && title.invalid }" required>
-                    <option value=""></option>
-                    <option value="Mr">Mr</option>
-                    <option value="Mrs">Mrs</option>
-                    <option value="Miss">Miss</option>
-                    <option value="Ms">Ms</option>
-                </select>
-                <div *ngIf="f.submitted && title.invalid" class="invalid-feedback">
-                    <div *ngIf="title.errors?.required">Title is required</div>
-                </div>
+        <mat-step [stepControl]="firstFormGroup" [editable]="!tokenDetails">
+      
+          <form [formGroup]="firstFormGroup">
+      
+            <ng-template matStepLabel>Token Details</ng-template>
+      
+            <mat-form-field class="w-100" >
+      
+              <mat-label>Token Contract Address</mat-label>
+      
+              <input class="mb-3" matInput placeholder="Token Address" formControlName="tokenAddress" required>
+              <mat-hint> Create Pool Fee:  0.2 {{baseTokenSymbol}} </mat-hint>
+            </mat-form-field>
+            <br/>
+            
+
+      
+            <br/> <br/>
+
+            <dl *ngIf="tokenDetails">
+                <dt>Name</dt>
+                <dd>{{tokenDetails.name}}</dd>
+
+                <dt>Symbol</dt>
+                <dd>{{tokenDetails.symbol}}</dd>
+
+                <dt>Decimals</dt>
+                <dd>{{tokenDetails.decimals}}</dd>
+            </dl>
+      
+            <br/>
+      
+            <div>
+      
+              <button mat-button color="primary" matStepperNext [disabled]="firstFormGroup.invalid || !tokenDetails" >Next</button>
+      
             </div>
-            <div class="form-group col-5">
-                <label>First Name</label>
-                <input type="text" name="firstName" class="form-control" [(ngModel)]="model.firstName" #firstName="ngModel" [ngClass]="{ 'is-invalid': f.submitted && firstName.invalid }" required>
-                <div *ngIf="f.submitted && firstName.invalid" class="invalid-feedback">
-                    <div *ngIf="firstName.errors?.required">First Name is required</div>
-                </div>
-            </div>
-            <div class="form-group col-5">
-                <label>Last Name</label>
-                <input type="text" name="lastName" class="form-control" [(ngModel)]="model.lastName" #lastName="ngModel" [ngClass]="{ 'is-invalid': f.submitted && lastName.invalid }" required>
-                <div *ngIf="f.submitted && lastName.invalid" class="invalid-feedback">
-                    <div *ngIf="lastName.errors?.required">Last Name is required</div>
-                </div>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col">
-                <label>Date of Birth</label>
-                <input type="date" name="dob" class="form-control" [(ngModel)]="model.dob" #dob="ngModel" [ngClass]="{ 'is-invalid': f.submitted && dob.invalid }" required pattern="^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$">
-                <div *ngIf="f.submitted && dob.invalid" class="invalid-feedback">
-                    <div *ngIf="dob.errors?.required">Date of Birth is required</div>
-                    <div *ngIf="dob.errors?.pattern">Date of Birth must be a valid date in the format YYYY-MM-DD</div>
-                </div>
-            </div>
-            <div class="form-group col">
-                <label>Email</label>
-                <input type="text" name="email" class="form-control" [(ngModel)]="model.email" #email="ngModel" [ngClass]="{ 'is-invalid': f.submitted && email.invalid }" required email>
-                <div *ngIf="f.submitted && email.invalid" class="invalid-feedback">
-                    <div *ngIf="email.errors?.required">Email is required</div>
-                    <div *ngIf="email.errors?.email">Email must be a valid email address</div>
-                </div>
-            </div>
-        </div> 
+      
+          </form>
+      
+        </mat-step>
+      
+        <mat-step [stepControl]="secondFormGroup">
+      
+          <form [formGroup]="secondFormGroup">
+      
+            <ng-template matStepLabel>Sale Details</ng-template>
+      
+            <mat-form-field class="w-100">
+      
+              <mat-label>Pre Sale rate</mat-label>
+      
+              <input matInput placeholder="100" formControlName="presalerate" required>
+              <mat-hint>How many {{ tokenDetails?.symbol }} tokens will 1 {{baseTokenSymbol}} get me? </mat-hint>
+            </mat-form-field>
+
+            
+      
+            <br/>
+      
+            <mat-form-field class="w-45 ">
+      
+              <mat-label>Soft Cap ({{baseTokenSymbol}})</mat-label>
+      
+              <input matInput placeholder="0" formControlName="softcap" required [min]="1">
+      
+            </mat-form-field>
+
+            <mat-form-field class="w-50 ">
+      
+                <mat-label>Hard Cap ({{baseTokenSymbol}})</mat-label>
         
-        <div class="form-group form-check">
-            <input type="checkbox" name="acceptTerms" id="acceptTerms" class="form-check-input" [(ngModel)]="model.acceptTerms" #acceptTerms="ngModel" [ngClass]="{ 'is-invalid': f.submitted && acceptTerms.invalid }" required>
-            <label for="acceptTerms" class="form-check-label">Accept Terms & Conditions</label>
-            <div *ngIf="f.submitted && acceptTerms?.invalid" class="invalid-feedback">Accept Ts & Cs is required</div>
-        </div>
-        <div class="text-center">
-            <button class="btn btn-primary mr-1">Register</button>
-            <button class="btn btn-secondary" type="reset">Cancel</button>
-        </div>
-    </form>
+                <input matInput placeholder="0" formControlName="hardcap" required>
+                
+                <mat-hint>Hard Cap can only be a max of x3 the Soft cap </mat-hint>
+
+                <mat-error >                  
+                    <span *ngFor="let error of secondFormGroup.get('hardcap')?.errors|keyvalue">
+                        {{validationMessages.hardcap[error.key]}}
+                    </span>
+                </mat-error>
+              </mat-form-field>
+      
+            <br/>
+
+            <mat-form-field class="w-45 ">
+      
+                <mat-label>Minimum Buy Size ({{baseTokenSymbol}})</mat-label>
+        
+                <input matInput placeholder="0" formControlName="minbuy" required>
+    
+            </mat-form-field>
+
+            <mat-form-field class="w-50 ">
+    
+                <mat-label>Maximum Buy Size ({{baseTokenSymbol}})</mat-label>
+        
+                <input matInput placeholder="0" formControlName="maxbuy" required>
+                <mat-error >                  
+                    <span *ngFor="let error of secondFormGroup.get('maxbuy')?.errors|keyvalue">
+                        {{validationMessages.maxbuy[error.key]}}
+                    </span>
+                </mat-error>
+            </mat-form-field>
+    
+            <br/>
+
+            <mat-form-field class="w-45 ">
+      
+                <mat-label>Liquidity (%)</mat-label>
+        
+                <input matInput placeholder="0" formControlName="liquidity" required>
+    
+            </mat-form-field>
+
+            <mat-form-field class="w-50 ">
+    
+                <mat-label>Listing Rate ({{baseTokenSymbol}})</mat-label>
+        
+                <input matInput placeholder="0" formControlName="listingrate" required>
+          
+            </mat-form-field>
+    
+            <br/>
+
+            <mat-form-field appearance="fill" class="w-75 mb-4">
+                <mat-label>DEX Router</mat-label>
+                <select matNativeControl required formControlName="router">
+                  
+                  <option value="ubeswap">UbeSwap</option>
+                </select>
+                <mat-error >                  
+                    <span *ngFor="let error of secondFormGroup.get('router')?.errors|keyvalue">
+                        {{validationMessages.router[error.key]}}
+                    </span>
+                </mat-error>
+                <mat-hint>The Contract adress of the DEX Router </mat-hint>
+            </mat-form-field>
+
+            <br/>
+
+            <mat-form-field appearance="fill" class="w-45">
+                <mat-label>Start date</mat-label>
+                <input matInput [ngxMatDatetimePicker]="picker" formControlName="startDate" required>
+                <mat-datepicker-toggle matSuffix [for]="pickerFixed"></mat-datepicker-toggle>
+                <!-- <mat-datepicker #picker></mat-datepicker> -->
+                <ngx-mat-datetime-picker #picker></ngx-mat-datetime-picker>
+                <mat-error >                  
+                    <span *ngFor="let error of secondFormGroup.get('startDate')?.errors|keyvalue">
+                        {{validationMessages.startDate[error.key]}}
+                    </span>
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class=" w-50 px-2">
+                <mat-label>End date</mat-label>
+                <input matInput [ngxMatDatetimePicker]="endpicker" formControlName="endDate" required>
+                <mat-datepicker-toggle matSuffix [for]="endPickerFixed"></mat-datepicker-toggle>
+                <!-- <mat-datepicker #endpicker></mat-datepicker> -->
+                <ngx-mat-datetime-picker #endpicker></ngx-mat-datetime-picker>
+
+                <mat-error >                  
+                    <span *ngFor="let error of secondFormGroup.get('endDate')?.errors|keyvalue">
+                        {{validationMessages.endDate[error.key]}}
+                    </span>
+                </mat-error>
+            </mat-form-field>
+              
+            <br/><br/>
+      
+            <div>
+      
+              <button mat-button matStepperPrevious>Back</button>
+      
+              <button mat-button matStepperNext [disabled]="secondFormGroup.invalid">Next</button>
+      
+            </div>
+      
+          </form>
+      
+        </mat-step>
+
+        <mat-step [stepControl]="thirdFormGroup">
+      
+            <form [formGroup]="thirdFormGroup">
+        
+              <ng-template matStepLabel>Owner Info</ng-template>
+        
+              <mat-form-field>
+        
+                <mat-label>Amount</mat-label>
+        
+                <input matInput placeholder="Amount" formControlName="amount" required>
+        
+              </mat-form-field>
+        
+              <br/>
+        
+              <mat-form-field>
+        
+                <mat-label>Stock</mat-label>
+        
+                <input matInput placeholder="Stock" formControlName="stock" required>
+        
+              </mat-form-field>
+
+              <mat-checkbox class="example-margin" >Accept Terms & Conditions</mat-checkbox>
+        
+              <br/>
+        
+              <div>
+        
+                <button mat-button matStepperPrevious>Back</button>
+        
+                <button mat-button matStepperNext [disabled]="thirdFormGroup.invalid">Next</button>
+        
+              </div>
+        
+            </form>
+        
+        </mat-step>
+      
+        <mat-step>
+      
+          <ng-template matStepLabel>Done</ng-template>
+      
+          <p>You are now done.</p>
+      
+        
+      
+          <mat-list>
+      
+           <mat-list-item> <strong>Name:</strong> {{ this.firstFormGroup.value.name }}</mat-list-item>
+      
+           <mat-list-item> <strong>Description:</strong> {{ this.firstFormGroup.value.description }}</mat-list-item>
+      
+           <mat-list-item> <strong>Amount:</strong> {{ this.secondFormGroup.value.amount }}</mat-list-item>
+      
+           <mat-list-item> <strong>Stock:</strong> {{ this.secondFormGroup.value.stock }}</mat-list-item>
+      
+          </mat-list>
+      
+        
+      
+          <div>
+      
+            <button mat-button matStepperPrevious>Back</button>
+      
+            <button mat-button (click)="stepper.reset()">Reset</button>
+      
+            <button mat-button (click)="submit()">Submit</button>
+      
+          </div>
+      
+        </mat-step>
+      
+      </mat-horizontal-stepper>
+
+
+      
+
+    
 
   </div>
 

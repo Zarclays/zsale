@@ -24,6 +24,8 @@ import { MdbTooltipModule } from 'mdb-angular-ui-kit/tooltip';
 import { MdbValidationModule } from 'mdb-angular-ui-kit/validation';
 import { ModalComponent } from './modal/modal.component';
 import { LaunchpadsModule } from './modules/application/launchpads/launchpads.module';
+import {STEPPER_GLOBAL_OPTIONS} from '@angular/cdk/stepper';
+
 
 @NgModule({
   declarations: [
@@ -43,7 +45,12 @@ import { LaunchpadsModule } from './modules/application/launchpads/launchpads.mo
     MdbValidationModule,
     LaunchpadsModule
   ],
-  providers: [], 
+  providers: [
+    {
+      provide: STEPPER_GLOBAL_OPTIONS,
+      useValue: { showError: true }
+    }
+  ], 
   bootstrap: [AppComponent]
 })
 export class AppModule { }
