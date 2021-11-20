@@ -1,6 +1,26 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Web3Service } from 'src/app/modules/services';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import { Web3Service,CampaignService } from 'src/app/modules/services';
+import {FormBuilder, FormGroup,FormControl, FormGroupDirective, NgForm, Validators, AbstractControl} from '@angular/forms';
+import { MatStepper } from '@angular/material/stepper';
+import { ValidateEndDateLaterThanStartDate } from '../validators/create-launchpad-validator';
+import {ErrorStateMatcher} from '@angular/material/core';
+
+
+/** Error when the parent is invalid */
+class CrossFieldErrorMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    //ts-ignore
+    return (control?.dirty??false) && (form?.invalid??false);
+  }
+}
+
+/** Error when invalid control is dirty, touched, or submitted. */
+// export class CrossFieldErrorMatcher implements ErrorStateMatcher {
+//   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+//     const isSubmitted = form && form.submitted;
+//     return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
+//   }
+// }
 
 @Component({
   selector: 'app-create-launchpad',
@@ -21,6 +41,8 @@ export class CreateLaunchpadComponent implements OnInit {
   thirdFormGroup: FormGroup; 
 
   baseTokenSymbol = 'CELO';
+
+  errorMatcher = new CrossFieldErrorMatcher();
 
   validationMessages : {
    [index: string]: any
@@ -64,10 +86,13 @@ export class CreateLaunchpadComponent implements OnInit {
       'max': 'Hard cap must be at most 1,000,000 '
     },
     'startDate' : {
-      'required'  :   'Start Date is Required.'
+      'required'  :   'Start Date is Required.',
+      'past': 'Start Date can not be in the past'
     },
     'endDate' : {
       'required'  :   'End Date is Required.',
+      'past': 'End Date can not be in the past',
+      //'less': 'End date cannot be less than Start date'
       // 'pattern'   :   'Contact No. should only contain Numbers '
     },
     'logo' : {
@@ -90,7 +115,7 @@ export class CreateLaunchpadComponent implements OnInit {
   @ViewChild('picker', { static: true }) pickerFixed?: any;
   @ViewChild('endpicker', { static: true }) endPickerFixed?: any;
 
-  constructor(public web3Service: Web3Service, private _formBuilder: FormBuilder) { }
+  constructor(public web3Service: Web3Service, public campaignService: CampaignService, private _formBuilder: FormBuilder) { }
 
   ngOnInit(): void {
     this.firstFormGroup = this._formBuilder.group({
@@ -101,18 +126,20 @@ export class CreateLaunchpadComponent implements OnInit {
 
     this.secondFormGroup = this._formBuilder.group({
 
-      presalerate: ['', [Validators.required]],
-      softcap: ['', [Validators.required, Validators.min(1)]],
-      hardcap: ['', [Validators.required,Validators.min(1),Validators.max(1000000)]],
-      minbuy: ['', [Validators.required, Validators.min(0)]],
-      maxbuy: ['', [Validators.required,Validators.min(0),Validators.max(1000000)]],
-      liquidity: ['50', [Validators.required, Validators.min(50), Validators.max(100)]],
-      listingrate : ['', [Validators.required,Validators.min(0)]],
-      router: ['', [Validators.required ] ],
-      startDate: ['', [Validators.required ] ],
-      endDate: ['', [Validators.required ] ]
+        presalerate: ['', [Validators.required]],
+        softcap: ['', [Validators.required, Validators.min(1)]],
+        hardcap: ['', [Validators.required,Validators.min(1),Validators.max(1000000)]],
+        minbuy: ['', [Validators.required, Validators.min(0)]],
+        maxbuy: ['', [Validators.required,Validators.min(0),Validators.max(1000000)]],
+        liquidity: ['50', [Validators.required, Validators.min(50), Validators.max(100)]],
+        listingrate : ['', [Validators.required,Validators.min(0)]],
+        router: ['', [Validators.required ] ],
+        startDate: ['', [Validators.required, this.ValidateDateIsNotInPast ] ],
+        endDate: ['', [Validators.required , this.ValidateDateIsNotInPast, ValidateEndDateLaterThanStartDate] ]
 
-    }, {validator: this.dateLessThan('startDate', 'endDate')});
+      }, 
+      {validator: [ValidateEndDateLaterThanStartDate]}// this.dateLessThan('startDate', 'endDate')    
+    );
 
     this.thirdFormGroup = this._formBuilder.group({
 
@@ -122,6 +149,9 @@ export class CreateLaunchpadComponent implements OnInit {
 
       website: ['', [Validators.required]],
 
+      desc: ['', [Validators.required]],
+      reddit: ['', []],
+
 
 
     });
@@ -129,29 +159,44 @@ export class CreateLaunchpadComponent implements OnInit {
 
 
     this.firstFormGroup.get('tokenAddress')?.valueChanges.subscribe(async value => {
-      console.log('new token: ',value);
-      if(value.length>=42){
+      
+      if(value && value.length>=42){
         this.tokenDetails = await this.web3Service.getERC20Details(value);
-        console.log(this.tokenDetails)
+        
       }
     });
-
-
   }
 
-  dateLessThan(from: string, to: string) {
-    return (group: FormGroup): {[key: string]: any} => {
-      let f = group.controls[from];
-      let t = group.controls[to];
-      if (f.value > t.value) {
-        return {
-          dates: "Start Date should be less than End Date"
-        };
-      }
-      return {};
+  
+  ValidateDateIsNotInPast(control: AbstractControl): {[key: string]: any} | null  {
+    if (control.value && new Date(control.value) < new Date() ) {
+      return { 'past': true };
     }
-}
+    return null;
+  }
 
+
+  // dateLessThan(from: string, to: string) {
+  //   return (group: FormGroup): {[key: string]: any} => {
+  //     let f = group.controls[from];
+  //     let t = group.controls[to];
+      
+  //     if (f.value > t.value) {
+  //       return {
+  //         startDate: "Start Date should be less than End Date"
+  //       };
+  //     }
+  //     return {}; 
+  //   }
+  // }
+
+
+
+
+  resetStepper(stepper: MatStepper){
+      stepper.reset();
+      this.tokenDetails= undefined;
+  }
    // convenience getter for easy access to form fields
   get f1() { return this.firstFormGroup.controls; }
 
@@ -159,9 +204,7 @@ export class CreateLaunchpadComponent implements OnInit {
 
   get f3() { return this.thirdFormGroup.controls; }
 
-  onSubmit() {
-    alert('SUCCESS!! :-)\n\n' + JSON.stringify(this.model, null, 4));
-  }
+ 
 
 
   submit(){
@@ -169,6 +212,8 @@ export class CreateLaunchpadComponent implements OnInit {
       console.log(this.firstFormGroup.value);
 
       console.log(this.secondFormGroup.value);
+
+
 
   }
 

@@ -153,6 +153,7 @@
                 <ngx-mat-datetime-picker #picker></ngx-mat-datetime-picker>
                 <mat-error >                  
                     <span *ngFor="let error of secondFormGroup.get('startDate')?.errors|keyvalue">
+                      
                         {{validationMessages.startDate[error.key]}}
                     </span>
                 </mat-error>
@@ -160,10 +161,14 @@
 
             <mat-form-field appearance="fill" class=" w-50 px-2">
                 <mat-label>End date</mat-label>
-                <input matInput [ngxMatDatetimePicker]="endpicker" formControlName="endDate" required>
+                <input matInput [ngxMatDatetimePicker]="endpicker" formControlName="endDate" required [errorStateMatcher]="errorMatcher">
                 <mat-datepicker-toggle matSuffix [for]="endPickerFixed"></mat-datepicker-toggle>
                 <!-- <mat-datepicker #endpicker></mat-datepicker> -->
                 <ngx-mat-datetime-picker #endpicker></ngx-mat-datetime-picker>
+
+                <mat-error *ngIf="secondFormGroup.hasError('endDateLater')">
+                  End Date cannot be later than start date!
+                </mat-error>
 
                 <mat-error >                  
                     <span *ngFor="let error of secondFormGroup.get('endDate')?.errors|keyvalue">
@@ -191,12 +196,22 @@
             <form [formGroup]="thirdFormGroup">
         
               <ng-template matStepLabel>Owner Info</ng-template>
+
+              <mat-form-field>
+        
+                <mat-label>Website</mat-label>
+        
+                <input matInput placeholder="" formControlName="website" required>
+        
+              </mat-form-field>
+
+              <br/>
         
               <mat-form-field>
         
-                <mat-label>Amount</mat-label>
+                <mat-label>Twitter Handle</mat-label>
         
-                <input matInput placeholder="Amount" formControlName="amount" required>
+                <input matInput placeholder="" formControlName="twitter" required>
         
               </mat-form-field>
         
@@ -204,11 +219,35 @@
         
               <mat-form-field>
         
-                <mat-label>Stock</mat-label>
+                <mat-label>Telegram link</mat-label>
         
-                <input matInput placeholder="Stock" formControlName="stock" required>
+                <input matInput placeholder="Stock" formControlName="telegram" >
         
               </mat-form-field>
+
+              
+
+              <mat-form-field>
+        
+                <mat-label>Reddit</mat-label>
+        
+                <input matInput placeholder="" formControlName="reddit" >
+        
+              </mat-form-field>
+
+              <br/>
+
+              <mat-form-field>
+        
+                <mat-label>Description</mat-label>
+        
+                <textarea rows="4" matInput placeholder="" formControlName="desc" ></textarea>
+        
+              </mat-form-field>
+
+              <br/>
+
+
 
               <mat-checkbox class="example-margin" >Accept Terms & Conditions</mat-checkbox>
         
@@ -228,21 +267,39 @@
       
         <mat-step>
       
-          <ng-template matStepLabel>Done</ng-template>
+          <ng-template matStepLabel>Preview</ng-template>
       
-          <p>You are now done.</p>
+          <h3>Preview your submissions.</h3>
+          <!-- <h3>You will need.</h3> -->
       
         
       
-          <mat-list>
+          <mat-list *ngIf="tokenDetails">
+            <!-- <mat-list-item> <strong>Presale Address:</strong> {{ tokenDetails.name }}</mat-list-item> -->
+           <mat-list-item> <strong>Name:</strong> {{ tokenDetails.name }}</mat-list-item>
+           <mat-list-item> <strong>Symbol:</strong> {{ tokenDetails.symbol }}</mat-list-item>
       
-           <mat-list-item> <strong>Name:</strong> {{ this.firstFormGroup.value.name }}</mat-list-item>
+           <mat-list-item> <strong>Description:</strong> {{ this.thirdFormGroup.value.desc }}</mat-list-item>
+
+           <mat-list-item> <strong>Token Decimals:</strong> {{ tokenDetails.decimals }}</mat-list-item>
       
-           <mat-list-item> <strong>Description:</strong> {{ this.firstFormGroup.value.description }}</mat-list-item>
+           <mat-list-item> <strong>Token Address:</strong> {{ this.firstFormGroup.value.tokenAddress }}</mat-list-item>
       
-           <mat-list-item> <strong>Amount:</strong> {{ this.secondFormGroup.value.amount }}</mat-list-item>
+           <mat-list-item> <strong>Presale rate:</strong> {{ this.secondFormGroup.value.presalerate }}</mat-list-item>
+           <mat-list-item> <strong>Listing rate:</strong> {{ this.secondFormGroup.value.listingrate }}</mat-list-item>
       
-           <mat-list-item> <strong>Stock:</strong> {{ this.secondFormGroup.value.stock }}</mat-list-item>
+           <mat-list-item> <strong>Soft Cap:</strong> {{ this.secondFormGroup.value.softcap }}</mat-list-item>
+           <mat-list-item> <strong>Hard Cap:</strong> {{ this.secondFormGroup.value.hardcap }}</mat-list-item>
+
+           <mat-list-item> <strong>Minimum Buy:</strong> {{ this.secondFormGroup.value.minbuy }}</mat-list-item>
+           <mat-list-item> <strong>Maximum Buy:</strong> {{ this.secondFormGroup.value.maxbuy }}</mat-list-item>
+
+           <mat-list-item> <strong>Liquidity Percent:</strong> {{ this.secondFormGroup.value.liquidity }}</mat-list-item>
+           <!-- <mat-list-item> <strong>Liquidity Lockup period:</strong> {{ this.secondFormGroup.value.amount }}</mat-list-item> -->
+
+           <mat-list-item> <strong>Presale Start Date:</strong> {{ this.secondFormGroup.value.startDate }}</mat-list-item>
+           <mat-list-item> <strong>Presale End Date:</strong> {{ this.secondFormGroup.value.endDate }}</mat-list-item>
+
       
           </mat-list>
       
@@ -252,9 +309,9 @@
       
             <button mat-button matStepperPrevious>Back</button>
       
-            <button mat-button (click)="stepper.reset()">Reset</button>
+            <button mat-button (click)="resetStepper(stepper)" color="danger">Reset</button>
       
-            <button mat-button (click)="submit()">Submit</button>
+            <button mat-button (click)="submit()" color="primary">Submit</button>
       
           </div>
       
