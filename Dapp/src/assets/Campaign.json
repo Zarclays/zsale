@@ -82,6 +82,25 @@
       "type": "event"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "ValueReceived",
+      "type": "event"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -226,6 +245,31 @@
           "internalType": "enum Campaign.RefundType",
           "name": "refundType",
           "type": "uint8"
+        },
+        {
+          "internalType": "string",
+          "name": "logoUrl",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "desc",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "website",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "twitter",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "telegram",
+          "type": "string"
         }
       ],
       "stateMutability": "view",
@@ -650,6 +694,13 @@
       "name": "setAudited",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "submitBid",
+      "outputs": [],
+      "stateMutability": "payable",
       "type": "function"
     },
     {

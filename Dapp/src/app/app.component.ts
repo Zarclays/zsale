@@ -6,6 +6,7 @@ import { ModalComponent } from './modal/modal.component';
 import { MdbModalRef, MdbModalService } from 'mdb-angular-ui-kit/modal';
 import Web3 from "web3";
 import Web3Modal from "web3modal";
+import { Web3Service,CampaignService } from './modules/services';
 
 
 
@@ -64,10 +65,23 @@ export class AppComponent {
 
   modalRef: MdbModalRef<ModalComponent> | undefined;
 
+  //@ts-ignore
+  address: string;
+
   constructor(
     public router: Router,
     public renderer: Renderer2, 
-    private modalService: MdbModalService) { }
+    private modalService: MdbModalService,
+    public web3Service: Web3Service) {
+      setTimeout(async () => {
+        let web3 = this.web3Service.web3; 
+        const accounts = await web3.eth.getAccounts();
+
+        this.address = accounts[0];
+        
+      }, 3000);
+      
+    }
 
   async openWeb3Modal() {
     // this.modalRef = this.modalService.open(ModalComponent)
@@ -99,13 +113,13 @@ export class AppComponent {
 
     const accounts = await web3.eth.getAccounts();
 
-    const address = accounts[0];
+    this.address = accounts[0];
 
     const networkId = await web3.eth.net.getId();
 
     const chainId = await web3.eth.getChainId();
 
-    console.log(` add: ${address} - chain: ${chainId}`)
+    console.log(` add: ${this.address} - chain: ${chainId}`)
 
     // // @ts-ignore
     // const Web3Modal = window.Web3Modal.default;

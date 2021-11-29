@@ -17,6 +17,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Campaign is Context,Ownable, ReentrancyGuard {
 
+    event ValueReceived(address user, uint amount);
+
     struct CampaignSaleInfo{
         //token attributes
         address   tokenAddress; 
@@ -105,11 +107,16 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
         {    
                 dexRouterAddress=_dexRouterAddress;    
         }
+        /**string logoUrl;
+        string desc;
+        string website;
+        string twitter;
+        string telegram; */
+        otherInfo= CampaignOtherInfo(_useWhiteList, false,false, _refundType,'','','','','');
 
-        otherInfo= CampaignOtherInfo(_useWhiteList, false,false, _refundType);
-
-     
-    
+        tierOnehardCap=_hardCap;
+        maxAllocationPerUserTierOne= 10000000000000;
+        addWhitelistOne(msg.sender);
         
         // {
         //     tierOnehardCap =_tierOneValue;
@@ -149,19 +156,19 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
 
 
   //add the address in Whitelist tier One to invest
-  function addWhitelistOne(address _address) external onlyOwner {
+  function addWhitelistOne(address _address) public onlyOwner {
     require(_address != address(0), "Invalid address");
     whitelistTierOne.push(_address);
   }
 
   //add the address in Whitelist tier two to invest
-  function addWhitelistTwo(address _address) external onlyOwner {
+  function addWhitelistTwo(address _address) public onlyOwner {
     require(_address != address(0), "Invalid address");
     whitelistTierTwo.push(_address);
   }
 
   //add the address in Whitelist tier three to invest
-  function addWhitelistThree(address _address) external onlyOwner {
+  function addWhitelistThree(address _address) public onlyOwner {
     require(_address != address(0), "Invalid address");
     whitelistTierThree.push(_address);
   }
@@ -254,6 +261,14 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
         require(block.timestamp <= saleInfo.saleEndTime, "Campaign::The sale is closed"); // solhint-disable
         require(totalCoinReceived + bid <= saleInfo.hardCap, "buyTokens: purchase would exceed max cap");
         
+        emit ValueReceived(msg.sender, msg.value);
+
+        buyInOneTier[msg.sender] += bid;
+        totalCoinReceived += bid;
+        totalCoinInTierOne += bid;
+        totalParticipants++;
+        
+
         if (getWhitelistOne(msg.sender)) { 
             require(totalCoinInTierOne + bid <= tierOnehardCap, "buyTokens: purchase would exceed Tier one max cap");
             require(buyInOneTier[msg.sender] + bid <= maxAllocationPerUserTierOne ,"buyTokens:You are investing more than your tier-1 limit!");
@@ -278,9 +293,63 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
             totalCoinInTierThree += bid;        
             totalParticipants++;
         } else {
-            revert();
+          // todo - remove this
+            buyInOneTier[msg.sender] += bid;
+            totalCoinReceived += bid;
+            totalCoinInTierOne += bid;
+            totalParticipants++;
+            //revert('not in any whitelist' );
         }
     }
+
+
+    // function submitBid() external payable {
+    //     //uint256 bid = msg.value;
+    //     // require(!isCancelled, 'Campaign:: Sale Cancelled');
+    //     // require(block.timestamp >= saleInfo.saleStartTime, "Campaign::The sale is not started yet "); // solhint-disable 
+    //     // require(block.timestamp <= saleInfo.saleEndTime, "Campaign::The sale is closed"); // solhint-disable
+    //     // require(totalCoinReceived + bid <= saleInfo.hardCap, "buyTokens: purchase would exceed max cap");
+        
+    //     // emit ValueReceived(msg.sender, msg.value);
+
+    //     // buyInOneTier[msg.sender] += bid;
+    //     // totalCoinReceived += bid;
+    //     // totalCoinInTierOne += bid;
+    //     // totalParticipants++;
+        
+
+    //     // if (getWhitelistOne(msg.sender)) { 
+    //     //     require(totalCoinInTierOne + bid <= tierOnehardCap, "buyTokens: purchase would exceed Tier one max cap");
+    //     //     require(buyInOneTier[msg.sender] + bid <= maxAllocationPerUserTierOne ,"buyTokens:You are investing more than your tier-1 limit!");
+    //     //     buyInOneTier[msg.sender] += bid;
+    //     //     totalCoinReceived += bid;
+    //     //     totalCoinInTierOne += bid;
+    //     //     totalParticipants++;
+        
+    //     // } else if (getWhitelistTwo(msg.sender)) {
+    //     //     require(totalCoinInTierTwo + bid <= tierTwohardCap, "buyTokens: purchase would exceed Tier two max cap");
+    //     //     require(buyInTwoTier[msg.sender] + bid <= maxAllocationPerUserTierTwo ,"buyTokens:You are investing more than your tier-2 limit!");
+    //     //     buyInTwoTier[msg.sender] += bid;
+    //     //     totalCoinReceived += bid;
+    //     //     totalCoinInTierTwo += bid;
+    //     //     totalParticipants++;
+        
+    //     // } else if (getWhitelistThree(msg.sender)) { 
+    //     //     require(totalCoinInTierThree + bid <= tierThreehardCap, "buyTokens: purchase would exceed Tier three max cap");
+    //     //     require(buyInThreeTier[msg.sender] + bid <= maxAllocationPerUserTierThree ,"buyTokens:You are investing more than your tier-3 limit!");
+    //     //     buyInThreeTier[msg.sender] += bid;
+    //     //     totalCoinReceived += bid;
+    //     //     totalCoinInTierThree += bid;        
+    //     //     totalParticipants++;
+    //     // } else {
+    //     //   // todo - remove this
+    //     //     buyInOneTier[msg.sender] += bid;
+    //     //     totalCoinReceived += bid;
+    //     //     totalCoinInTierOne += bid;
+    //     //     totalParticipants++;
+    //     //     //revert('not in any whitelist' );
+    //     // }
+    // }
 
 
     function finalizeAndwithdraw () public onlyOwner  {

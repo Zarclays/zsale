@@ -1,1 +1,121 @@
-<p>Launchpad ID: {{ id }}</p>
+<div class="container">
+    <div class="row">
+        <div class="col-8">
+            <div class="card">
+                <div class="card-header"></div>
+                <div class="card-body" *ngIf="details">
+                    <p>{{ details.desc }}</p>
+
+                    <mat-list >
+                        <mat-list-item > <strong class="text-left">Presale Address:</strong> {{ details.saleAddress }}</mat-list-item> 
+                        
+                       <mat-list-item class="d-flex justify-content-between"> <strong>Name:</strong> <div>{{ details.name }} ({{ details.symbol }})</div> </mat-list-item>
+                       
+                  
+                       <!-- <mat-list-item> <strong>Description:</strong> {{ details.desc }}</mat-list-item> -->
+            
+                       <!-- <mat-list-item> <strong>Token Decimals:</strong> {{ details.decimals }}</mat-list-item> -->
+                  
+                       <mat-list-item> <strong>Token Address:</strong> {{ details.tokenAddress }}</mat-list-item>
+                  
+                       <mat-list-item> <strong>Presale rate:</strong> 1 {{baseTokenSymbol}} gets {{ details.listRate }}</mat-list-item>
+                       <mat-list-item> <strong>Listing rate:</strong> 1 {{baseTokenSymbol}} gets {{ details.dexListRate }}</mat-list-item>
+                  
+                       <mat-list-item> <strong>Cap:</strong> <small>from</small> {{ details.softCap }} <small>to</small> {{ details.hardCap }}</mat-list-item>
+                       
+            
+                       <mat-list-item> <strong>Minimum Buy:</strong> {{ details.minbuy }}</mat-list-item>
+                       <mat-list-item> <strong>Maximum Buy:</strong> {{ details.maxbuy }}</mat-list-item>
+            
+                       
+            
+                       <mat-list-item> <strong>Liquidity Percent:</strong> {{ details.liquidityPercent }}</mat-list-item>
+                       <!-- <mat-list-item> <strong>Liquidity Lockup period:</strong> {{ details.amount }}</mat-list-item> -->
+            
+                       <mat-list-item> <strong>Presale Start Date:</strong> {{ details.saleStartTime | date }}</mat-list-item>
+                       <mat-list-item> <strong>Presale End Date:</strong> {{ details.saleEndTime | date }}</mat-list-item>
+            
+                       <mat-list-item> <strong>Router Address:</strong> <b>{{ details.dexRouterAddress }}</b></mat-list-item>
+                      </mat-list>
+                  
+                    
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header"></div>
+                <div class="card-body " *ngIf="details">
+
+                    <h2 ><strong>Raising:</strong> from {{ details.softCap }} CELO to {{ details.hardCap }} CELO</h2>
+                    <h3 *ngIf="details && details.totalCoinsReceived"> Raised: {{details.totalCoinsReceived}} </h3>
+
+
+                    <mat-list  class="ongoing-details ">
+
+                        <mat-list-item class="text-small"> <strong>Presale Start Date:</strong> {{ details?.saleStartTime | date:'medium' }}</mat-list-item>
+                        <mat-list-item class="text-small"> <strong>Presale End Date:</strong> {{ details?.saleEndTime| date:'medium' }}</mat-list-item>
+ 
+                        <mat-list-item class="text-small"> <strong>Minimum Buy:</strong> {{ details.minbuy }}</mat-list-item>
+                        <mat-list-item class="text-small"> <strong>Maximum Buy:</strong> {{ details.maxbuy }}</mat-list-item>
+
+                        
+                  
+                      </mat-list>
+
+                      <!-- if not cancelled and not reached hardcap or enddate -->
+                      <form [formGroup]="frmGrp" class="form-donate">
+      
+                        <ng-template matStepLabel>Participate</ng-template>
+                                   
+                    
+            
+                        <mat-form-field class="w-100 ">
+                
+                            <mat-label>Amount ({{baseTokenSymbol}})</mat-label>
+                    
+                            <input type="number"  matInput placeholder="1" formControlName="amount" required>
+                            <mat-error >                  
+                                <span *ngFor="let error of frmGrp.get('amount')?.errors|keyvalue">
+                                    {{validationMessages.amount[error.key]}}
+                                </span>
+                            </mat-error>
+                        </mat-form-field>
+                
+                        <br/>
+            
+                        
+                  
+                        <div>
+                                  
+                          <button class="btn btn-primary btn-md" (click)="submit()"  [disabled]="frmGrp.invalid">Submit</button>
+                  
+                        </div>
+
+                        <div class="my-1 py-1">
+                            <button class="btn btn-danger btn-md my-1 py-2" (click)="cancelSale()"  [disabled]="true">Cancel sale</button>
+
+                            <button class="btn btn-secondary btn-md my-1 py-2" (click)="postponeSale()"  [disabled]="true">Postpone sale</button>
+
+                            <button class="btn btn-primary btn-md my-1 py-2" (click)="finalizeSale()"  [disabled]="true">Finalize sale</button>
+                        </div>
+
+                        <div >
+                            <button class="btn btn-danger btn-md my-1 py-2" (click)="withdrawFunds()"  [disabled]="true">Withdraw your funds</button>
+
+                        </div>
+
+                        
+
+                  
+                      </form>
+
+                  
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>

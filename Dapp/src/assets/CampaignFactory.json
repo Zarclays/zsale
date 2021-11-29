@@ -215,13 +215,7 @@
         }
       ],
       "name": "createNewCampaign",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "nc",
-          "type": "address"
-        }
-      ],
+      "outputs": [],
       "stateMutability": "payable",
       "type": "function",
       "payable": true

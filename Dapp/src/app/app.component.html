@@ -48,7 +48,7 @@
       <!-- Right elements -->
       <div class="d-flex align-items-center text-white">
         <!-- Icon -->
-        <a class="text-reset me-3" [routerLink]="['/launchpads']">
+        <a class="text-reset me-3" [routerLink]="['/launchpads/create']">
           <i class="fas fa-plus"></i> Create
         </a>
 
@@ -60,10 +60,15 @@
         </a>
 
         <!-- Connect to Wallet -->
-        <a class="text-reset me-3 btn btn-primary" (click)="openWeb3Modal()">
+        <a *ngIf="!web3Service.ready" class="text-reset me-3 btn btn-primary" (click)="openWeb3Modal()">
           
           Connect
         </a>
+
+        <span  class="text-reset me-3 " >
+          {{address}}
+          
+        </span>
 
         
         
@@ -88,11 +93,18 @@
             About ZSales
           </a>
           <ul class="list-unstyled font-weight-normal mb-2 collapse" id="ganatan-collapse">
-            <li><a [routerLink]="['/launchpads']" class="d-inline-flex align-items-center rounded active"
+            <li><a [routerLink]="['/launchpads/create']" class="d-inline-flex align-items-center rounded active"
                 aria-current="page">Create  IDO/Launchpad</a>
             </li>
             <li><a (click)="onSelectMenu('contact')" class="d-inline-flex align-items-center rounded">Contact</a></li>
           </ul>
+        </li>
+        <li class="mb-1">
+          <a class="bd-select d-inline-flex align-items-center rounded" [routerLink]="['/launchpads/create']"    role="button" aria-expanded="true" aria-current="true">
+            <i class="fas fa-house-user me-2"></i>
+            Create  IDO/Launchpad
+          </a>
+          
         </li>
         <li *ngFor="let item of items; let i = index" class="mb-1">
           <a class="bd-select d-inline-flex align-items-center rounded" data-bs-toggle="collapse"

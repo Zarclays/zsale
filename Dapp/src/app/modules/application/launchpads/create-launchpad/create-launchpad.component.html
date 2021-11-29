@@ -56,7 +56,7 @@
       
               <mat-label>Pre Sale rate</mat-label>
       
-              <input matInput placeholder="100" formControlName="presalerate" required>
+              <input type="number" matInput placeholder="100" formControlName="presalerate" required>
               <mat-hint>How many {{ tokenDetails?.symbol }} tokens will 1 {{baseTokenSymbol}} get me? </mat-hint>
             </mat-form-field>
 
@@ -68,7 +68,7 @@
       
               <mat-label>Soft Cap ({{baseTokenSymbol}})</mat-label>
       
-              <input matInput placeholder="0" formControlName="softcap" required [min]="1">
+              <input  type="number"  matInput placeholder="0" formControlName="softcap" required [min]="1">
       
             </mat-form-field>
 
@@ -76,7 +76,7 @@
       
                 <mat-label>Hard Cap ({{baseTokenSymbol}})</mat-label>
         
-                <input matInput placeholder="0" formControlName="hardcap" required>
+                <input type="number"  matInput placeholder="0" formControlName="hardcap" required>
                 
                 <mat-hint>Hard Cap can only be a max of x3 the Soft cap </mat-hint>
 
@@ -93,7 +93,7 @@
       
                 <mat-label>Minimum Buy Size ({{baseTokenSymbol}})</mat-label>
         
-                <input matInput placeholder="0" formControlName="minbuy" required>
+                <input type="number"  matInput placeholder="0" formControlName="minbuy" required>
     
             </mat-form-field>
 
@@ -101,7 +101,7 @@
     
                 <mat-label>Maximum Buy Size ({{baseTokenSymbol}})</mat-label>
         
-                <input matInput placeholder="0" formControlName="maxbuy" required>
+                <input type="number"  matInput placeholder="0" formControlName="maxbuy" required>
                 <mat-error >                  
                     <span *ngFor="let error of secondFormGroup.get('maxbuy')?.errors|keyvalue">
                         {{validationMessages.maxbuy[error.key]}}
@@ -115,7 +115,7 @@
       
                 <mat-label>Liquidity (%)</mat-label>
         
-                <input matInput placeholder="0" formControlName="liquidity" required>
+                <input type="number"  matInput placeholder="0" formControlName="liquidity" required>
     
             </mat-form-field>
 
@@ -123,17 +123,17 @@
     
                 <mat-label>Listing Rate ({{baseTokenSymbol}})</mat-label>
         
-                <input matInput placeholder="0" formControlName="listingrate" required>
+                <input type="number"  matInput placeholder="0" formControlName="listingrate" required>
           
             </mat-form-field>
     
             <br/>
 
-            <mat-form-field appearance="fill" class="w-75 mb-4">
+            <mat-form-field appearance="fill" class="w-50 mb-4">
                 <mat-label>DEX Router</mat-label>
                 <select matNativeControl required formControlName="router">
                   
-                  <option value="ubeswap">UbeSwap</option>
+                  <option value="0xe3d8bd6aed4f159bc8000a9cd47cffdb95f96121">UbeSwap</option>
                 </select>
                 <mat-error >                  
                     <span *ngFor="let error of secondFormGroup.get('router')?.errors|keyvalue">
@@ -143,25 +143,40 @@
                 <mat-hint>The Contract adress of the DEX Router </mat-hint>
             </mat-form-field>
 
-            <br/>
+            <mat-form-field appearance="fill" class=" mb-4">
+              <mat-label>Refund Type</mat-label>
+              <select matNativeControl required formControlName="refundType">
+                
+                <option value="0">Burn Tokens</option>
+                <option value="1">Refund</option>
+              </select>
+              <mat-error >                  
+                  <span *ngFor="let error of secondFormGroup.get('refundType')?.errors|keyvalue">
+                      {{validationMessages.router[error.key]}}
+                  </span>
+              </mat-error>
+              <mat-hint>The action to take if Sale fails </mat-hint>
+          </mat-form-field>
+
+          <br/>
 
             <mat-form-field appearance="fill" class="w-45">
                 <mat-label>Start date</mat-label>
-                <input matInput [ngxMatDatetimePicker]="picker" formControlName="startDate" required>
+                <input type="datetime" matInput [ngxMatDatetimePicker]="picker" formControlName="saleStartTime" required>
                 <mat-datepicker-toggle matSuffix [for]="pickerFixed"></mat-datepicker-toggle>
                 <!-- <mat-datepicker #picker></mat-datepicker> -->
                 <ngx-mat-datetime-picker #picker></ngx-mat-datetime-picker>
                 <mat-error >                  
-                    <span *ngFor="let error of secondFormGroup.get('startDate')?.errors|keyvalue">
+                    <span *ngFor="let error of secondFormGroup.get('saleStartTime')?.errors|keyvalue">
                       
-                        {{validationMessages.startDate[error.key]}}
+                        {{validationMessages.saleStartTime[error.key]}}
                     </span>
                 </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="fill" class=" w-50 px-2">
                 <mat-label>End date</mat-label>
-                <input matInput [ngxMatDatetimePicker]="endpicker" formControlName="endDate" required [errorStateMatcher]="errorMatcher">
+                <input  type="datetime"  matInput [ngxMatDatetimePicker]="endpicker" formControlName="saleEndTime" required [errorStateMatcher]="errorMatcher">
                 <mat-datepicker-toggle matSuffix [for]="endPickerFixed"></mat-datepicker-toggle>
                 <!-- <mat-datepicker #endpicker></mat-datepicker> -->
                 <ngx-mat-datetime-picker #endpicker></ngx-mat-datetime-picker>
@@ -171,8 +186,8 @@
                 </mat-error>
 
                 <mat-error >                  
-                    <span *ngFor="let error of secondFormGroup.get('endDate')?.errors|keyvalue">
-                        {{validationMessages.endDate[error.key]}}
+                    <span *ngFor="let error of secondFormGroup.get('saleEndTime')?.errors|keyvalue">
+                        {{validationMessages.saleEndTime[error.key]}}
                     </span>
                 </mat-error>
             </mat-form-field>
@@ -221,7 +236,7 @@
         
                 <mat-label>Telegram link</mat-label>
         
-                <input matInput placeholder="Stock" formControlName="telegram" >
+                <input matInput placeholder="Stock" formControlName="telegram" required>
         
               </mat-form-field>
 
@@ -241,7 +256,7 @@
         
                 <mat-label>Description</mat-label>
         
-                <textarea rows="4" matInput placeholder="" formControlName="desc" ></textarea>
+                <textarea rows="4" matInput placeholder="" formControlName="desc" required></textarea>
         
               </mat-form-field>
 
@@ -294,11 +309,13 @@
            <mat-list-item> <strong>Minimum Buy:</strong> {{ this.secondFormGroup.value.minbuy }}</mat-list-item>
            <mat-list-item> <strong>Maximum Buy:</strong> {{ this.secondFormGroup.value.maxbuy }}</mat-list-item>
 
+           <mat-list-item> <strong>Router:</strong> {{ this.secondFormGroup.value.router }}</mat-list-item>
+
            <mat-list-item> <strong>Liquidity Percent:</strong> {{ this.secondFormGroup.value.liquidity }}</mat-list-item>
            <!-- <mat-list-item> <strong>Liquidity Lockup period:</strong> {{ this.secondFormGroup.value.amount }}</mat-list-item> -->
 
-           <mat-list-item> <strong>Presale Start Date:</strong> {{ this.secondFormGroup.value.startDate }}</mat-list-item>
-           <mat-list-item> <strong>Presale End Date:</strong> {{ this.secondFormGroup.value.endDate }}</mat-list-item>
+           <mat-list-item> <strong>Presale Start Date:</strong> {{ this.secondFormGroup.value.saleStartTime }}</mat-list-item>
+           <mat-list-item> <strong>Presale End Date:</strong> {{ this.secondFormGroup.value.saleEndTime }}</mat-list-item>
 
       
           </mat-list>

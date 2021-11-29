@@ -48,13 +48,15 @@ contract CampaignFactory is Context,Ownable, ReentrancyGuard {
     }
 
     
-    function createNewCampaign(address _tokenAddress,uint _softCap,uint _hardCap, uint256 _saleStartTime, uint256 _saleEndTime,   bool _useWhiteList, Campaign.RefundType _refundType, address _dexRouterAddress,uint _liquidityPercent, uint _listRate, uint _dexListRate) public payable returns(address nc) {
+    function createNewCampaign(address _tokenAddress,uint _softCap,uint _hardCap, uint256 _saleStartTime, uint256 _saleEndTime,   bool _useWhiteList, Campaign.RefundType _refundType, address _dexRouterAddress,uint _liquidityPercent, uint _listRate, uint _dexListRate) public payable  {
 
         require(msg.value >= campaignCreationPrice, 'Requires CampaignCreation Price' );
 
         hasCampaignRunningForToken(_tokenAddress);
 
-        address payable newCampaignAddress = payable( address(new Campaign(_tokenAddress, _softCap,_hardCap, _saleStartTime, _saleEndTime,   _useWhiteList, _refundType, _dexRouterAddress,_liquidityPercent, _listRate, _dexListRate)) );
+        Campaign cmpgn = new Campaign(_tokenAddress, _softCap,_hardCap, _saleStartTime, _saleEndTime,   _useWhiteList, _refundType, _dexRouterAddress,_liquidityPercent, _listRate, _dexListRate);
+
+        address newCampaignAddress =  address( cmpgn);
 
         _counter.increment();
         
@@ -63,26 +65,26 @@ contract CampaignFactory is Context,Ownable, ReentrancyGuard {
         //avoid stack too deep
         {
             ownersCampaign[msg.sender].push( _counter.current());        
-            _tokenCampaigns[_tokenAddress]= newCampaignAddress;
+            _tokenCampaigns[_tokenAddress]= payable(newCampaignAddress);
             emit CampaignCreated(msg.sender, _counter.current(),newCampaignAddress);
         }
         
         
     }
 
-    function hasCampaignRunningForToken(address _tokenAddress) public view {
-        if(_tokenCampaigns[_tokenAddress] != address(0) ){
-            Campaign c = Campaign(_tokenCampaigns[_tokenAddress]);
-            // Campaign.CampaignSaleInfo memory s = Campaign.CampaignSaleInfo(c.saleInfo() );
-            ( address   tokenAddress, , , uint256 saleStartTime,uint256 saleEndTime ,,, ) = c.saleInfo();
+    function hasCampaignRunningForToken(address _tokenAddress) public view {// check if dex has pool for the pair already
+        // if(_tokenCampaigns[_tokenAddress] != address(0) ){
+        //     Campaign c = Campaign(_tokenCampaigns[_tokenAddress]);
+        //     // Campaign.CampaignSaleInfo memory s = Campaign.CampaignSaleInfo(c.saleInfo() );
+        //     ( address   tokenAddress, , , uint256 saleStartTime,uint256 saleEndTime ,,, ) = c.saleInfo();
 
-            if( saleEndTime >= block.timestamp && c.isCancelled() == false)  {
-                // revert( concatenate('Pool already exists: ', tokenAddress ) );
-                revert( 'Pool already exists '  );
+        //     if( saleEndTime >= block.timestamp && c.isCancelled() == false)  {
+        //         // revert( concatenate('Pool already exists: ', tokenAddress ) );
+        //         revert( 'Pool already exists '  );
                 
-            }
+        //     }
             
-        }
+        // }
     }
 
     function allCampaigns() public view returns (uint256) {
