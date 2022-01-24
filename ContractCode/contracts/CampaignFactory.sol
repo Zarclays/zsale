@@ -2,9 +2,9 @@
 pragma solidity ^0.8.8;
 
 import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+// import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+// import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 
@@ -15,7 +15,7 @@ import "./Campaign.sol";
 
 
 
-contract CampaignFactory is Context,Ownable, ReentrancyGuard {
+contract CampaignFactory is Context,Ownable /*, ReentrancyGuard */ {
 
   // Add the library methods
     using EnumerableMap for EnumerableMap.UintToAddressMap;
@@ -30,7 +30,7 @@ contract CampaignFactory is Context,Ownable, ReentrancyGuard {
         uint256 amount;
     }
 
-    mapping(address => uint256[]) public ownersCampaign; //owneraddress -> campaignIndex
+    mapping(address => uint256[]) private ownersCampaign; //owneraddress -> campaignIndex
     
 
     mapping(address => address payable ) public _tokenCampaigns; //tokenAddress=>Campaign
@@ -50,8 +50,14 @@ contract CampaignFactory is Context,Ownable, ReentrancyGuard {
     
     function createNewCampaign(address _tokenAddress,uint _softCap,uint _hardCap, uint256 _saleStartTime, uint256 _saleEndTime,   bool _useWhiteList, Campaign.RefundType _refundType, address _dexRouterAddress,uint _liquidityPercent, uint _listRate, uint _dexListRate,uint _maxAllocationPerUserTierTwo) public payable  {
 
-        require(msg.value >= campaignCreationPrice, 'Requires CampaignCreation Price' );
-
+        require(msg.value >= campaignCreationPrice, 'CampaignFactory: Requires CampaignCreation Price' );
+        
+        if(_tokenCampaigns[_tokenAddress] != address(0)){
+            Campaign ct = Campaign(_tokenCampaigns[_tokenAddress]);
+            if( !(ct.status() == Campaign.CampaignStatus.CANCELLED || ct.status()== Campaign.CampaignStatus.FAILED) ){
+                revert('CampaignFactory: There is an Existing Campaign');
+            }
+        }
         
         {
             Campaign cmpgn = new Campaign(_tokenAddress, _softCap,_hardCap, _saleStartTime, _saleEndTime,   _useWhiteList, _refundType, _dexRouterAddress,_liquidityPercent, _listRate, _dexListRate,_maxAllocationPerUserTierTwo

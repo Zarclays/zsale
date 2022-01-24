@@ -22,7 +22,7 @@
 * SOFTWARE.
 */
 
-const { Token } = require("@celo/contractkit");
+// const { Token } = require("@celo/contractkit");
 const { assert, expect } = require("chai");
 
 advanceBlock = () => {
@@ -49,8 +49,9 @@ var CampaignArtifact = artifacts.require("Campaign");
 contract("Campaign Factory Tests", async function(accounts) {
 //   let accounts;
   let owner, addr1, addr2;
-  let admin, borrower, lender;
+  let admin;
   let loanRequest;
+  const router = '0xeD37AEDD777B44d34621Fe5cb1CF594dc39C8192';
 
     
   before(async function() {
@@ -85,12 +86,26 @@ contract("Campaign Factory Tests", async function(accounts) {
         
     });
 
+    it("get the size of the contract", function() {
+      return CampaignFactoryArtifact.deployed().then(function(instance) {
+        var bytecode = instance.constructor._json.bytecode;
+        var deployed = instance.constructor._json.deployedBytecode;
+        var sizeOfB  = bytecode.length / 2;
+        var sizeOfD  = deployed.length / 2;
+        console.log("size of bytecode in bytes = ", sizeOfB);
+        console.log("size of deployed in bytes = ", sizeOfD);
+        console.log("initialisation and constructor code in bytes = ", sizeOfB - sizeOfD);
+      });  
+    });
+
     it('Creates New Contracts successfully', async() => {
       const now = new Date();
       const twoHoursTime = now.setHours(now.getHours()+2);
       const fourHoursLater = now.setHours(now.getHours()+2);
-      const router = '0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3';
-      await campaignFactory.createNewCampaign(token.address,100,200, twoHoursTime, fourHoursLater,false,0,router,60,1000,800, {
+      
+
+      // address _tokenAddress,uint _softCap,uint _hardCap, uint256 _saleStartTime, uint256 _saleEndTime,   bool _useWhiteList, Campaign.RefundType _refundType, address _dexRouterAddress,uint _liquidityPercent, uint _listRate, uint _dexListRate,uint _maxAllocationPerUserTierTwo
+      await campaignFactory.createNewCampaign(token.address,1,2, twoHoursTime, fourHoursLater,false,0,router,60,1000,800,2, {
         from: owner,
         value: web3.utils.toWei('0.0001', 'ether')
       } );
@@ -121,28 +136,28 @@ contract("Campaign Factory Tests", async function(accounts) {
       
   });
 
-    // it('stops duplicates contract for the same token', async() => {
+  it('stops duplicates contract for the same token except when cancelled', async() => {
 
-    //     // const instance = await MetaCoin.deployed();
-    //     // const balance = await instance.getBalance.call(accounts[0]);
-    //     const now = new Date();
-    //     const twoHoursTime = now.setHours(now.getHours()+2);
-    //     const fourHoursLater = now.setHours(now.getHours()+2);
-    //     const router = '0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3';
-    //     let createError;
-    //     try{
-    //       await campaignFactory.createNewCampaign(token.address,100,200, twoHoursTime, fourHoursLater,false,0,router,60,1000,800, {
-    //         from: owner,
-    //         value: web3.utils.toWei('0.0001', 'ether')
-    //       } );
-        
-    //       await advanceBlock();
-    //     }catch(err){
-    //       createError=err;
-    //     }
-    //     assert.notEqual(createError, undefined, 'Transaction should be reverted');
+      // const instance = await MetaCoin.deployed();
+      // const balance = await instance.getBalance.call(accounts[0]);
+      const now = new Date();
+      const twoHoursTime = now.setHours(now.getHours()+2);
+      const fourHoursLater = now.setHours(now.getHours()+2);
+      
+      let createError;
+      try{
+        await campaignFactory.createNewCampaign(token.address,1,2, twoHoursTime, fourHoursLater,false,0,router,60,1000,800,2, {
+          from: owner,
+          value: web3.utils.toWei('0.0001', 'ether')
+        } );
+      
+        await advanceBlock();
+      }catch(err){
+        createError=err;
+      }
+      assert.notEqual(createError, undefined, 'Transaction should be reverted');
 
-    // });
+  });
 
 
     // it('only Token owners can create contract', async() => {
