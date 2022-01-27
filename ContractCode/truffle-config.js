@@ -63,8 +63,8 @@ module.exports = {
       port: 7545,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none)
       // gas: 7500000,
-      gas: 7500000 ,// 50000000, 
-      gasLimit: 8000000
+      gas: 6721975 ,// 50000000, 
+      // gasLimit: 8000000
      },
      develop: {
       port: 9545,
@@ -195,7 +195,11 @@ module.exports = {
        // evmVersion: "byzantium"
       }
     }
-  }
+  },
+
+  plugins: [
+    'truffle-contract-size'
+  ]
 
   // Truffle DB is currently disabled by default; to enable it, change enabled:
   // false to enabled: true. The default storage location can also be

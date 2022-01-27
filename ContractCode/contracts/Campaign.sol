@@ -14,7 +14,10 @@ import './Lockers/DexLocker.sol';
 
 
 
-
+interface iCampaignList {
+  function hasExistingCampaign(address _tokenAddress) external view returns (bool);
+  function createNewCampaign(address _tokenAddress, address _campaignAddress) external payable ;
+}
 
 contract Campaign is Context,Ownable, ReentrancyGuard {
   using SafeERC20 for IERC20;
@@ -58,14 +61,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     LIQUIDITY_SETUP
 
   }
-  // struct CampaignStatus{
-  //   bool isCancelled;
-  //   bool isSoldOut;
-  //   bool isLiquiditySetup;
-  //   bool isRefunded;
-  // }
-  // CampaignStatus status;
-
+  
   CampaignStatus public  status = CampaignStatus.CREATED;
 
   address private _admin= 0xB7e16f5fa9941B84baCd1601F277B00911Aed339; //zsales admin - can setkyc and audited
@@ -125,18 +121,19 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   //mapping the user purchase per tier
   mapping(address => uint) public buyInOneTier;
   mapping(address => uint) public buyInTwoTier;
-
   mapping(address => uint) public buyInAllTiers;
   
-  DexLocker private _dexLocker;
+  // DexLocker private _dexLocker;
+  address public _campaignFactory= 0x92Fe2933C795FF95A758362f9535A4D0a516053d ;
   
   constructor(
+    address campaignFactory,
     address  _tokenAddress,
     uint256 _softCap,
     uint256 _hardCap, 
     uint256 _saleStartTime, 
     uint256 _saleEndTime,   
-    bool _useWhiteList, 
+    
     RefundType _refundType, 
     address _dexRouterAddress,
     uint _liquidityPercent, 
@@ -144,7 +141,15 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     uint _dexListRate,
     uint _maxAllocationPerUserTierTwo
     
-  ) {
+  ) payable  {
+      _campaignFactory= campaignFactory;
+      if(iCampaignList(_campaignFactory).hasExistingCampaign(_tokenAddress)){
+        Campaign ct2 = Campaign(payable(_tokenAddress));
+        if( !(ct2.status() == CampaignStatus.CANCELLED || ct2.status()== CampaignStatus.FAILED) ){
+            revert('CampaignFactory: There is an Existing Campaign');
+        }
+      }
+
       require(_saleStartTime > block.timestamp, "CAMPAIGN: Sale Start time needs to be above current time");
       // require(releaseTime > block.timestamp, "CAMPAIGN: release time above current time");
       require(_saleEndTime > _saleStartTime, "CAMPAIGN: Sale End time above start time");
@@ -161,23 +166,24 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
          
       }
         
-      otherInfo= CampaignOtherInfo(_useWhiteList, false,false,'', _refundType,'','','','','');
+      otherInfo= CampaignOtherInfo(false, false,false,'', _refundType,'','','','','');
 
       tierOnehardCap=_hardCap / 2; //50% by default
       maxAllocationPerUserTierOne = tierOnehardCap/50 ;  //50 people by default
 
       tierTwohardCap=_hardCap / 2; //50% by default
       maxAllocationPerUserTierTwo = _maxAllocationPerUserTierTwo ;  
-      addWhitelistOne(msg.sender);
+      // addWhitelistOne(msg.sender);
 
       
-      //Set dexLock
-      _dexLocker = new DexLocker(_dexRouterAddress,IERC20(saleInfo.tokenAddress), msg.sender);
       
+      
+      iCampaignList(_campaignFactory).createNewCampaign{value: 0.0001 ether}(_tokenAddress, address(this));
   }
 
   // function to update other details not initialized in constructor - this is bcos solidity limits how many variables u can pass in at once
   function updateCampaignDetails(uint liquidityReleaseTimeDays, //Time to add to startTime in days
+    bool _useWhiteList, 
     string memory logoUrl,
     string memory desc,
     string memory website,
@@ -193,11 +199,13 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     otherInfo.website= website;
     otherInfo.twitter= twitter;
     otherInfo.telegram= telegram;
-
+    otherInfo.useWhiteList=_useWhiteList;
 
     updateTierDetails (capDetails[0], capDetails[1], capDetails[2],capDetails[3]);
 
-    _dexLocker.setupLock( liquidityReleaseTime,  saleInfo.dexListRate, teamTokenVestingDetails, raisedFundVestingDetails);
+    //Set dexLock
+    // _dexLocker = new DexLocker(dexRouterAddress,IERC20(saleInfo.tokenAddress), msg.sender);
+    // _dexLocker.setupLock( liquidityReleaseTime,  saleInfo.dexListRate, teamTokenVestingDetails, raisedFundVestingDetails);
 
     status = CampaignStatus.DETAILS_FILLED;
 
@@ -230,6 +238,10 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
 
   function end() public view returns (uint256) {
     return saleInfo.saleEndTime;
+  }
+
+  function setCampaignFactory(address _newCampaignFactory) public onlyAdmin {
+    _campaignFactory=_newCampaignFactory;
   }
 
 
@@ -449,7 +461,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
 
       IERC20 _token = IERC20(saleInfo.tokenAddress);
 
-      // _dexLocker.setupToken(_token);
+      //// _dexLocker.setupToken(_token);
       uint256 currentCoinBalance = address(this).balance;
       require(currentCoinBalance > 0, "CAMPAIGN: Coin balance needs to be above zero" );
       uint256 liquidityAmount = currentCoinBalance * saleInfo.liquidityPercent / 10000;
@@ -466,11 +478,11 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
       // payable(_teamWallet).transfer(teamAmount);
 
       //liquidity pair
-      payable(_dexLocker).transfer(liquidityAmount);
-      _token.safeTransfer(address(_dexLocker), liquidityAmount * saleInfo.dexListRate );
+      // payable(_dexLocker).transfer(liquidityAmount);
+      // _token.safeTransfer(address(_dexLocker), liquidityAmount * saleInfo.dexListRate );
           
       
-      _dexLocker.addLiquidity();
+      // _dexLocker.addLiquidity();
       
       status== CampaignStatus.LIQUIDITY_SETUP;
   }
@@ -507,9 +519,9 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   }
 
   
-  function dexLocker() public view returns (address) {
-      return address(_dexLocker);
-  }
+  // function dexLocker() public view returns (address) {
+  //     return address(_dexLocker);
+  // }
 
   // //To get refund when the requirement not ment
   // function getRefund() public {

@@ -65,16 +65,11 @@ contract DexLocker{
 
 
     constructor(address dexRouterAddress, IERC20 token,address owner){
-        
-
-        
         _dexRouter = IDexRouter(dexRouterAddress);
         _deployer = msg.sender;
         
         _owner = owner;
-        _token = token;
-
-        
+        _token = token;        
     }
 
     

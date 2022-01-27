@@ -41,7 +41,7 @@ advanceBlock = () => {
 }
 
 
-var CampaignFactoryArtifact = artifacts.require("CampaignFactory");
+var CampaignFactoryArtifact = artifacts.require("CampaignList");
 var TokenArtifact = artifacts.require("Token");
 var CampaignArtifact = artifacts.require("Campaign");
 
@@ -79,37 +79,66 @@ contract("Campaign Factory Tests", async function(accounts) {
         //     gas: 300000
         // });
 
-        token = await TokenArtifact.deployed();
-        campaignFactory = await CampaignFactoryArtifact.new();
-        //campaignFactory = await CampaignFactoryArtifact.at('0xd12d5237c15ae556dA3564A9F9F8beCAfE85C617');
-        console.log('Using Factory Deployed at  ', campaignFactory.address );
+        token = await TokenArtifact.new();
+        // campaignFactory = await CampaignFactoryArtifact.new();
+        campaignFactory = await CampaignFactoryArtifact.at('0x92Fe2933C795FF95A758362f9535A4D0a516053d');
+        console.log('Using Campaign List Deployed at  ', campaignFactory.address );
         
     });
 
-    it("get the size of the contract", function() {
-      return CampaignFactoryArtifact.deployed().then(function(instance) {
-        var bytecode = instance.constructor._json.bytecode;
-        var deployed = instance.constructor._json.deployedBytecode;
-        var sizeOfB  = bytecode.length / 2;
-        var sizeOfD  = deployed.length / 2;
-        console.log("size of bytecode in bytes = ", sizeOfB);
-        console.log("size of deployed in bytes = ", sizeOfD);
-        console.log("initialisation and constructor code in bytes = ", sizeOfB - sizeOfD);
-      });  
-    });
+    // it("get the size of the contract", function() {
+    //   return CampaignFactoryArtifact.deployed().then(function(instance) {
+    //     var bytecode = instance.constructor._json.bytecode;
+    //     var deployed = instance.constructor._json.deployedBytecode;
+    //     var sizeOfB  = bytecode.length / 2;
+    //     var sizeOfD  = deployed.length / 2;
+    //     console.log("size of bytecode in bytes = ", sizeOfB);
+    //     console.log("size of deployed in bytes = ", sizeOfD);
+    //     console.log("initialisation and constructor code in bytes = ", sizeOfB - sizeOfD);
+    //   });  
+    // });
 
     it('Creates New Contracts successfully', async() => {
       const now = new Date();
       const twoHoursTime = now.setHours(now.getHours()+2);
-      const fourHoursLater = now.setHours(now.getHours()+2);
+      const fourHoursLater = now.setHours(now.getHours()+4);
       
 
       // address _tokenAddress,uint _softCap,uint _hardCap, uint256 _saleStartTime, uint256 _saleEndTime,   bool _useWhiteList, Campaign.RefundType _refundType, address _dexRouterAddress,uint _liquidityPercent, uint _listRate, uint _dexListRate,uint _maxAllocationPerUserTierTwo
-      await campaignFactory.createNewCampaign(token.address,1,2, twoHoursTime, fourHoursLater,false,0,router,60,1000,800,2, {
-        from: owner,
-        value: web3.utils.toWei('0.0001', 'ether')
-      } );
-    
+      // await campaignFactory.createNewCampaign(token.address,1,2, twoHoursTime, fourHoursLater,false,0,router,60,1000,800,2, {
+      //   from: owner,
+      //   value: web3.utils.toWei('0.0001', 'ether')
+      // } );
+      /**
+      address  _tokenAddress,
+    uint256 _softCap,
+    uint256 _hardCap, 
+    uint256 _saleStartTime, 
+    uint256 _saleEndTime,   
+    bool _useWhiteList, 
+    RefundType _refundType, 
+    address _dexRouterAddress,
+    uint _liquidityPercent, 
+    uint _listRate, 
+    uint _dexListRate,
+    uint _maxAllocationPerUserTierTwo */
+    let campaign;
+    try{
+      campaign = await CampaignArtifact.new(token.address,1,2, twoHoursTime, fourHoursLater,false,0,router,6000,1000,800,2);
+    }catch(err){
+      console.error('Error :', err);
+      const { error: contractError, reason } = err.data[Object.keys(err.data)[0]];
+      console.error('Error :', contractError, ', reason: ' , reason);
+      console.error('DError :', err.data);
+    }
+    // var fcn = function(){
+    //   campaign = await CampaignArtifact.new(token.address,1,2, twoHoursTime, fourHoursLater,false,0,router,6000,1000,800,2,{
+    //     from: owner,
+    //     value: web3.utils.toWei('0.0001', 'ether')
+    //   });
+    // };
+    //   await expect(fcn()).to.be.revertedWith("Contract A reverted");
+
       await advanceBlock();     
       
 
@@ -133,6 +162,7 @@ contract("Campaign Factory Tests", async function(accounts) {
         // let info = await campaign.saleInfo.call();
         // console.log('info: ', info );
       }
+    
       
   });
 

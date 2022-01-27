@@ -11,11 +11,11 @@ import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "./Campaign.sol";
+// import "./Campaign.sol";
 
 
 
-contract CampaignFactory is Context,Ownable /*, ReentrancyGuard */ {
+contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
 
   // Add the library methods
     using EnumerableMap for EnumerableMap.UintToAddressMap;
@@ -25,10 +25,7 @@ contract CampaignFactory is Context,Ownable /*, ReentrancyGuard */ {
 
     Counters.Counter private _counter;
 
-    struct OwnerCampaign{
-        address addr;
-        uint256 amount;
-    }
+    
 
     mapping(address => uint256[]) private ownersCampaign; //owneraddress -> campaignIndex
     
@@ -48,30 +45,53 @@ contract CampaignFactory is Context,Ownable /*, ReentrancyGuard */ {
     }
 
     
-    function createNewCampaign(address _tokenAddress,uint _softCap,uint _hardCap, uint256 _saleStartTime, uint256 _saleEndTime,   bool _useWhiteList, Campaign.RefundType _refundType, address _dexRouterAddress,uint _liquidityPercent, uint _listRate, uint _dexListRate,uint _maxAllocationPerUserTierTwo) public payable  {
+    function createNewCampaign(address _tokenAddress, address _campaignAddress) public payable  {
 
         require(msg.value >= campaignCreationPrice, 'CampaignFactory: Requires CampaignCreation Price' );
         
-        if(_tokenCampaigns[_tokenAddress] != address(0)){
-            Campaign ct = Campaign(_tokenCampaigns[_tokenAddress]);
-            if( !(ct.status() == Campaign.CampaignStatus.CANCELLED || ct.status()== Campaign.CampaignStatus.FAILED) ){
-                revert('CampaignFactory: There is an Existing Campaign');
-            }
-        }
-        
+                
         {
-            Campaign cmpgn = new Campaign(_tokenAddress, _softCap,_hardCap, _saleStartTime, _saleEndTime,   _useWhiteList, _refundType, _dexRouterAddress,_liquidityPercent, _listRate, _dexListRate,_maxAllocationPerUserTierTwo
-            );
+            
             _counter.increment();            
-            _campaigns.set(_counter.current(), address( cmpgn));
+            _campaigns.set(_counter.current(), _campaignAddress);
 
             //avoid stack too deep
             {
                 ownersCampaign[msg.sender].push( _counter.current());        
-                _tokenCampaigns[_tokenAddress]= payable(address( cmpgn));
-                emit CampaignCreated(msg.sender, _counter.current(),address( cmpgn));
+                _tokenCampaigns[_tokenAddress]= payable(_campaignAddress);
+                emit CampaignCreated(msg.sender, _counter.current(),_campaignAddress);
             }
         }
+    }
+
+    // function createNewCampaign(address _tokenAddress,uint _softCap,uint _hardCap, uint256 _saleStartTime, uint256 _saleEndTime,   bool _useWhiteList, Campaign.RefundType _refundType, address _dexRouterAddress,uint _liquidityPercent, uint _listRate, uint _dexListRate,uint _maxAllocationPerUserTierTwo) public payable  {
+
+    //     require(msg.value >= campaignCreationPrice, 'CampaignFactory: Requires CampaignCreation Price' );
+        
+    //     if(_tokenCampaigns[_tokenAddress] != address(0)){
+    //         Campaign ct = Campaign(_tokenCampaigns[_tokenAddress]);
+    //         if( !(ct.status() == Campaign.CampaignStatus.CANCELLED || ct.status()== Campaign.CampaignStatus.FAILED) ){
+    //             revert('CampaignFactory: There is an Existing Campaign');
+    //         }
+    //     }
+        
+    //     {
+    //         Campaign cmpgn = new Campaign(_tokenAddress, _softCap,_hardCap, _saleStartTime, _saleEndTime,   _useWhiteList, _refundType, _dexRouterAddress,_liquidityPercent, _listRate, _dexListRate,_maxAllocationPerUserTierTwo
+    //         );
+    //         _counter.increment();            
+    //         _campaigns.set(_counter.current(), address( cmpgn));
+
+    //         //avoid stack too deep
+    //         {
+    //             ownersCampaign[msg.sender].push( _counter.current());        
+    //             _tokenCampaigns[_tokenAddress]= payable(address( cmpgn));
+    //             emit CampaignCreated(msg.sender, _counter.current(),address( cmpgn));
+    //         }
+    //     }
+    // }
+
+    function hasExistingCampaign(address _tokenAddress) external view returns (bool){
+        return _tokenCampaigns[_tokenAddress] != address(0);
     }
 
     
