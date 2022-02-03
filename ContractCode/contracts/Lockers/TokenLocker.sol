@@ -35,46 +35,22 @@ contract TokenLocker{
     
     VestSchedule[] public tokenVestSchedule ;
 
-    constructor( IERC20 token, address owner,  uint256 totalVestingTokens, uint256 firstTokenReleasetime,uint256 firstTokenReleasePercent,uint256 vestingPeriod,uint256 vestingPercent) {
+    constructor( IERC20 token, address owner, VestSchedule[8] memory schedule) {
 
-        require(firstTokenReleasetime > block.timestamp, "TokenLocker: First release time is before current time");
-        require(firstTokenReleasePercent > 0 && firstTokenReleasePercent <= 10000, "TokenLocker: First release percent must be between 0 and 100%");
+        // require(schedule.length <= 8, "TokenLocker: Vesting cannot have more than 8 schedules");
         
         _deployer = msg.sender;
         
         _owner = owner;
-        _token = token; 
+        _token = token;
+
+        for (uint8 i=0; i < 8 /*100%*/; i++) {
+            schedule[i].hasBeenClaimed=false;
+            tokenVestSchedule.push(schedule[i]);
+
+        }
  
         
-        VestSchedule memory v= VestSchedule(firstTokenReleasetime, totalVestingTokens * firstTokenReleasePercent /10000 , false);
-        tokenVestSchedule.push(v);
-
-        if(firstTokenReleasePercent != 10000){
-            uint step = 1;
-            uint j;
-            for (j=firstTokenReleasePercent; j <= 10000 /*100%*/; j += vestingPercent) {  //for loop example
-                tokenVestSchedule.push(
-                    VestSchedule(
-                        firstTokenReleasetime + vestingPeriod * step * 1 days, //initial releaseDate + vestingperiod in days
-                        totalVestingTokens * vestingPercent /10000, 
-                        false
-                    )
-                );  
-
-                step++;
-            }
-
-            //add remainning vesting tokens
-            if(j<10000){
-                tokenVestSchedule.push(
-                    VestSchedule(
-                        firstTokenReleasetime + vestingPeriod * step * 1 days, //initial releaseDate + vestingperiod in days
-                        totalVestingTokens * (10000 - j) /10000, 
-                        false
-                    )
-                ); 
-            }
-        }
 
 
     }

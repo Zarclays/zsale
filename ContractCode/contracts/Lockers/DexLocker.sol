@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../Campaign.sol";
+
 import {IDexRouter} from "../IDexRouter.sol";
 import "./VestSchedule.sol";
 import "./TokenLocker.sol";
@@ -73,7 +73,7 @@ contract DexLocker{
     }
 
     
-    function setupLock(uint256 lpReleaseTime,  uint256 dexListPrice, uint256[5] memory teamTokenVestingDetails, uint256[5] memory raisedFundVestingDetails) public {
+    function setupLock(uint256 lpReleaseTime,  uint256 dexListPrice, VestSchedule[8] memory teamTokenVestingDetails, VestSchedule[8] memory raisedFundVestingDetails) public {
         require(msg.sender == _deployer, "DexLocker: Only Deployer is allowed ");
 
         require(lpReleaseTime > block.timestamp, "DexLocker: release time is before current time");
@@ -83,16 +83,16 @@ contract DexLocker{
         _lpReleaseTime = lpReleaseTime;
         _dexListPrice = dexListPrice;
 
-        _teamTokenVestingDetails=teamTokenVestingDetails; 
+        // _teamTokenVestingDetails=teamTokenVestingDetails; 
 
-        _raisedFundVestingDetails=raisedFundVestingDetails;
+        // _raisedFundVestingDetails=raisedFundVestingDetails;
 
         _liquidtyLocker = new LiquidityLocker(address(_dexRouter),_token, _owner, dexListPrice, lpReleaseTime);
         //IERC20 token, address owner, uint256 price, uint256 totalVestingTokens, uint256 firstTokenReleasetime,uint256 firstTokenReleasePercent,uint256 vestingPeriod,uint256 vestingPercent
-        _tokenLocker = new TokenLocker(_token, _owner,teamTokenVestingDetails[0],teamTokenVestingDetails[1],teamTokenVestingDetails[2],teamTokenVestingDetails[3],teamTokenVestingDetails[4] );
+        _tokenLocker = new TokenLocker(_token, _owner,teamTokenVestingDetails );
 
 
-        _coinLocker = new CoinLocker(_owner,_raisedFundVestingDetails[0],_raisedFundVestingDetails[1],_raisedFundVestingDetails[2],_raisedFundVestingDetails[3],_raisedFundVestingDetails[4] );
+        _coinLocker = new CoinLocker(_owner,raisedFundVestingDetails );
     }
 
     receive() external payable {

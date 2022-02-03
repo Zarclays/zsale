@@ -27,48 +27,20 @@ contract CoinLocker{
 
     VestSchedule[] public coinVestSchedule ;
 
-    constructor(address owner, uint256 totalCoinsVested, uint256 firstCoinReleasetime,uint256 firstCoinReleasePercent,uint256 vestingPeriod,uint256 vestingPercent) {
+    constructor(address owner, VestSchedule[8] memory schedule) {
        
-        require(firstCoinReleasetime > block.timestamp, "CoinLocker: First release time is before current time");
-        require(firstCoinReleasePercent > 0 && firstCoinReleasePercent <= 10000, "CoinLocker: First release percent must be between 0 and 100%");
+        // require(schedule.length <= 8, "CoinLocker: Vesting cannot have more than 8 schedules");
         
         _deployer = msg.sender; 
         
         _owner = owner;
-        
-        // add initial vest ing
-        VestSchedule memory v= VestSchedule(firstCoinReleasetime, totalCoinsVested * firstCoinReleasePercent /10000 , false);
-        coinVestSchedule.push(v);
 
-        if(firstCoinReleasePercent != 10000){
-            uint step = 1;
-            uint j;
-            for (j=firstCoinReleasePercent; j <= 10000 /*100%*/; j += vestingPercent) {  //for loop example
-                coinVestSchedule.push( 
-                    VestSchedule(
-                        firstCoinReleasetime + vestingPeriod * step * 1 days, //initial releaseDate + vestingperiod in days
-                        totalCoinsVested * vestingPercent /10000, 
-                        false
-                    )
-                );  
+        for (uint8 i=0; i < 8 /*100%*/; i++) {
+            schedule[i].hasBeenClaimed=false;
+            coinVestSchedule.push(schedule[i]);
 
-                step++;
-            }
-
-            //add remainning vesting tokens
-            if(j<10000){
-                coinVestSchedule.push(
-                    VestSchedule(
-                        firstCoinReleasetime + vestingPeriod * step * 1 days, //initial releaseDate + vestingperiod in days
-                        totalCoinsVested * (10000 - j) /10000, 
-                        false
-                    )
-                ); 
-            }
         }
         
-
-
     }
 
     

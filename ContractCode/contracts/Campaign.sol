@@ -11,6 +11,7 @@ import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import './Lockers/DexLocker.sol';
+import "./Lockers/VestSchedule.sol";
 
 
 
@@ -123,7 +124,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   mapping(address => uint) public buyInTwoTier;
   mapping(address => uint) public buyInAllTiers;
   
-  // DexLocker private _dexLocker;
+  address payable private _dexLockerAddress;
   address public _campaignFactory= 0x92Fe2933C795FF95A758362f9535A4D0a516053d ;
   
   constructor(
@@ -158,7 +159,17 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
         
       // //block scopin to avoid stack too deep 
       {
-        saleInfo= CampaignSaleInfo(_tokenAddress,_softCap,_hardCap, _saleStartTime, _saleEndTime,_liquidityPercent,_listRate, _dexListRate );
+        // saleInfo= CampaignSaleInfo(_tokenAddress,_softCap,_hardCap, _saleStartTime, _saleEndTime,_liquidityPercent,_listRate, _dexListRate );
+
+        // saleInfo= CampaignSaleInfo();
+        saleInfo.tokenAddress=_tokenAddress;
+        saleInfo.softCap=_softCap;
+        saleInfo.hardCap=_hardCap;
+        saleInfo.saleStartTime=_saleStartTime;
+        saleInfo.saleEndTime=_saleEndTime;
+        saleInfo.liquidityPercent=_liquidityPercent;
+        saleInfo.listRate=_listRate;
+        saleInfo.dexListRate=_dexListRate;
       }        
 
       {    
@@ -189,8 +200,8 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     string memory website,
     string memory twitter,
     string memory telegram,
-    uint256[5] memory teamTokenVestingDetails, 
-    uint256[5] memory raisedFundVestingDetails,
+    VestSchedule[8] memory teamTokenVestingDetails, 
+    VestSchedule[8] memory raisedFundVestingDetails,
     uint256[4] memory capDetails
   ) external onlyOwner {
     liquidityReleaseTime  = saleInfo.saleEndTime + (liquidityReleaseTimeDays * 1 days);
@@ -204,8 +215,9 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     updateTierDetails (capDetails[0], capDetails[1], capDetails[2],capDetails[3]);
 
     //Set dexLock
-    // _dexLocker = new DexLocker(dexRouterAddress,IERC20(saleInfo.tokenAddress), msg.sender);
-    // _dexLocker.setupLock( liquidityReleaseTime,  saleInfo.dexListRate, teamTokenVestingDetails, raisedFundVestingDetails);
+    DexLocker dexLocker = new DexLocker(dexRouterAddress,IERC20(saleInfo.tokenAddress), msg.sender);
+    dexLocker.setupLock( liquidityReleaseTime,  saleInfo.dexListRate, teamTokenVestingDetails, raisedFundVestingDetails);
+    _dexLockerAddress= payable(dexLocker);
 
     status = CampaignStatus.DETAILS_FILLED;
 
@@ -215,7 +227,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   function updateTierDetails(uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo) public onlyOwner {
     require(block.timestamp < saleInfo.saleStartTime, 'Can only updateTierDetails before Sale StartTime');
     require(_tierOneHardCap > (saleInfo.hardCap * 3000 / 10000), "CAMPAIGN: Tier Caps must be greater than 30 %" );
-    require(_tierTwoHardCap + _tierTwoHardCap == saleInfo.hardCap, "CAMPAIGN: Tier 1 & 2 Caps must be equal to hard cap" );
+    require(_tierOneHardCap + _tierTwoHardCap == saleInfo.hardCap, "CAMPAIGN: Tier 1 & 2 Caps must be equal to hard cap" );
 
     require(maxAllocationPerUserTierOne > 0, "CAMPAIGN: Tier 1 Max Allocation must be greater than 0" );
     require(maxAllocationPerUserTierTwo > 0, "CAMPAIGN: Tier 2 Max Allocation must be greater than 0" );
@@ -461,7 +473,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
 
       IERC20 _token = IERC20(saleInfo.tokenAddress);
 
-      //// _dexLocker.setupToken(_token);
+      
       uint256 currentCoinBalance = address(this).balance;
       require(currentCoinBalance > 0, "CAMPAIGN: Coin balance needs to be above zero" );
       uint256 liquidityAmount = currentCoinBalance * saleInfo.liquidityPercent / 10000;
@@ -478,11 +490,11 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
       // payable(_teamWallet).transfer(teamAmount);
 
       //liquidity pair
-      // payable(_dexLocker).transfer(liquidityAmount);
-      // _token.safeTransfer(address(_dexLocker), liquidityAmount * saleInfo.dexListRate );
+      payable(_dexLockerAddress).transfer(liquidityAmount);
+      _token.safeTransfer(_dexLockerAddress, liquidityAmount * saleInfo.dexListRate );
           
       
-      // _dexLocker.addLiquidity();
+      DexLocker(_dexLockerAddress).addLiquidity();
       
       status== CampaignStatus.LIQUIDITY_SETUP;
   }
@@ -519,9 +531,9 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   }
 
   
-  // function dexLocker() public view returns (address) {
-  //     return address(_dexLocker);
-  // }
+  function dexLockerAddress() public view onlyAdmin returns (address) {
+      return _dexLockerAddress;
+  }
 
   // //To get refund when the requirement not ment
   // function getRefund() public {
