@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 
 import { Box, Hidden, IconButton, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -9,7 +9,9 @@ import CloseTwoToneIcon from '@mui/icons-material/CloseTwoTone';
 import HeaderMenu from './Menu';
 import HeaderButtons from './Buttons';
 import HeaderUserbox from './Userbox';
+import ConnectWalletBox from './ConnectWalletBox';
 import Logo from 'src/components/Logo';
+import WalletOptionsModal from 'src/components/WalletOptionsModal';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
@@ -32,8 +34,15 @@ const HeaderWrapper = styled(Box)(
 
 function Header() {
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
+  const [showWalletOptions, setShowWalletOptions] = useState(false);
 
   return (
+    <>
+      <WalletOptionsModal
+            open={showWalletOptions}
+            setOpen={setShowWalletOptions}
+          />
+    
     <HeaderWrapper display="flex" alignItems="center">
       <Box display="flex" alignItems="center">
         <Hidden lgUp>
@@ -46,6 +55,8 @@ function Header() {
       <Box display="flex" alignItems="center">
         <HeaderButtons />
         <HeaderUserbox />
+        <ConnectWalletBox showWalletOptions={showWalletOptions}
+            setShowWalletOptions={setShowWalletOptions} />
         <Hidden lgUp>
           <Tooltip arrow title="Toggle Menu">
             <IconButton color="primary" onClick={toggleSidebar}>
@@ -55,6 +66,8 @@ function Header() {
         </Hidden>
       </Box>
     </HeaderWrapper>
+
+    </>
   );
 }
 

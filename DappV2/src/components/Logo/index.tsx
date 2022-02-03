@@ -110,9 +110,9 @@ function Logo() {
       <Hidden smDown>
         <LogoTextWrapper>
           <Tooltip title="Version 1.1.0" arrow placement="right">
-            <VersionBadge>1.1</VersionBadge>
+            <VersionBadge>0.1</VersionBadge>
           </Tooltip>
-          <LogoText>Tokyo Free White</LogoText>
+          <LogoText>ZSale</LogoText>
         </LogoTextWrapper>
       </Hidden>
     </LogoWrapper>
