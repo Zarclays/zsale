@@ -1,5 +1,5 @@
 import { FC, ReactNode, useState, useContext } from 'react';
-import { NavLink as RouterLink } from 'react-router-dom';
+import { NavLink as RouterLink, useMatch, useResolvedPath } from 'react-router-dom';
 import clsx from 'clsx';
 import { SidebarContext } from 'src/contexts/SidebarContext';
 
@@ -37,6 +37,9 @@ const SidebarMenuItem: FC<SidebarMenuItemProps> = ({
     setMenuToggle((Open) => !Open);
   };
 
+  let resolved = useResolvedPath(link);
+  let match = useMatch({ path: resolved.pathname, end: true });
+
   if (children) {
     return (
       <ListItem component="div" className="Mui-children" key={name} {...rest}>
@@ -55,10 +58,14 @@ const SidebarMenuItem: FC<SidebarMenuItemProps> = ({
     );
   }
 
+
+  
+
   return (
     <ListItem component="div" key={name} {...rest}>
       <Button
-        activeClassName="Mui-active"
+        // activeClassName="Mui-active"
+        className={(match ? " Mui-active" : "")}
         component={RouterLink}
         onClick={toggleSidebar}
         to={link}

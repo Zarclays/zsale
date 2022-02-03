@@ -1,6 +1,6 @@
 import { Suspense, lazy } from 'react';
 import { Navigate } from 'react-router-dom';
-import { PartialRouteObject } from 'react-router';
+import { RouteObject  } from 'react-router';
 
 import SidebarLayout from 'src/layouts/SidebarLayout';
 import BaseLayout from 'src/layouts/BaseLayout';
@@ -48,9 +48,9 @@ const StatusComingSoon = Loader(lazy(() => import('src/content/pages/Status/Comi
 const StatusMaintenance = Loader(lazy(() => import('src/content/pages/Status/Maintenance')));
 
 
-const routes: PartialRouteObject[] = [
+const routes: RouteObject [] = [
   {
-    path: '*',
+    path: '/',
     element: <BaseLayout />,
     children: [
       {
@@ -70,7 +70,7 @@ const routes: PartialRouteObject[] = [
         path: 'status',
         children: [
           {
-            path: '/',
+            path: '/status',
             element: (
               <Navigate
                 to="404"
@@ -109,7 +109,7 @@ const routes: PartialRouteObject[] = [
     ),
     children: [
       {
-        path: '/',
+        path: '/dashboards',
         element: (
           <Navigate
             to="/dashboards/crypto"
@@ -134,7 +134,7 @@ const routes: PartialRouteObject[] = [
     ),
     children: [
       {
-        path: '/',
+        path: '/management',
         element: (
           <Navigate
             to="/management/transactions"
@@ -150,7 +150,7 @@ const routes: PartialRouteObject[] = [
         path: 'profile',
         children: [
           {
-            path: '/',
+            path: '/management/profile',
             element: (
               <Navigate
                 to="details"
@@ -177,7 +177,7 @@ const routes: PartialRouteObject[] = [
     ),
     children: [
       {
-        path: '/',
+        path: '/components',
         element: (
           <Navigate
             to="/components/buttons"
