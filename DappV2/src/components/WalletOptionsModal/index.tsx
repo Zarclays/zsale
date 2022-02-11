@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useConnect, useAccount } from "wagmi";
 import { Modal, Button, Box, Typography, Avatar } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { spacing } from '@mui/system';
 
 interface Props {
   open: boolean;
@@ -46,27 +47,28 @@ export default function WalletOptionsModal(props: Props) {
           Choose a Wallet
         </Typography>
         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+          
         </Typography>
 
         {connectData.connectors.map((c) => (
-          <div key={c.id} className="mb-2 ml-2 mr-2 w-80">
+          <Box key={c.id} sx={{ mx: 2, mb: 2, width: '80%' }} className="mb-2 ml-2 mr-2 w-80">
             <LoadingButton 
               variant="outlined"
               loading={connectDataLoading}
+              sx={{ width: '80%' }}
               // width={80}
               // disabled={!c.ready}
               onClick={() => connect(c)}
             >
               <>
-                <div className="mr-3">
+                <Box sx={{ mr: 2 }} >
                   <Avatar alt={c.name} src={`/images/${c.id}.svg`} />
                   
-                </div>
+                </Box>
                 {`${c.name}${!c.ready ? " (unsupported)" : ""}`}
               </>
             </LoadingButton>
-          </div>
+          </Box>
         ))}
         {error && (
           <div className="ml-2 text-red-500">

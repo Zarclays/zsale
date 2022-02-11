@@ -166,23 +166,23 @@ contract("Campaign Factory Tests", async function(accounts) {
 
     // console.log('Encoded 3:  ', encoded );
 
-    encoded =  web3.eth.abi.encodeParameters(
-      'tuple(string,uint)[]',
-      [[['item1', 2], ['item2', 3]]]
-  //   [{
-  //     releaseDate: 1643814669155,
-  //     releaseAmount: '500000000000000',
-  //     hasBeenClaimed: false
-  //   }, 
-  //   {
-  //     releaseDate: 1643814669155,
-  //     releaseAmount: '500000000000000',
-  //     hasBeenClaimed: false
-  //   }
-  // ]
-  );
+  //   encoded =  web3.eth.abi.encodeParameters(
+  //     'tuple(string,uint)[]',
+  //     [[['item1', 2], ['item2', 3]]]
+  // //   [{
+  // //     releaseDate: 1643814669155,
+  // //     releaseAmount: '500000000000000',
+  // //     hasBeenClaimed: false
+  // //   }, 
+  // //   {
+  // //     releaseDate: 1643814669155,
+  // //     releaseAmount: '500000000000000',
+  // //     hasBeenClaimed: false
+  // //   }
+  // // ]
+  // );
 
-  console.log('Encoded 4:  ', encoded );
+  // console.log('Encoded 4:  ', encoded );
         // await cmp.updateCampaignDetails(fourHoursLater,false,'logourl', 'desc', 'websiteurl','twitter','telegram',
         // [ [
         //   [fourHoursLater, '500000000000000', false],
@@ -225,46 +225,46 @@ contract("Campaign Factory Tests", async function(accounts) {
         //  );
 
 
-        //  await cmp.updateCampaignDetails(fourHoursLater,false,'logourl', 'desc', 'websiteurl','twitter','telegram',
-        // [
-        //   {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
-        //   {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
-        //   {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
-        //   {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
-        //   {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
-        //   {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
-        //   {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
-        //   {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false}
-        // ],
-        // [
-        //   {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
-        //   {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
-        //   {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
-        //   {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
-        //   {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
-        //   {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
-        //   {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
-        //   {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false}
-        // ],
-        // [
-        //   '500000000000000',
-        //   '500000000000000',
-        //   '500000000000000',
-        //   '500000000000000'
-        //   // ['500000000000000'],
-        //   // ['500000000000000'],
-        //   // ['500000000000000'],
-        //   // ['500000000000000']
-        //   // web3.utils.toWei('1', 'ether'),
-        //   // web3.utils.toWei('1', 'ether'),
-        //   // web3.utils.toWei('1', 'ether'),
-        //   // web3.utils.toWei('1', 'ether')
-        // ]
-        // // ,  { 
-        // //           // from: owner,
-        // //           value: web3.utils.toWei('0.0001', 'ether')
-        // // }
-        //  );
+         await cmp.updateCampaignDetails(fourHoursLater,false,'logourl', 'desc', 'websiteurl','twitter','telegram',
+        [
+          {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false}
+        ],
+        [
+          {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false}
+        ],
+        [
+          '500000000000000',
+          '500000000000000',
+          '500000000000000',
+          '500000000000000'
+          // ['500000000000000'],
+          // ['500000000000000'],
+          // ['500000000000000'],
+          // ['500000000000000']
+          // web3.utils.toWei('1', 'ether'),
+          // web3.utils.toWei('1', 'ether'),
+          // web3.utils.toWei('1', 'ether'),
+          // web3.utils.toWei('1', 'ether')
+        ]
+        // ,  { 
+        //           // from: owner,
+        //           value: web3.utils.toWei('0.0001', 'ether')
+        // }
+         );
         
       }catch(err){
         console.error('Error :', err);

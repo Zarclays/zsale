@@ -31,6 +31,17 @@ const UserBoxButton = styled(Button)(
 `
 );
 
+const TruncatedBox = styled(Box)(
+  ({ theme }) => `
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width : 100px;
+`
+);
+
+
+
 const MenuUserBox = styled(Box)(
   ({ theme }) => `
         background: ${theme.colors.alpha.black[5]};
@@ -55,7 +66,10 @@ const UserBoxLabel = styled(Typography)(
 
 const AccountDescription = styled(Typography)(
   ({ theme }) => `
-        color: ${lighten(theme.palette.secondary.main, 0.5)}
+        font-weight: ${theme.typography.fontWeightBold};
+        color: ${theme.palette.secondary.main};
+        background: ${theme.colors.alpha.black[5]};
+        padding: ${theme.spacing(2)};
 `
 );
 
@@ -67,17 +81,10 @@ interface Props {
 
 function ConnectWalletBox(props: Props) {
   const {  showWalletOptions, setShowWalletOptions } = props;
-  const user =
-  {
-    name: 'Catherine Pike',
-    avatar: '/static/images/avatars/1.jpg',
-    jobtitle: 'Project Manager'
-  };
-
+  
   const ref = useRef<any>(null);
   const [isOpen, setOpen] = useState<boolean>(false);
 
-  const [address, setAddress] = useState<string>();
   const [{ data: accountData, loading }, disconnect] = useAccount({
     fetchEns: true,
   });
@@ -115,7 +122,7 @@ function ConnectWalletBox(props: Props) {
               />
             )}
           </div>
-          <span className="truncate max-w-[100px]">
+          <span style={{}} className="truncate max-w-[100px]">
             {accountData.ens?.name}
           </span>
         </>
@@ -123,7 +130,8 @@ function ConnectWalletBox(props: Props) {
     }
 
     return (
-      <span className="truncate max-w-[150px]">{accountData?.address}</span>
+      
+      <TruncatedBox>{accountData?.address}</TruncatedBox>
     );
   };
 
@@ -142,12 +150,12 @@ function ConnectWalletBox(props: Props) {
       {accountData &&
         <>
           
-          <AccountDescription >
+          <AccountDescription onClick={handleOpen}>
             {renderLabel()}
           </AccountDescription>
-          <AccountDescription >
+          {/* <AccountDescription >
             DisConnect Wallet
-          </AccountDescription>
+          </AccountDescription> */}
           <Hidden smDown>
             <ExpandMoreTwoToneIcon sx={{ ml: 1 }} onClick={handleOpen} />
           </Hidden>

@@ -54,7 +54,7 @@ function Header() {
       </Box>
       <Box display="flex" alignItems="center">
         <HeaderButtons />
-        <HeaderUserbox />
+        {/* <HeaderUserbox /> */}
         <ConnectWalletBox showWalletOptions={showWalletOptions}
             setShowWalletOptions={setShowWalletOptions} />
         <Hidden lgUp>
