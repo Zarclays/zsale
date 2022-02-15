@@ -6,19 +6,22 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
+// import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import './Lockers/DexLockerFactory.sol';
 import './Lockers/DexLocker.sol';
 import "./Lockers/VestSchedule.sol";
 
+import "hardhat/console.sol";
 
 
-interface iCampaignList {
-  function hasExistingCampaign(address _tokenAddress) external view returns (bool);
-  function createNewCampaign(address _tokenAddress, address _campaignAddress) external payable ;
-}
+
+// interface iCampaignList {
+//   function hasExistingCampaign(address _tokenAddress) external view returns (bool);
+//   function createNewCampaign(address _tokenAddress, address _campaignAddress) external payable ;
+// }
 
 contract Campaign is Context,Ownable, ReentrancyGuard {
   using SafeERC20 for IERC20;
@@ -123,7 +126,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   mapping(address => uint) public buyInOneTier;
   mapping(address => uint) public buyInTwoTier;
   mapping(address => uint) public buyInAllTiers;
-  
+  DexLockerFactory private _dexLockerFactory;
   address payable private _dexLockerAddress;
   address public _campaignFactory= 0x92Fe2933C795FF95A758362f9535A4D0a516053d ;
   
@@ -138,17 +141,12 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     uint _liquidityPercent, 
     uint _listRate, 
     uint _dexListRate,
-    uint _maxAllocationPerUserTierTwo
+    uint _maxAllocationPerUserTierTwo,
+    DexLockerFactory dexLockerFactory
     
   ) payable  {
       _campaignFactory= campaignFactory;
-      if(iCampaignList(_campaignFactory).hasExistingCampaign(_tokenAddress)){
-        Campaign ct2 = Campaign(payable(_tokenAddress));
-        if( !(ct2.status() == CampaignStatus.CANCELLED || ct2.status()== CampaignStatus.FAILED) ){
-            revert('CampaignFactory: There is an Existing Campaign');
-        }
-      }
-
+      _dexLockerFactory=dexLockerFactory;
       require(capAndDate[2] > block.timestamp, "CAMPAIGN: Sale Start time needs to be above current time");
       // require(releaseTime > block.timestamp, "CAMPAIGN: release time above current time");
       require(capAndDate[3] > capAndDate[2], "CAMPAIGN: Sale End time above start time");
@@ -176,12 +174,9 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
       }
         
       otherInfo= CampaignOtherInfo(false, false,false,'', _refundType,'','','','','');
-
+      
       
       updateTierDetails (capAndDate[4], capAndDate[5], capAndDate[6],capAndDate[7]);
-      
-      
-      iCampaignList(_campaignFactory).createNewCampaign{value: 0.0001 ether}(_tokenAddress, address(this));//campaignCreationPrice
   }
 
   // function to update other details not initialized in constructor - this is bcos solidity limits how many variables u can pass in at once
@@ -207,7 +202,8 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     
 
     //Set dexLock
-    DexLocker dexLocker = new DexLocker(dexRouterAddress,IERC20(saleInfo.tokenAddress), msg.sender);
+    DexLocker dexLocker =_dexLockerFactory.createDexLocker(dexRouterAddress,saleInfo.tokenAddress, msg.sender);
+    //DexLocker dexLocker = new DexLocker(dexRouterAddress,saleInfo.tokenAddress, msg.sender);
     dexLocker.setupLock( liquidityReleaseTime,  saleInfo.dexListRate, teamTokenVestingDetails, raisedFundVestingDetails);
     _dexLockerAddress= payable(dexLocker);
 
@@ -220,9 +216,10 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     require(block.timestamp < saleInfo.saleStartTime, 'Can only updateTierDetails before Sale StartTime');
     require(_tierOneHardCap > (saleInfo.hardCap * 3000 / 10000), "CAMPAIGN: Tier Caps must be greater than 30 %" );
     require(_tierOneHardCap + _tierTwoHardCap == saleInfo.hardCap, "CAMPAIGN: Tier 1 & 2 Caps must be equal to hard cap" );
-
-    require(maxAllocationPerUserTierOne > 0, "CAMPAIGN: Tier 1 Max Allocation must be greater than 0" );
-    require(maxAllocationPerUserTierTwo > 0, "CAMPAIGN: Tier 2 Max Allocation must be greater than 0" );
+    
+    console.log("maxAllocationPerUserTierOne:", maxAllocationPerUserTierOne);
+    require(_maxAllocationPerUserTierOne > 0, "CAMPAIGN: Tier 1 Max Allocation must be greater than 0" );
+    require(_maxAllocationPerUserTierTwo > 0, "CAMPAIGN: Tier 2 Max Allocation must be greater than 0" );
     
     
     tierOnehardCap =_tierOneHardCap;
@@ -244,21 +241,21 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     return saleInfo.saleEndTime;
   }
 
-  function setCampaignFactory(address _newCampaignFactory) public onlyAdmin {
-    _campaignFactory=_newCampaignFactory;
-  }
+  // function setCampaignFactory(address _newCampaignFactory) public onlyAdmin {
+  //   _campaignFactory=_newCampaignFactory;
+  // }
 
 
 
 
-  //add the address in Whitelist tier One to invest
-  function addWhitelistOne(address _address) public onlyOwner {
+  // //add the address in Whitelist tier One to invest
+  // function addWhitelistOne(address _address) public onlyOwner {
 
-    //Every token holder is automatically whitelisted, so no needfor this
+  //   //Every token holder is automatically whitelisted, so no needfor this
 
-    require(_address != address(0), "Invalid address");
-    whitelistTierOne.push(_address);
-  }
+  //   require(_address != address(0), "Invalid address");
+  //   whitelistTierOne.push(_address);
+  // }
 
   //add the address in Whitelist tier two to invest
   function addWhitelistTwo(address _address) public onlyOwner {
@@ -412,10 +409,10 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     
   }
 
-  function finalizeAndwithdraw () public onlyOwner  {
-    require(status!=CampaignStatus.CANCELLED, 'Campaign: Sale Cancelled');
-    //todo
-  }
+  // function finalizeAndwithdraw () public onlyOwner  {
+  //   require(status!=CampaignStatus.CANCELLED, 'Campaign: Sale Cancelled');
+  //   //todo
+  // }
 
   /**
   * @dev Withdraw tokens or coin by user after end time
@@ -453,7 +450,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   /**
     * Setup liquidity and transfer all amounts according to defined percents, if softcap not reached set Refunded flag
     */
-  function setupLiquidity() public {
+  function finalizeAndSetupLiquidity() public {
       require(totalCoinReceived>= saleInfo.hardCap || block.timestamp > end() , "Campaign: not sold out or time not elapsed yet" );
       require(status != CampaignStatus.FAILED, "CAMPAIGN: campaign will be refunded");
       require(status != CampaignStatus.CANCELLED, "CAMPAIGN: campaign was cancelled");

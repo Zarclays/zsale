@@ -58,7 +58,7 @@ contract("Campaign Factory Tests", async function(accounts) {
   before(async function() {
     // accounts = await web3.eth.getAccounts();
     [owner, addr1, addr2] = accounts;
-    console.log('owner ', owner, ', add1: ', addr1,', add2: ', addr2);
+    
 
   });
   

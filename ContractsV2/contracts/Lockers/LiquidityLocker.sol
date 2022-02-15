@@ -34,7 +34,7 @@ contract LiquidityLocker{
 
     
 
-    IERC20 private _token;
+    address private _token;
     address private _lpTokenPairAddress;
 
     IDexRouter private _dexRouter;
@@ -44,7 +44,7 @@ contract LiquidityLocker{
 
     VestSchedule[] tokenVestSchedule ;
 
-    constructor(address dexRouterAddress, IERC20 token, address owner, uint256 price,uint256 releaseTime) {
+    constructor(address dexRouterAddress, address token, address owner, uint256 price,uint256 releaseTime) {
         require(releaseTime > block.timestamp, "LiquidityLocker: release time is before current time");
         _releaseTime = releaseTime;
         _dexRouter = IDexRouter(dexRouterAddress);
@@ -65,19 +65,19 @@ contract LiquidityLocker{
      */
     function addLiquidity() public {
         require(msg.sender == address(_deployer), "LiquidityLocker: Only deployer can call this function");
-        require(address(_token) != address(0), "LiquidityLocker: Token can not be zero");
+        require(_token != address(0), "LiquidityLocker: Token can not be zero");
         uint256 etherBalance = address(this).balance;
         uint256 tokensAmount = _price * etherBalance;
         uint256 tokensAmountMin = tokensAmount - (_price * etherBalance);
         require(etherBalance > 0, "LiquidityLocker: no ether to add liquidity");
-        require( _token.balanceOf(address(this)) > 0, "LiquidityLocker: no token balance to add liquidity");
+        require( IERC20(_token).balanceOf(address(this)) > 0, "LiquidityLocker: no token balance to add liquidity");
         
-        _token.approve(address(_dexRouter), MAX_INT);
+        IERC20(_token).approve(address(_dexRouter), MAX_INT);
         
         
-        _dexRouter.addLiquidityETH(address(_token), tokensAmount , tokensAmount, etherBalance, address(this), block.timestamp + 100);
+        _dexRouter.addLiquidityETH(_token, tokensAmount , tokensAmount, etherBalance, address(this), block.timestamp + 100);
 
-        _lpTokenPairAddress = IDexFactory(_dexRouter.factory() ).getPair(address(_token), _dexRouter.WETH() );
+        _lpTokenPairAddress = IDexFactory(_dexRouter.factory() ).getPair(_token, _dexRouter.WETH() );
     }
 
   
@@ -104,25 +104,25 @@ contract LiquidityLocker{
         // solhint-disable-next-line not-rely-on-time
         require(block.timestamp >= _releaseTime, "LiquidityLocker: current time is before release time");
 
-        IERC20 token=IERC20(_lpTokenPairAddress);
-        uint256 amount = token.balanceOf(address(this));
+        IERC20 lptoken=IERC20(_lpTokenPairAddress);
+        uint256 amount = lptoken.balanceOf(address(this));
         require(amount > 0, "LiquidityLocker: no LP tokens to release");
 
-        token.safeTransfer(_owner, amount); 
+        lptoken.safeTransfer(_owner, amount); 
     }
 
     /**
      * @notice Transfers tokens held by Lock to owner.
        @dev Able to withdraw LP funds after release time 
      */
-    function release(IERC20 token) public {
+    function release() public {
         // solhint-disable-next-line not-rely-on-time
         require(block.timestamp >= _releaseTime, "LiquidityLocker: current time is before release time");
 
-        uint256 amount = token.balanceOf(address(this));
+        uint256 amount = IERC20(_token).balanceOf(address(this));
         require(amount > 0, "LiquidityLocker: no tokens to release");
 
-        token.safeTransfer(_owner, amount); 
+        IERC20(_token).safeTransfer(_owner, amount); 
     }
 
        /**

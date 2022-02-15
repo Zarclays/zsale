@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.8;
 
-
-
-
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./VestSchedule.sol";
 
 
@@ -21,11 +17,11 @@ contract CoinLocker{
 
     address private _deployer;
 
-    uint256 constant private MAX_INT = 2**256 - 1;
+    
     bool public _funded ;
     
 
-    VestSchedule[] public coinVestSchedule ;
+    VestSchedule[8] public coinVestSchedule ;
 
     constructor(address owner, VestSchedule[8] memory schedule) {
        
@@ -37,7 +33,8 @@ contract CoinLocker{
 
         for (uint8 i=0; i < 8 /*100%*/; i++) {
             schedule[i].hasBeenClaimed=false;
-            coinVestSchedule.push(schedule[i]);
+            // coinVestSchedule.push(schedule[i]);
+            coinVestSchedule[i]=schedule[i];
 
         }
         
@@ -47,7 +44,7 @@ contract CoinLocker{
     receive() external payable {
 
         uint amount = 0;
-        for(uint i=0;i< coinVestSchedule.length; i++){
+        for(uint i=0;i< 8; i++){
             amount+= coinVestSchedule[i].releaseAmount;
         }
         if(msg.value>= amount){
@@ -69,7 +66,7 @@ contract CoinLocker{
         
         uint256 amountToReleaseThisTime =0;
         uint i;
-        for (i=0; i <= coinVestSchedule.length; i++) { 
+        for (i=0; i <= 8; i++) { 
             if(block.timestamp >= coinVestSchedule[i].releaseDate && !coinVestSchedule[i].hasBeenClaimed ) {
                 amountToReleaseThisTime += coinVestSchedule[i].releaseAmount;
                 coinVestSchedule[i].hasBeenClaimed = true;
@@ -77,8 +74,8 @@ contract CoinLocker{
         }
         
         uint256 balance = address(this).balance;
-        require(balance > 0, "CoinLocker: no coins to release");
-        require(balance >= amountToReleaseThisTime, "CoinLocker: not enough coins to release");
+        require(balance > 0);//, "CoinLocker: no coins to release"
+        require(balance >= amountToReleaseThisTime);//, "CoinLocker: not enough coins to release"
 
         payable(getOwner()).transfer(amountToReleaseThisTime);
     }

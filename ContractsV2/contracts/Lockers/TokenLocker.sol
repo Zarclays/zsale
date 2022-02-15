@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.8;
 
 
 
@@ -22,31 +22,28 @@ contract TokenLocker{
    
     address private _owner;
 
-    address private _deployer;
+    address private _deployer;    
 
-    uint256 constant private MAX_INT = 2**256 - 1;
-
-    
-
-    IERC20 private _token;
+    address private _token;
     
 
     
     
-    VestSchedule[] public tokenVestSchedule ;
+    VestSchedule[8] public tokenVestSchedule ;
 
-    constructor( IERC20 token, address owner, VestSchedule[8] memory schedule) {
+    constructor( address tokenAddress, address owner, VestSchedule[8] memory schedule) {
 
         // require(schedule.length <= 8, "TokenLocker: Vesting cannot have more than 8 schedules");
         
         _deployer = msg.sender;
         
         _owner = owner;
-        _token = token;
+        _token = tokenAddress;
 
         for (uint8 i=0; i < 8 /*100%*/; i++) {
             schedule[i].hasBeenClaimed=false;
-            tokenVestSchedule.push(schedule[i]);
+            // tokenVestSchedule.push(schedule[i]);
+            tokenVestSchedule[i]=schedule[i];
 
         }
  
@@ -75,18 +72,18 @@ contract TokenLocker{
     function release() public {
         uint256 amountToReleaseThisTime =0;
         uint i;
-        for (i=0; i <= tokenVestSchedule.length; i++) { 
+        for (i=0; i <= 8; i++) { 
             if(block.timestamp >= tokenVestSchedule[i].releaseDate && !tokenVestSchedule[i].hasBeenClaimed ) {
                 amountToReleaseThisTime += tokenVestSchedule[i].releaseAmount;
                 tokenVestSchedule[i].hasBeenClaimed = true;
             }            
         }
         
-        uint256 balance = _token.balanceOf(address(this));
+        uint256 balance = IERC20(_token).balanceOf(address(this));
         require(balance > 0, "TokenLocker: no tokens to release");
         require(balance >= amountToReleaseThisTime, "TokenLocker: not enough tokens to release");
 
-        _token.safeTransfer(_owner, amountToReleaseThisTime); 
+        IERC20(_token).safeTransfer(_owner, amountToReleaseThisTime); 
     }
 
     /**

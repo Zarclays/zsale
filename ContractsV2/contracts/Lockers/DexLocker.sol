@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.8;
 
 
 import {IDexRouter} from "../IDexRouter.sol";
@@ -7,14 +7,14 @@ import "./VestSchedule.sol";
 import "./TokenLocker.sol";
 import "./CoinLocker.sol";
 import "./LiquidityLocker.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+// import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 
 
 // locks liquidity for LP tokens and handles team vseting
 contract DexLocker{
 
-    using SafeERC20 for IERC20;
+    // using SafeERC20 for IERC20;
     // using SafeMath for uint256;
 
     
@@ -33,7 +33,7 @@ contract DexLocker{
 
     
 
-    IERC20 private _token;
+    address private _token;
     address private _lpTokenPairAddress;
 
     IDexRouter private _dexRouter;
@@ -43,28 +43,28 @@ contract DexLocker{
     LiquidityLocker private _liquidtyLocker;
 
 
-    /**
-    Total team vesting tokens
+    // /**
+    // Total team vesting tokens
 
-    firstTokenReleasetime
-    firstTokenReleasePercent
-    vestingPeriod (in days)
-    vestingPercent
-     */
-    uint256[5] private _teamTokenVestingDetails; 
+    // firstTokenReleasetime
+    // firstTokenReleasePercent
+    // vestingPeriod (in days)
+    // vestingPercent
+    //  */
+    // uint256[8] private _teamTokenVestingDetails; 
 
-    /**
-    Total vesting tokens
+    // /**
+    // Total vesting tokens
 
-    firstCoinReleasetime
-    firstCoinReleasePercent
-    CoinvestingPeriod (in days)
-    CoinvestingPercent
-     */
-    uint256[5] private _raisedFundVestingDetails; 
+    // firstCoinReleasetime
+    // firstCoinReleasePercent
+    // CoinvestingPeriod (in days)
+    // CoinvestingPercent
+    //  */
+    // uint256[8] private _raisedFundVestingDetails; 
 
 
-    constructor(address dexRouterAddress, IERC20 token,address owner){
+    constructor(address dexRouterAddress, address token,address owner){
         _dexRouter = IDexRouter(dexRouterAddress);
         _deployer = msg.sender;
         
