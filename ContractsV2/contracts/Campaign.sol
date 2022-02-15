@@ -130,10 +130,8 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   constructor(
     address campaignFactory,
     address  _tokenAddress,
-    uint256 _softCap,
-    uint256 _hardCap, 
-    uint256 _saleStartTime, 
-    uint256 _saleEndTime,   
+     
+    uint256[8] memory capAndDate,  // uint256 _softCap,uint256 _hardCap,uint256 _saleStartTime,uint256 _saleEndTime, uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo 
     
     RefundType _refundType, 
     address _dexRouterAddress,
@@ -151,9 +149,9 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
         }
       }
 
-      require(_saleStartTime > block.timestamp, "CAMPAIGN: Sale Start time needs to be above current time");
+      require(capAndDate[2] > block.timestamp, "CAMPAIGN: Sale Start time needs to be above current time");
       // require(releaseTime > block.timestamp, "CAMPAIGN: release time above current time");
-      require(_saleEndTime > _saleStartTime, "CAMPAIGN: Sale End time above start time");
+      require(capAndDate[3] > capAndDate[2], "CAMPAIGN: Sale End time above start time");
       require(_liquidityPercent >= 5100, "CAMPAIGN: Liquidity allowed is > 51 %");
         
         
@@ -163,10 +161,10 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
 
         // saleInfo= CampaignSaleInfo();
         saleInfo.tokenAddress=_tokenAddress;
-        saleInfo.softCap=_softCap;
-        saleInfo.hardCap=_hardCap;
-        saleInfo.saleStartTime=_saleStartTime;
-        saleInfo.saleEndTime=_saleEndTime;
+        saleInfo.softCap=capAndDate[0];
+        saleInfo.hardCap=capAndDate[1];
+        saleInfo.saleStartTime=capAndDate[2];
+        saleInfo.saleEndTime=capAndDate[3];
         saleInfo.liquidityPercent=_liquidityPercent;
         saleInfo.listRate=_listRate;
         saleInfo.dexListRate=_dexListRate;
@@ -179,17 +177,11 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
         
       otherInfo= CampaignOtherInfo(false, false,false,'', _refundType,'','','','','');
 
-      tierOnehardCap=_hardCap / 2; //50% by default
-      maxAllocationPerUserTierOne = tierOnehardCap/50 ;  //50 people by default
-
-      tierTwohardCap=_hardCap / 2; //50% by default
-      maxAllocationPerUserTierTwo = _maxAllocationPerUserTierTwo ;  
-      // addWhitelistOne(msg.sender);
-
+      
+      updateTierDetails (capAndDate[4], capAndDate[5], capAndDate[6],capAndDate[7]);
       
       
-      
-      iCampaignList(_campaignFactory).createNewCampaign{value: 0.0001 ether}(_tokenAddress, address(this));
+      iCampaignList(_campaignFactory).createNewCampaign{value: 0.0001 ether}(_tokenAddress, address(this));//campaignCreationPrice
   }
 
   // function to update other details not initialized in constructor - this is bcos solidity limits how many variables u can pass in at once
@@ -212,7 +204,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     otherInfo.telegram= telegram;
     otherInfo.useWhiteList=_useWhiteList;
 
-    updateTierDetails (capDetails[0], capDetails[1], capDetails[2],capDetails[3]);
+    
 
     //Set dexLock
     DexLocker dexLocker = new DexLocker(dexRouterAddress,IERC20(saleInfo.tokenAddress), msg.sender);
