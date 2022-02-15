@@ -70,7 +70,11 @@ contract("Campaign Factory Tests", async function(accounts) {
   describe("Scenario 1", () => {
 
     let  campaignFactory;
+    let campaign;
     let  token;
+    const now = new Date();
+    const twoHoursTime = now.setHours(now.getHours()+2);
+    const fourHoursLater = now.setHours(now.getHours()+4);
 
     before('Initialize and Deploy SmartContracts', async () => {
         // wPBTToken = await WPBTToken.new("Test Tokens", "TTT", 18, 10000000);
@@ -86,6 +90,10 @@ contract("Campaign Factory Tests", async function(accounts) {
 
         campaignFactory = await CampaignFactoryArtifact.deployed();
         console.log('Using Campaign List Deployed at  ', campaignFactory.address );
+
+        campaign = await CampaignArtifact.new(campaignFactory.address, token.address,web3.utils.toWei('0.1', 'ether'),web3.utils.toWei('0.2', 'ether'), twoHoursTime, fourHoursLater,0,router,6000,1000,800,web3.utils.toWei('0.2', 'ether'), {  value: "1000000000000000" });
+
+        console.log('Using Campaign Deployed at  ', campaign.address );
         
     });
 
@@ -102,128 +110,18 @@ contract("Campaign Factory Tests", async function(accounts) {
     // });
 
     it('Creates New Contracts successfully', async() => {
-      const now = new Date();
-      const twoHoursTime = now.setHours(now.getHours()+2);
-      const fourHoursLater = now.setHours(now.getHours()+4);
+      
 
       try{
         
         const router = '0xeD37AEDD777B44d34621Fe5cb1CF594dc39C8192';
         // const cmp = await CampaignArtifact.deployed();
-        const cmp = await CampaignArtifact.at('0x3195875100D00bD85BA2058a05BDDD1D3DaCc6f0');
+        // const cmp = await CampaignArtifact.at('0x3195875100D00bD85BA2058a05BDDD1D3DaCc6f0');
+        const cmp = campaign;
         console.log('Using Campaign Deployed at  ', cmp.address ); // 0x3195875100D00bD85BA2058a05BDDD1D3DaCc6f0
 
         
-        let encoded = web3.eth.abi.encodeParameters(['uint8[]','bytes32'], [['34','43'], '0x324567fff']);
-        console.log('Encoded:  ', encoded );
-
-    //     encoded = web3.eth.abi.encodeParameters(
-    //       [
-    //           'uint8[]',
-    //           {
-    //               "ParentStruct": {
-    //                   "propertyOne": 'uint256',
-    //                   "propertyTwo": 'uint256',
-                      
-    //               }
-    //           }
-    //       ],
-    //       [
-    //           ['34','43'],
-    //           {
-    //               "propertyOne": '42',
-    //               "propertyTwo": '56',
-                  
-    //           }
-    //       ]
-    //   );
-
-    //   console.log('Encoded 2:  ', encoded );
-
         
-    //   encoded =  web3.eth.abi.encodeParameters(
-    //     [
-    //         'uint8[]',
-    //         {
-    //           "ParentStruct":[{
-    //             "releaseDate": 'uint256',
-    //             "releaseAmount": 'uint256',
-    //             "hasBeenClaimed" : 'bool'
-    //           }]
-    //         }
-    //     ],
-    //     [
-    //         ['34','43'],
-    //         [{
-                
-    //                 "releaseDate": fourHoursLater,
-    //                 "releaseAmount": '500000000000000',
-    //                 "hasBeenClaimed" : false
-                
-    //         }]
-    //     ]
-    // );
-
-    // console.log('Encoded 3:  ', encoded );
-
-  //   encoded =  web3.eth.abi.encodeParameters(
-  //     'tuple(string,uint)[]',
-  //     [[['item1', 2], ['item2', 3]]]
-  // //   [{
-  // //     releaseDate: 1643814669155,
-  // //     releaseAmount: '500000000000000',
-  // //     hasBeenClaimed: false
-  // //   }, 
-  // //   {
-  // //     releaseDate: 1643814669155,
-  // //     releaseAmount: '500000000000000',
-  // //     hasBeenClaimed: false
-  // //   }
-  // // ]
-  // );
-
-  // console.log('Encoded 4:  ', encoded );
-        // await cmp.updateCampaignDetails(fourHoursLater,false,'logourl', 'desc', 'websiteurl','twitter','telegram',
-        // [ [
-        //   [fourHoursLater, '500000000000000', false],
-        //   [fourHoursLater, '200000000000000', false],
-        //   [fourHoursLater, '500000000000000', false],
-        //   [fourHoursLater, '200000000000000', false],
-        //   [fourHoursLater, '500000000000000', false],
-        //   [fourHoursLater, '200000000000000', false],
-        //   [fourHoursLater, '500000000000000', false],
-        //   [fourHoursLater, '200000000000000', false]
-        // ] ],
-        // [ [
-        //   [fourHoursLater, '500000000000000', false],
-        //   [fourHoursLater, '200000000000000', false],
-        //   [fourHoursLater, '500000000000000', false],
-        //   [fourHoursLater, '200000000000000', false],
-        //   [fourHoursLater, '500000000000000', false],
-        //   [fourHoursLater, '200000000000000', false],
-        //   [fourHoursLater, '500000000000000', false],
-        //   [fourHoursLater, '200000000000000', false]
-        // ] ],
-        // [
-        //   '500000000000000',
-        //   '500000000000000',
-        //   '500000000000000',
-        //   '500000000000000'
-        //   // ['500000000000000'],
-        //   // ['500000000000000'],
-        //   // ['500000000000000'],
-        //   // ['500000000000000']
-        //   // web3.utils.toWei('1', 'ether'),
-        //   // web3.utils.toWei('1', 'ether'),
-        //   // web3.utils.toWei('1', 'ether'),
-        //   // web3.utils.toWei('1', 'ether')
-        // ]
-        // // ,  { 
-        // //           // from: owner,
-        // //           value: web3.utils.toWei('0.0001', 'ether')
-        // // }
-        //  );
-
 
          await cmp.updateCampaignDetails(fourHoursLater,false,'logourl', 'desc', 'websiteurl','twitter','telegram',
         [
@@ -231,34 +129,30 @@ contract("Campaign Factory Tests", async function(accounts) {
           {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
           {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
           {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false}
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false}
         ],
         [
-          {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '500000000000000', hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '200000000000000', hasBeenClaimed: false}
+          {releaseDate: fourHoursLater, releaseAmount: web3.utils.toWei('0.02', 'ether'), hasBeenClaimed: false}, //25% of 0.08 being raisedfunds - raisedfundsUsedForLiquidity
+          {releaseDate: fourHoursLater, releaseAmount: web3.utils.toWei('0.02', 'ether'), hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: web3.utils.toWei('0.02', 'ether'), hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: web3.utils.toWei('0.02', 'ether'), hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false}
         ],
         [
-          '500000000000000',
-          '500000000000000',
-          '500000000000000',
-          '500000000000000'
-          // ['500000000000000'],
-          // ['500000000000000'],
-          // ['500000000000000'],
-          // ['500000000000000']
-          // web3.utils.toWei('1', 'ether'),
-          // web3.utils.toWei('1', 'ether'),
-          // web3.utils.toWei('1', 'ether'),
-          // web3.utils.toWei('1', 'ether')
+          // '500000000000000',
+          // '500000000000000',
+          // '500000000000000',
+          // '500000000000000'
+          web3.utils.toWei('0.1', 'ether'),
+          web3.utils.toWei('0.1', 'ether'),
+          web3.utils.toWei('1', 'ether'),
+          web3.utils.toWei('1', 'ether')
         ]
         // ,  { 
         //           // from: owner,
@@ -267,10 +161,12 @@ contract("Campaign Factory Tests", async function(accounts) {
          );
         
       }catch(err){
-        console.error('Error :', err);
+        console.error('All Error :', err);        
+        console.error('Error Data :', err.data);
+        try{
         const { error: contractError, reason } = err.data[Object.keys(err.data)[0]];
-        console.error('Error :', contractError, ', reason: ' , reason);
-        console.error('DError :', err.data);
+        console.error('Contract Error :', contractError, ', reason: ' , reason);
+        }catch{}
       }
 
     //   try{
