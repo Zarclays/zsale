@@ -46,57 +46,144 @@ describe("Greeter", function () {
 });
 
 
-// describe("CampaignList", function () {
+describe("CampaignList", function () {
   
-//   const now = new Date();
-//   const twoHoursTime = now.setHours(now.getHours()+2);
-//   const fourHoursLater = now.setHours(now.getHours()+4);
-//   let CampaignFactoryArtifact = undefined;
-//   let TokenArtifact = undefined;
-//   let CampaignArtifact = undefined;
+  const now = new Date();
+  const twoHoursTime = now.setHours(now.getHours()+2);
+  const fourHoursLater = now.setHours(now.getHours()+4);
+  let CampaignFactoryArtifact = undefined;
+  let TokenArtifact = undefined;
+  let CampaignArtifact:any  = undefined;
+  let DexLockerFactoryArtifact = undefined;
 
-//   const router = '0xeD37AEDD777B44d34621Fe5cb1CF594dc39C8192';
-//   let  campaignFactory: any;
-//   let campaign;
-//   let  token: any;
+  const router = '0xeD37AEDD777B44d34621Fe5cb1CF594dc39C8192';
+  let  campaignFactory: any;
+  let campaign:any;
+  let  token: any;
+  let campaignAddress: string;
   
 
-//   before('Initialize and Deploy SmartContracts', async () => {
-//       CampaignFactoryArtifact = await ethers.getContractFactory("CampaignList");
-//       TokenArtifact = await ethers.getContractFactory("Token");
-//       CampaignArtifact = await ethers.getContractFactory("Campaign");
-
-
-//       token = await TokenArtifact.deploy();
-//       await token.deployed();
+  before('Initialize and Deploy SmartContracts', async () => {
       
-//       campaignFactory = await CampaignFactoryArtifact.deploy();
-//       await campaignFactory.deployed();
-//       console.log('Using Campaign List Deployed at  ', campaignFactory.address );
+      CampaignFactoryArtifact = await ethers.getContractFactory("CampaignList");
+      TokenArtifact = await ethers.getContractFactory("Token");
+      CampaignArtifact = await ethers.getContractFactory("Campaign");
+      DexLockerFactoryArtifact = await ethers.getContractFactory("DexLockerFactory");
+
+
+      token = await TokenArtifact.deploy();
+      await token.deployed();
+
+      const dexLockerFactory = await DexLockerFactoryArtifact.deploy();
+      await dexLockerFactory.deployed();
+      
+      campaignFactory = await CampaignFactoryArtifact.deploy(dexLockerFactory.address);
+      await campaignFactory.deployed();
+      console.log('Using Campaign List Deployed at  ', campaignFactory.address );
 
       
 
-//       // console.log('Using Campaign Deployed at  ', campaign.address );
+      // console.log('Using Campaign Deployed at  ', campaign.address );
       
-//   });
+  });
 
 
-//   it("Should create new campaign", async function () {
-//     console.log('arr: ', [ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),ethers.utils.formatUnits( ethers.utils.parseEther("0.2"), 'wei'), twoHoursTime, fourHoursLater, ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
-//           ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
-//           ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei'),
-//           ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei')
-//         ] )
-//     const createCampaignTx = await campaignFactory.createNewCampaign( token.address,
-//         [ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),ethers.utils.formatUnits( ethers.utils.parseEther("0.2"), 'wei'), twoHoursTime, fourHoursLater, ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
-//           ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
-//           ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei'),
-//           ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei')
-//         ] 
-//           ,0,router,6000,1000,800,ethers.utils.formatUnits( ethers.utils.parseEther("0.2"), 'wei'), {  value: ethers.utils.parseEther("1.0") }); // , {  value: ethers.utils.parseEther("1.0") }
-//       await createCampaignTx.wait();
+  it("Should create new campaign", async function () {
+    const [owner] = await ethers.getSigners();
+    const createCampaignTx = await campaignFactory.createNewCampaign(token.address,
+        [ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),ethers.utils.formatUnits( ethers.utils.parseEther("0.2"), 'wei'), twoHoursTime, fourHoursLater, ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
+          ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
+          ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei'),
+          ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei')
+        ] 
+          ,0,router,6000,1000,800,ethers.utils.formatUnits( ethers.utils.parseEther("0.2"), 'wei'), {  value: ethers.utils.parseEther("1.0") }); // , {  value: ethers.utils.parseEther("1.0") }
+    let txResult =   await createCampaignTx.wait();
+    campaignAddress = txResult.events[2].args['createdCampaignAddress'];
 
-//     expect(await campaignFactory.campaignSize()).to.equal(1);
-//   });
-// });
+    expect(await campaignFactory.campaignSize()).to.equal(1);
+  });
+
+  it('campaignlist sould return correct campaign address for token address', async() => {
+        const returnedAddress = await campaignFactory.tryGetCampaignByTokenAddress(token.address);
+        expect(returnedAddress).to.equal(campaignAddress);
+      
+
+  });
+
+  it('stops duplicates contract for the same token except when cancelled', async() => {
+
+      
+      let createError;
+      try{
+        const createCampaignTx = await campaignFactory.createNewCampaign(token.address,
+        [ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),ethers.utils.formatUnits( ethers.utils.parseEther("0.2"), 'wei'), twoHoursTime, fourHoursLater, ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
+          ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
+          ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei'),
+          ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei')
+        ] 
+          ,0,router,6000,1000,800,ethers.utils.formatUnits( ethers.utils.parseEther("0.2"), 'wei'), {  value: ethers.utils.parseEther("1.0") });
+
+        let txResult =   await createCampaignTx.wait();
+         
+      }catch(err){
+        // console.error('Error duplicating: ', err);
+        
+        createError=err;
+      }
+      expect(createError).to.not.equal(undefined);
+      expect(await campaignFactory.campaignSize()).to.equal(1);
+      
+
+  });
+
+  it('updates  contract details successfully', async() => {
+
+    
+    let error;
+    try{
+      let cmp = CampaignArtifact.attach(campaignAddress);
+      const updateCampaignTx = await cmp.updateCampaignDetails(fourHoursLater,false,'logourl', 'desc', 'websiteurl','twitter','telegram',
+        [
+          {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.05"), hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.02"), hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.05"), hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.02"), hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false}
+        ],
+        [
+          {releaseDate: fourHoursLater, releaseAmount:  ethers.utils.parseEther("0.02"), hasBeenClaimed: false}, //25% of 0.08 being raisedfunds - raisedfundsUsedForLiquidity
+          {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.02"), hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.02"), hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.02"), hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false}
+        ]
+        // ,{ 
+        // //           // from: owner,
+        //     value: ethers.utils.parseEther("0.0001")
+        // }
+         );
+        
+      let txResult =   await updateCampaignTx.wait();
+      console.log('Update Campaign List Res: ', txResult );
+    }catch(err){
+      // console.error('Error duplicating: ', err);
+      
+      error=err;
+    }
+    expect(error).to.equal(undefined);
+    expect(await campaignFactory.campaignSize()).to.equal(1);
+    
+
+  });
+
+
+
+
+});
 

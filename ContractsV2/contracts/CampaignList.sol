@@ -81,7 +81,7 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
         }
         
         {            
-            Campaign cmpgn = new Campaign(address(this) , _tokenAddress, capAndDate,    _refundType, _dexRouterAddress,_liquidityPercent, _listRate, _dexListRate,_maxAllocationPerUserTierTwo, _dexLockerFactory
+            Campaign cmpgn = new Campaign(msg.sender, address(this) , _tokenAddress, capAndDate,    _refundType, _dexRouterAddress,_liquidityPercent, _listRate, _dexListRate,_maxAllocationPerUserTierTwo, _dexLockerFactory
             );
             _counter.increment();            
             _campaigns.set(_counter.current(), address( cmpgn));

@@ -131,6 +131,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   address public _campaignFactory= 0x92Fe2933C795FF95A758362f9535A4D0a516053d ;
   
   constructor(
+    address campaignOwner,
     address campaignFactory,
     address  _tokenAddress,
      
@@ -177,6 +178,8 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
       
       
       updateTierDetails (capAndDate[4], capAndDate[5], capAndDate[6],capAndDate[7]);
+
+      transferOwnership(campaignOwner);
   }
 
   // function to update other details not initialized in constructor - this is bcos solidity limits how many variables u can pass in at once
@@ -188,8 +191,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     string memory twitter,
     string memory telegram,
     VestSchedule[8] memory teamTokenVestingDetails, 
-    VestSchedule[8] memory raisedFundVestingDetails,
-    uint256[4] memory capDetails
+    VestSchedule[8] memory raisedFundVestingDetails
   ) external onlyOwner {
     liquidityReleaseTime  = saleInfo.saleEndTime + (liquidityReleaseTimeDays * 1 days);
     otherInfo.logoUrl= logoUrl;
@@ -202,7 +204,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     
 
     //Set dexLock
-    DexLocker dexLocker =_dexLockerFactory.createDexLocker(dexRouterAddress,saleInfo.tokenAddress, msg.sender);
+    DexLocker dexLocker =_dexLockerFactory.createDexLocker(dexRouterAddress,saleInfo.tokenAddress,address(this), msg.sender);
     //DexLocker dexLocker = new DexLocker(dexRouterAddress,saleInfo.tokenAddress, msg.sender);
     dexLocker.setupLock( liquidityReleaseTime,  saleInfo.dexListRate, teamTokenVestingDetails, raisedFundVestingDetails);
     _dexLockerAddress= payable(dexLocker);

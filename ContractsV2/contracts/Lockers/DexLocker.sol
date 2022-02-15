@@ -64,9 +64,9 @@ contract DexLocker{
     // uint256[8] private _raisedFundVestingDetails; 
 
 
-    constructor(address dexRouterAddress, address token,address owner){
+    constructor(address dexRouterAddress, address token,address deployer,address owner)  {
         _dexRouter = IDexRouter(dexRouterAddress);
-        _deployer = msg.sender;
+        _deployer = deployer; //msg.sender;
         
         _owner = owner;
         _token = token;        
