@@ -39,7 +39,7 @@ const Tooltips = Loader(lazy(() => import('src/content/pages/Components/Tooltips
 const Avatars = Loader(lazy(() => import('src/content/pages/Components/Avatars')));
 const Cards = Loader(lazy(() => import('src/content/pages/Components/Cards')));
 const Forms = Loader(lazy(() => import('src/content/pages/Components/Forms')));
-
+const Contact = Loader(lazy(() => import('src/content/pages/Components/Contact')));
 // Status
 
 const Status404 = Loader(lazy(() => import('src/content/pages/Status/Status404')));
@@ -221,6 +221,10 @@ const routes: RouteObject [] = [
         path: 'forms',
         element: <Forms />
       },
+      {
+        path: 'contact',
+        element: <Contact />
+      }
     ]
   }
 ];

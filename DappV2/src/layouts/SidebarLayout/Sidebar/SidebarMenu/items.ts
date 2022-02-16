@@ -34,127 +34,78 @@ const menuItems: MenuItems[] = [
     heading: '',
     items: [
       {
-        name: 'Overview',
+        name: 'Landing Page',
         link: '/overview',
         icon: DesignServicesTwoToneIcon
       }
     ]
   },
   {
-    heading: 'Dashboards',
+    heading: 'Campaign',
     items: [
       {
-        name: 'Crypto',
+        name: 'Home',
         link: '/dashboards/crypto',
         icon: BrightnessLowTwoToneIcon
       },
       {
-        name: 'Messenger',
+        name: 'Create Campaign',
         icon: MmsTwoToneIcon,
         link: '/dashboards/messenger'
       },
-    ]
-  },
-  {
-    heading: 'Management',
-    items: [
       {
-        name: 'Transactions',
+        name: 'Create Fair Campaign',
         icon: TableChartTwoToneIcon,
         link: '/management/transactions'
       },
       {
-        name: 'User Profile',
-        icon: AccountCircleTwoToneIcon,
-        link: '/management/profile',
-        items: [
-          {
-            name: 'Profile Details',
-            link: '/management/profile/details'
-          },
-          {
-            name: 'User Settings',
-            link: '/management/profile/settings'
-          }
-        ]
+        name: 'Create Token',
+        icon: TableChartTwoToneIcon,
+        link: ''
+      },
+      {
+        name: 'All Campaing List',
+        icon: HowToVoteTwoToneIcon,
+        link: ''
       }
     ]
   },
   {
-    heading: 'Components',
+    heading: 'Zsale Lock',
     items: [
       {
-        name: 'Buttons',
-        icon: BallotTwoToneIcon,
-        link: '/components/buttons'
-      },
-      {
-        name: 'Modals',
-        icon: BeachAccessTwoToneIcon,
-        link: '/components/modals'
-      },
-      {
-        name: 'Accordions',
-        icon: EmojiEventsTwoToneIcon,
-        link: '/components/accordions'
-      },
-      {
-        name: 'Tabs',
-        icon: FilterVintageTwoToneIcon,
-        link: '/components/tabs'
-      },
-      {
-        name: 'Badges',
-        icon: HowToVoteTwoToneIcon,
-        link: '/components/badges'
-      },
-      {
-        name: 'Tooltips',
+        name: 'Create Lock',
         icon: LocalPharmacyTwoToneIcon,
-        link: '/components/tooltips'
+        link: ''
       },
       {
-        name: 'Avatars',
-        icon: RedeemTwoToneIcon,
-        link: '/components/avatars'
-      },
-      {
-        name: 'Cards',
-        icon: SettingsTwoToneIcon,
-        link: '/components/cards'
-      },
-      {
-        name: 'Forms',
+        name: 'Token',
         icon: TrafficTwoToneIcon,
-        link: '/components/forms'
+        link: ''     
       },
+      {
+        name: 'Liquidity',
+        icon: VerifiedUserTwoToneIcon,
+        link: ''
+      },
+      {
+        name: 'KYC & Audit',
+        icon: VerifiedUserTwoToneIcon,
+        link: ''
+      },
+      {
+        name: 'Docs',
+        icon: EmojiEventsTwoToneIcon,
+        link: ''
+      }
     ]
   },
   {
-    heading: 'Extra Pages',
+    heading: 'Get in Touch',
     items: [
       {
-        name: 'Status',
-        icon: VerifiedUserTwoToneIcon,
-        link: '/status',
-        items: [
-          {
-            name: 'Error 404',
-            link: '/status/404'
-          },
-          {
-            name: 'Error 500',
-            link: '/status/500'
-          },
-          {
-            name: 'Maintenance',
-            link: '/status/maintenance'
-          },
-          {
-            name: 'Coming Soon',
-            link: '/status/coming-soon'
-          }
-        ]
+        name: 'Contact Us',
+        link: '/components/contact'
       }
     ]
   }

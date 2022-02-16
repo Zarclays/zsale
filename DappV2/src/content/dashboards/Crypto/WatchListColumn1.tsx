@@ -1,4 +1,4 @@
-import { Card, Box, Typography, Avatar } from '@mui/material';
+import { Card, Box, Typography, Avatar, Button } from '@mui/material';
 
 import { styled } from '@mui/material/styles';
 import Label from 'src/components/Label';
@@ -17,6 +17,16 @@ const WatchListColumn1ChartWrapper = styled(WatchListColumn1Chart)(
         height: 130px;
 `
 );
+
+const campaigns = {
+  coinName: 'Bitcoin',
+  coinSymbol: 'BTC',
+  totalSupply: '1,000,000',
+  totalContributed: 500 + 'BNB',
+  coinToBnb: '5,000',
+  startDate: '2/03/2022'
+
+}
 
 function WatchListColumn1() {
 
@@ -44,10 +54,10 @@ function WatchListColumn1() {
           </AvatarWrapper>
           <Box>
             <Typography variant="h4" noWrap>
-              Bitcoin
+              {campaigns.coinName}
             </Typography>
             <Typography variant="subtitle1" noWrap>
-              BTC
+              {campaigns.coinSymbol}
             </Typography>
           </Box>
         </Box>
@@ -59,13 +69,19 @@ function WatchListColumn1() {
             pt: 3
           }}
         >
-          <Typography variant="h2" sx={{ pr: 1, mb: 1 }}>
-            $56,475.99
+          <Typography variant="h5" sx={{ pr: 1, mb: 1 }}>
+            Total Supply: {campaigns.totalSupply}
           </Typography>
-          <Text color="success">
-            <b>+12.5%</b>
-          </Text>
         </Box>
+        <Typography variant="h6" sx={{ pr: 1, mb: 1 }}>
+            Coin To BNB: {campaigns.coinToBnb}
+          </Typography>
+          <Typography variant="h6" sx={{ pr: 1, mb: 1 }}>
+            Starting Date: {campaigns.startDate}
+          </Typography>
+          <Typography variant="h6" sx={{ pr: 1, mb: 1 }}>
+            Total Contributed: {campaigns.totalContributed}
+          </Typography>
         <Box
           sx={{
             display: 'flex',
@@ -73,17 +89,13 @@ function WatchListColumn1() {
             justifyContent: 'flex-start'
           }}
         >
-          <Label color="success">+$500</Label>
-          <Typography variant="body2" color="text.secondary" sx={{ pl: 1 }}>
-            last 24h
-          </Typography>
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+          }}>
+          <Button >Full Details</Button>
+          </Box>
         </Box>
-      </Box>
-      <Box height={130} sx={{ ml: -1.5 }}>
-        <WatchListColumn1ChartWrapper
-          data={price.week.data}
-          labels={price.week.labels}
-        />
       </Box>
     </Card>
   );

@@ -1,4 +1,4 @@
-import { Card, Box, Typography, Avatar, Button } from '@mui/material';
+import { Card, Box, Typography, Avatar, Button} from '@mui/material';
 
 import { styled } from '@mui/material/styles';
 import Label from 'src/components/Label';
@@ -28,7 +28,7 @@ const campaigns = {
 
 }
 
-function WatchListColumn3() {
+function WatchListColumn4() {
 
   const price = {
     week: {
@@ -41,7 +41,7 @@ function WatchListColumn3() {
         'Saturday',
         'Sunday'
       ],
-      data: [13, 16, 14, 21, 8, 11, 20]
+      data: [55.701, 57.598, 48.607, 46.439, 58.755, 46.978, 58.16]
     }
   };
 
@@ -98,4 +98,4 @@ function WatchListColumn3() {
   );
 }
 
-export default WatchListColumn3;
+export default WatchListColumn4;

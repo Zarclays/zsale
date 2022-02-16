@@ -16,6 +16,7 @@ import WatchListColumn1 from './WatchListColumn1';
 import WatchListColumn2 from './WatchListColumn2';
 import WatchListColumn3 from './WatchListColumn3';
 import WatchListRow from './WatchListRow';
+import WatchListColumn4 from './WatchListColumn4';
 
 const EmptyResultsWrapper = styled('img')(
   ({ theme }) => `
@@ -42,39 +43,30 @@ function WatchList() {
         display="flex"
         alignItems="center"
         justifyContent="space-between"
-        sx={{ pb: 3 }}
+        sx={{ pb: 4 }}
       >
-        <Typography variant="h3">Watch List</Typography>
-        <ToggleButtonGroup
-          value={tabs}
-          exclusive
-          onChange={handleViewOrientation}
-        >
-          <ToggleButton disableRipple value="watch_list_columns">
-            <ViewWeekTwoToneIcon />
-          </ToggleButton>
-          <ToggleButton disableRipple value="watch_list_rows">
-            <TableRowsTwoToneIcon />
-          </ToggleButton>
-        </ToggleButtonGroup>
+        <Typography variant="h3">Campaigns</Typography>
       </Box>
       <Grid
         container
         direction="row"
         justifyContent="center"
         alignItems="stretch"
-        spacing={3}
+        spacing={2}
       >
         {tabs === 'watch_list_columns' && (
           <>
-            <Grid item lg={4} xs={12}>
+            <Grid item lg={3} xs={12}>
               <WatchListColumn1 />
             </Grid>
-            <Grid item lg={4} xs={12}>
+            <Grid item lg={3} xs={12}>
               <WatchListColumn2 />
             </Grid>
-            <Grid item lg={4} xs={12}>
+            <Grid item lg={3} xs={12}>
               <WatchListColumn3 />
+            </Grid>
+            <Grid item lg={3} xs={12}>
+              <WatchListColumn4 />
             </Grid>
           </>
         )}
@@ -90,19 +82,6 @@ function WatchList() {
             <Card sx={{ textAlign: 'center', p: 3 }}>
               <EmptyResultsWrapper src="/static/images/placeholders/illustrations/1.svg" />
 
-              <Typography
-                align="center"
-                variant="h2"
-                fontWeight="normal"
-                color="text.secondary"
-                sx={{ mt: 3 }}
-                gutterBottom
-              >
-                Click something, anything!
-              </Typography>
-              <Button variant="contained" size="large" sx={{ mt: 4 }}>
-                Maybe, a button?
-              </Button>
             </Card>
           </Grid>
         )}

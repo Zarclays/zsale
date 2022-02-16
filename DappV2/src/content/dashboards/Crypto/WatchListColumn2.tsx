@@ -1,4 +1,4 @@
-import { Card, Box, Typography, Avatar } from '@mui/material';
+import { Card, Box, Typography, Avatar, Button } from '@mui/material';
 
 import { styled } from '@mui/material/styles';
 import Label from 'src/components/Label';
@@ -17,6 +17,16 @@ const WatchListColumn1ChartWrapper = styled(WatchListColumn1Chart)(
         height: 130px;
 `
 );
+
+const campaigns = {
+  coinName: 'Bitcoin',
+  coinSymbol: 'BTC',
+  totalSupply: '1,000,000',
+  totalContributed: 500 && 'BNB',
+  coinToBnb: '5,000',
+  startDate: '2/03/2022'
+
+}
 
 function WatchListColumn2() {
 
@@ -40,17 +50,14 @@ function WatchListColumn2() {
       <Box sx={{ p: 3 }}>
         <Box display="flex" alignItems="center">
           <AvatarWrapper>
-            <img
-              alt="ETH"
-              src="/static/images/placeholders/logo/ethereum.png"
-            />
+            <img alt="BTC" src="/static/images/placeholders/logo/bitcoin.png" />
           </AvatarWrapper>
           <Box>
             <Typography variant="h4" noWrap>
-              Ethereum
+              {campaigns.coinName}
             </Typography>
             <Typography variant="subtitle1" noWrap>
-              ETH
+              {campaigns.coinSymbol}
             </Typography>
           </Box>
         </Box>
@@ -62,13 +69,16 @@ function WatchListColumn2() {
             pt: 3
           }}
         >
-          <Typography variant="h2" sx={{ pr: 1, mb: 1 }}>
-            $1,968.00
+          <Typography variant="h5" sx={{ pr: 1, mb: 1 }}>
+            Total Supply: {campaigns.totalSupply}
           </Typography>
-          <Text color="error">
-            <b>-3.24%</b>
-          </Text>
         </Box>
+        <Typography variant="h6" sx={{ pr: 1, mb: 1 }}>
+            Coin To BNB: {campaigns.coinToBnb}
+          </Typography>
+          <Typography variant="h6" sx={{ pr: 1, mb: 1 }}>
+            Starting Date: {campaigns.startDate}
+          </Typography>
         <Box
           sx={{
             display: 'flex',
@@ -76,17 +86,13 @@ function WatchListColumn2() {
             justifyContent: 'flex-start'
           }}
         >
-          <Label color="error">-$90</Label>
-          <Typography variant="body2" color="text.secondary" sx={{ pl: 1 }}>
-            last 24h
-          </Typography>
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+          }}>
+          <Button >Full Details</Button>
+          </Box>
         </Box>
-      </Box>
-      <Box height={130} sx={{ ml: -1.5 }}>
-        <WatchListColumn1ChartWrapper
-          data={price.week.data}
-          labels={price.week.labels}
-        />
       </Box>
     </Card>
   );
