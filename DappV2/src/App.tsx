@@ -10,10 +10,13 @@ import { Provider, chain, defaultChains } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { WalletLinkConnector } from "wagmi/connectors/walletLink";
+import ChainList from './models/chain-list';
 
 const infuraId = process.env.NEXT_PUBLIC_INFURA_ID;
 
-const chains = defaultChains;
+const chains = ChainList;
+
+
 
 type Connector =
   | InjectedConnector

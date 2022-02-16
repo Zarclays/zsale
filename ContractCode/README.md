@@ -8,7 +8,7 @@ npx truffle migrate --reset --network  alfajores
 
 
 ## Test
-npx truffle test test/test.js
+npx truffle test test/test.js --compile-none
 
 
 test router - ganache

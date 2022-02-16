@@ -77,8 +77,8 @@ contract DexLocker{
         require(msg.sender == _deployer, "DexLocker: Only Deployer is allowed ");
 
         require(lpReleaseTime > block.timestamp, "DexLocker: release time is before current time");
-        require(teamTokenVestingDetails.length == 5, "DEXLocker: TeamTokenVestingDetails length must be 5" );
-        require(raisedFundVestingDetails.length == 5, "DEXLocker: RaisedFundDetails length must be 5" );
+        require(teamTokenVestingDetails.length == 8, "DEXLocker: TeamTokenVestingDetails length must be 8" );
+        require(raisedFundVestingDetails.length == 8, "DEXLocker: RaisedFundDetails length must be 8" );
 
         _lpReleaseTime = lpReleaseTime;
         _dexListPrice = dexListPrice;
