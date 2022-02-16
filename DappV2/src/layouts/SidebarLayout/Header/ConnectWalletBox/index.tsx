@@ -1,4 +1,4 @@
-import { ReactNode, useRef, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 
 import { NavLink } from 'react-router-dom';
 
@@ -7,12 +7,17 @@ import {
   Box,
   Button,
   Divider,
+  FormControl,
   Hidden,
+  InputLabel,
   lighten,
   List,
   ListItem,
   ListItemText,
+  MenuItem,
   Popover,
+  Select,
+  SelectChangeEvent,
   Typography
 } from '@mui/material';
 
@@ -22,7 +27,8 @@ import ExpandMoreTwoToneIcon from '@mui/icons-material/ExpandMoreTwoTone';
 import AccountBoxTwoToneIcon from '@mui/icons-material/AccountBoxTwoTone';
 import LockOpenTwoToneIcon from '@mui/icons-material/LockOpenTwoTone';
 import AccountTreeTwoToneIcon from '@mui/icons-material/AccountTreeTwoTone';
-import { useAccount } from 'wagmi';
+import { useAccount, useNetwork  } from 'wagmi';
+import ChainList from 'src/models/chain-list';
 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
@@ -85,9 +91,29 @@ function ConnectWalletBox(props: Props) {
   const ref = useRef<any>(null);
   const [isOpen, setOpen] = useState<boolean>(false);
 
+  
+
+  const [{ data:chaindata, error:chainerror, loading: chainloading }, switchNetwork] = useNetwork()
+
   const [{ data: accountData, loading }, disconnect] = useAccount({
     fetchEns: true,
   });
+
+  // const chainList = ChainList;
+
+  const [chainId, setChainId] = useState('1');
+
+  const handleNetworkChange = (event: SelectChangeEvent) => {
+    
+    switchNetwork(+event.target.value);
+  };
+
+  useEffect(()=>{
+    if(chaindata.chain?.id){
+      setChainId(chaindata.chain.id.toString());
+    }
+  },[chaindata])
+
 
   const handleOpen = (): void => {
     setOpen(true);
@@ -137,6 +163,33 @@ function ConnectWalletBox(props: Props) {
 
   return (
     <>
+      {!chainloading && 
+      <FormControl sx={{ m: 1, minWidth: 120 }}>
+        <InputLabel id="select-network-label">Network</InputLabel>
+        <Select
+          labelId="select-network-label"
+          id="select-network"
+          value={chainId}          
+          label="Network"
+          onChange={handleNetworkChange}
+        >
+          {switchNetwork && chaindata.chains.map((x) => (
+            <MenuItem key={x.id} value={x.id} >
+              {x.name} 
+              {/* {x.unsupported && '(unsupported)'} */}
+            </MenuItem>
+
+          ),
+          )}
+        </Select>
+        
+      </FormControl>
+      }
+     
+      {chainerror && <div>{chainerror?.message}</div>}
+
+      
+
       <UserBoxButton color="secondary" ref={ref} >
         {!accountData &&
         <>
