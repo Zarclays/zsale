@@ -92,15 +92,17 @@ function Hero() {
             color="text.secondary"
             fontWeight="normal"
           >
-            High performance React template built with lots of powerful Material-UI components across multiple product niches for fast & perfect apps development processes
+          Multi-chain Crypto Launchpad Protocol , perfect for Web3 Creators!
+
+            Create your own token and start a token sale for it instantaneously
           </TypographyH2>
           <Button
             component={RouterLink}
-            to="/dashboards/crypto"
+            to="/campaigns"
             size="large"
             variant="contained"
           >
-            Browse Live Preview
+            Launch a Campaign
           </Button>
           <Button
             sx={{ ml: 2 }}
@@ -111,23 +113,36 @@ function Hero() {
             size="large"
             variant="text"
           >
-            Key Features
+            Mint Your Own Crypto Token
           </Button>
           <Grid container spacing={3} mt={5}>
             <Grid item md={6}>
-              <MuiAvatar>
-                <img src="/static/images/logo/material-ui.svg" alt="Material-UI" />
-              </MuiAvatar>
+              <img src="/static/images/rocket.png" alt="Crypto Minter" style={{maxWidth:'80px'}} />
+              
               <Typography variant="h4">
-                <Box sx={{ pb: 2 }}><b>Powered by Material-UI</b></Box><Typography component="span" variant="subtitle2"> - A simple and customizable component library to build faster, beautiful, andaccessible React apps.</Typography>
+                <Box sx={{ pb: 2 }}>
+                  <b><a href="/token-minter">Mint a Crypto Coin/Token</a></b>
+                </Box>
+              </Typography>
+
+              <Typography variant="h5">
+                <Box sx={{ pb: 2 }}><b>Powered by our Easy to Use Crypto Minter</b></Box>
+                <Typography component="span" variant="subtitle2"> Use our simple and fast Token Minter to create your own crypto token.<br/> No programming knowledge needed.</Typography>
               </Typography>
             </Grid>
             <Grid item md={6}>
-              <TsAvatar>
-                <img src="/static/images/logo/typescript.svg" alt="Typescript" />
-              </TsAvatar>
+              <img src="/static/images/astronaut.png" alt="Typescript" style={{maxWidth:'80px'}}/>
               <Typography variant="h4">
-                <Box sx={{ pb: 2 }}><b>Built with Typescript</b></Box><Typography component="span" variant="subtitle2"> - Tokyo Free White features a modern technology stack and is built with React + Typescript.</Typography>
+                <Box sx={{ pb: 2 }}>
+                  <b><a href="/token-minter">Start a sale for your coin</a></b>
+                </Box>
+              </Typography>
+              <Typography variant="h5">
+                <Box sx={{ pb: 2 }}>
+                  <b>Raise funds for your Crypto Tokens</b>
+                </Box>
+                  
+                <Typography component="span" variant="subtitle2"> Present your project to our large community of investors</Typography>
               </Typography>
             </Grid>
           </Grid>

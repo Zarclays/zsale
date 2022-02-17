@@ -76,9 +76,10 @@ function Logo() {
     <Tooltip title="ZSale Launchpad" arrow>
       <LogoWrapper to="/overview">
         <LogoSignWrapper>
-          <LogoSign>
+          {/* <LogoSign>
             <LogoSignInner />
-          </LogoSign>
+          </LogoSign> */}
+          <img src="/static/images/logo/zsale.png" alt="Crypto Minter" style={{maxWidth:'100px'}} />
         </LogoSignWrapper>
       </LogoWrapper>
     </Tooltip>

@@ -103,26 +103,26 @@ const routes: RouteObject [] = [
     ]
   },
   {
-    path: 'dashboards',
+    path: 'campaigns',
     element: (
       <SidebarLayout />
     ),
     children: [
       {
-        path: '/dashboards',
+        path: '/campaigns',
         element: (
           <Navigate
-            to="/dashboards/crypto"
+            to="/campaigns/list"
             replace
           />
         )
       },
       {
-        path: 'crypto',
+        path: 'list',
         element: <Crypto />
       },
       {
-        path: 'messenger',
+        path: 'create',
         element: <Messenger />
       }
     ]

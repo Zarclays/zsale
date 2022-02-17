@@ -41,30 +41,30 @@ const menuItems: MenuItems[] = [
     ]
   },
   {
-    heading: 'Campaign',
+    heading: 'Campaigns',
     items: [
       {
-        name: 'Home',
-        link: '/dashboards/crypto',
+        name: 'All Campaigns',
+        link: '/campaigns',
         icon: BrightnessLowTwoToneIcon
       },
       {
         name: 'Create Campaign',
         icon: MmsTwoToneIcon,
-        link: '/dashboards/messenger'
+        link: '/campaigns/start'
       },
       {
         name: 'Create Fair Campaign',
         icon: TableChartTwoToneIcon,
-        link: '/management/transactions'
+        link: '/campaigns/start-fair'
       },
       {
-        name: 'Create Token',
+        name: 'Create/Mint Token',
         icon: TableChartTwoToneIcon,
         link: ''
       },
       {
-        name: 'All Campaing List',
+        name: 'View My Campaigns',
         icon: HowToVoteTwoToneIcon,
         link: ''
       }
