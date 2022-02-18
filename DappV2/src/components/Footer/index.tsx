@@ -25,7 +25,7 @@ function Footer() {
             </Typography>
           </Box>
           <Typography sx={{ pt: { xs: 2, md: 0 } }} variant="subtitle1">
-            Crafted by <Link href="https://zarclays.com" target="_blank" rel="noopener noreferrer">Zarclays.com</Link>
+            Crafted by <Link style={{textDecoration: 'none'}} href="https://zarclays.com" target="_blank" rel="noopener noreferrer">Zarclays.com</Link>
           </Typography>
         </Box>
       </Container>

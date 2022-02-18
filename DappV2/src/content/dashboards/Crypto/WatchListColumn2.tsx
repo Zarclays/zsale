@@ -79,6 +79,9 @@ function WatchListColumn2() {
           <Typography variant="h6" sx={{ pr: 1, mb: 1 }}>
             Starting Date: {campaigns.startDate}
           </Typography>
+          <Typography variant="h6" sx={{ pr: 1, mb: 1 }}>
+            Total Contributed: {campaigns.totalContributed}
+          </Typography>
         <Box
           sx={{
             display: 'flex',

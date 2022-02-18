@@ -197,7 +197,6 @@ function WatchListRow() {
         disableSpacing
         sx={{ p: 3, display: 'flex', justifyContent: 'center' }}
       >
-        <Button variant="outlined">View more assets</Button>
       </CardActions>
     </Card>
   );

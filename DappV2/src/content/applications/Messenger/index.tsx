@@ -9,8 +9,9 @@ import ChatContent from './ChatContent';
 
 import { Scrollbars } from 'react-custom-scrollbars-2';
 
-import { Box } from '@mui/material';
+import { Box, Grid, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { Label } from '@mui/icons-material';
 
 const RootWrapper = styled(Box)(
   () => `
@@ -69,28 +70,26 @@ function ApplicationsMessenger() {
   return (
     <>
       <Helmet>
-        <title>Messenger - Applications</title>
+        <title>Create Campaign</title>
       </Helmet>
-      <RootWrapper>
-        <Sidebar>
-          <Scrollbars autoHide>
-            <SidebarContent />
-          </Scrollbars>
-        </Sidebar>
-        <ChatWindow>
-          <ChatTopBar>
-            <TopBarContent />
-          </ChatTopBar>
-          <ChatMain>
-            <Scrollbars ref={ref} autoHide>
-              <ChatContent />
-            </Scrollbars>
-          </ChatMain>
-          <ChatBottomBar>
-            <BottomBarContent />
-          </ChatBottomBar>
-        </ChatWindow>
-      </RootWrapper>
+      <Box marginX={25} marginY={17}>
+        <Grid container
+        >
+          <Grid item xs={3}>
+          <Typography>Veryfy Token</Typography>
+          </Grid>
+        </Grid>
+      </Box>
+      <Box>
+        <Grid>
+          <Grid>
+            <TextField required
+            id='outlined-required'
+            label='Token Address'
+            defaultValue={"Ex: Zarcmoon"} />
+          </Grid>
+        </Grid>
+      </Box>
     </>
   );
 }

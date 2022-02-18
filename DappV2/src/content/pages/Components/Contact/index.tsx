@@ -3,7 +3,7 @@ import PageTitle from 'src/components/PageTitle';
 import { useState } from 'react';
 
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import { Container, Grid, Card, CardHeader, CardContent, Divider, Button, Link, Typography } from '@mui/material';
+import { Container, Grid, Card, CardHeader, CardContent, Divider, Button, Link, Typography, Icon } from '@mui/material';
 import Footer from 'src/components/Footer';
 
 import Box from '@mui/material/Box';
@@ -28,27 +28,39 @@ import { Email } from '@mui/icons-material';
 
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
-const currencies = [
+const socialicons = [
   {
-    value: 'USD',
-    label: '$',
+    facebookName: 'Facebook',
+    facebookIcons: 'icon-192x192.png',
   },
   {
-    value: 'EUR',
-    label: '€',
+    name: 'Website',
+    icons: '',
   },
   {
-    value: 'BTC',
-    label: '฿',
+    name: 'Instagram',
+    icons: '',
   },
   {
-    value: 'JPY',
-    label: '¥',
+    name: 'Twitter',
+    icons: '',
   },
   {
-    value: 'NGN',
-    label: '#'
-  }
+    name: 'Discord',
+    icons: '',
+  },
+  {
+    name: 'Github',
+    icons: '',
+  },
+  {
+    name: 'Reddit',
+    icons: '',
+  },
+  {
+    name: 'Gmail',
+    icons: '',
+  },
 ];
 
 function Contact() {
@@ -122,12 +134,38 @@ function Contact() {
                 mt: 9
               }}>
                 <Typography variant='h2'>Or you could follow us on:</Typography>
-                <Box sx={{
-                  mt:7,
-                }}>
-                  <Link href='https://www.twitter.com'>Twitter</Link>
-                  <Link href='zarclays.com'>Zarclays</Link>
-                </Box>
+                <Grid container
+                direction={"row"}
+                mt={7}
+                justifyContent={"left"}
+                alignItems="stretch"
+                spacing={3}
+                >
+                  <Grid item xs={2} textAlign='center'>
+                  <img style={{width: 25}} src='/icon-192x192.png'/>
+                  <Link style={{textDecoration: 'none'}} href="https://zarclays.com" target="_blank" rel="noopener noreferrer">Zarclays</Link>
+                  </Grid>
+                  <Grid item xs={2} textAlign='center'>
+                  <img style={{width: 25}} src='/icon-192x192.png'/>
+                  <Link style={{textDecoration: 'none'}} href="https://twitter.com/zarclays" target="_blank" rel="noopener noreferrer">Twitter</Link>
+                  </Grid>
+                  <Grid item xs={2} textAlign='center'>
+                  <img style={{width: 25}} src='/icon-192x192.png'/>
+                  <Link style={{textDecoration: 'none'}} href="https://discord.com/zarclays" target="_blank" rel="noopener noreferrer">Discord</Link>
+                  </Grid>
+                  <Grid item xs={2}>
+                  <img style={{width: 25}} src='/icon-192x192.png'/>
+                  <Link style={{textDecoration: 'none'}} href="https://instagram.com/zarclays" target="_blank" rel="noopener noreferrer">Instagram</Link>
+                  </Grid>
+                  <Grid item xs={2} textAlign='center'>
+                    <img style={{width: 25}} src='/icon-192x192.png'/>
+                  <Link style={{textDecoration: 'none'}} href="https://facebook.com/zarclays" target="_blank" rel="noopener noreferrer">Facebook</Link>
+                  </Grid>
+                  <Grid item xs={2} textAlign='center'>
+                  <img style={{width: 25}} src='/icon-192x192.png'/>
+                  <Link style={{textDecoration: 'none'}} href="https://gmail.com/zarclays" target="_blank" rel="noopener noreferrer">Gmail</Link>
+                  </Grid>
+                </Grid>
               </Box>
             </CardContent>
           </Grid>
