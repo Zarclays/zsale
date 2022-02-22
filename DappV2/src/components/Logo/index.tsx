@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import LogoSign from '../LogoSign';
 
-const LogoWrapper = styled(Link)(
+const LogoWrapper = styled(Box)(
   ({ theme }) => `
         color: ${theme.palette.text.primary};
         padding: ${theme.spacing(0, 1, 0, 0)};
@@ -105,7 +105,7 @@ function Logo() {
 
 
   return (
-    <LogoWrapper to="/overview">
+    <LogoWrapper >
       <LogoSignWrapper>
         {/* <LogoSign>
           <LogoSignInner />

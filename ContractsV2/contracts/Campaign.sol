@@ -54,6 +54,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
       string website;
       string twitter;
       string telegram;
+      string discord;
       
   }
   enum CampaignStatus{ 
@@ -117,7 +118,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   address[] private whitelistTierTwo; 
   
 
-
+  uint public campaignKey;
   enum RefundType{ BURN, REFUND }
   
   uint256 public liquidityReleaseTime; // time to relesase Lp tokens to owner
@@ -131,27 +132,34 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   address public _campaignFactory= 0x92Fe2933C795FF95A758362f9535A4D0a516053d ;
   
   constructor(
+    
     address campaignOwner,
     address campaignFactory,
     address  _tokenAddress,
      
-    uint256[8] memory capAndDate,  // uint256 _softCap,uint256 _hardCap,uint256 _saleStartTime,uint256 _saleEndTime, uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo 
+    uint256[9] memory capAndDate,  // uint256 _softCap,uint256 _hardCap,uint256 _saleStartTime,uint256 _saleEndTime, uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo ,uint _campaignKey,
     
     RefundType _refundType, 
     address _dexRouterAddress,
-    uint _liquidityPercent, 
-    uint _listRate, 
-    uint _dexListRate,
-    uint _maxAllocationPerUserTierTwo,
+    // uint _liquidityPercent, 
+    // uint liquidityReleaseTime,
+    // uint _listRate, 
+    // uint _dexListRate,
+    // uint _maxAllocationPerUserTierTwo,
+    uint[4] memory liquidityAllocationAndRates,
+    VestSchedule[8] memory teamTokenVestingDetails, 
+    VestSchedule[8] memory raisedFundVestingDetails,
+    string[6] memory founderInfo,
     DexLockerFactory dexLockerFactory
     
   ) payable  {
+      campaignKey=capAndDate[8];
       _campaignFactory= campaignFactory;
       _dexLockerFactory=dexLockerFactory;
       require(capAndDate[2] > block.timestamp, "CAMPAIGN: Sale Start time needs to be above current time");
       // require(releaseTime > block.timestamp, "CAMPAIGN: release time above current time");
       require(capAndDate[3] > capAndDate[2], "CAMPAIGN: Sale End time above start time");
-      require(_liquidityPercent >= 5100, "CAMPAIGN: Liquidity allowed is > 51 %");
+      require(liquidityAllocationAndRates[0] >= 5100, "CAMPAIGN: Liquidity allowed is > 51 %");
         
         
       // //block scopin to avoid stack too deep 
@@ -164,42 +172,50 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
         saleInfo.hardCap=capAndDate[1];
         saleInfo.saleStartTime=capAndDate[2];
         saleInfo.saleEndTime=capAndDate[3];
-        saleInfo.liquidityPercent=_liquidityPercent;
-        saleInfo.listRate=_listRate;
-        saleInfo.dexListRate=_dexListRate;
+        saleInfo.liquidityPercent=liquidityAllocationAndRates[0];
+        saleInfo.listRate=liquidityAllocationAndRates[2];
+        saleInfo.dexListRate=liquidityAllocationAndRates[3];
       }        
 
       {    
         dexRouterAddress=_dexRouterAddress; 
          
       }
-        
-      otherInfo= CampaignOtherInfo(false, false,false,'', _refundType,'','','','','');
+        /**string logoUrl;
+      string desc;
+      string website;
+      string twitter;
+      string telegram;
+      string discord; */
+      otherInfo= CampaignOtherInfo(false, false,false,'', _refundType,founderInfo[0],founderInfo[1],founderInfo[2],founderInfo[3],founderInfo[4], founderInfo[5]);
       
       
       updateTierDetails (capAndDate[4], capAndDate[5], capAndDate[6],capAndDate[7]);
 
       transferOwnership(campaignOwner);
+
+      updateCampaignDetails(liquidityAllocationAndRates[1], false, teamTokenVestingDetails, raisedFundVestingDetails );
   }
 
   // function to update other details not initialized in constructor - this is bcos solidity limits how many variables u can pass in at once
   function updateCampaignDetails(uint liquidityReleaseTimeDays, //Time to add to startTime in days
     bool _useWhiteList, 
-    string memory logoUrl,
-    string memory desc,
-    string memory website,
-    string memory twitter,
-    string memory telegram,
+    // string memory logoUrl,
+    // string memory desc,
+    // string memory website,
+    // string memory twitter,
+    // string memory telegram,
+    // string memory discord,
     VestSchedule[8] memory teamTokenVestingDetails, 
     VestSchedule[8] memory raisedFundVestingDetails
-  ) external onlyOwner {
+  ) private /*public onlyOwner*/ {
     liquidityReleaseTime  = saleInfo.saleEndTime + (liquidityReleaseTimeDays * 1 days);
-    otherInfo.logoUrl= logoUrl;
-    otherInfo.desc= desc;
-    otherInfo.website= website;
-    otherInfo.twitter= twitter;
-    otherInfo.telegram= telegram;
-    otherInfo.useWhiteList=_useWhiteList;
+    // otherInfo.logoUrl= logoUrl;
+    // otherInfo.desc= desc;
+    // otherInfo.website= website;
+    // otherInfo.twitter= twitter;
+    // otherInfo.telegram= telegram;
+    // otherInfo.useWhiteList=_useWhiteList;
 
     
 
@@ -491,8 +507,8 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   }
 
   
-  function getCampaignInfo() public view returns(address _tokenAddress, uint256 softcap, uint256 hardcap,uint256 saleStartTime, uint256 saleEndTime,uint256 listRate, uint256 dexListRate ,uint256 totalCoins, uint256 totalParticipant, bool useWhiteList, bool hasKyc, bool isAuditd ){
-      return (saleInfo.tokenAddress, saleInfo.softCap, saleInfo.hardCap,saleInfo.saleStartTime, saleInfo.saleEndTime, saleInfo.listRate, saleInfo.dexListRate,totalCoinReceived,totalParticipants, otherInfo.useWhiteList,otherInfo.hasKYC, otherInfo.isAudited );
+  function getCampaignInfo() public view returns(address _tokenAddress, uint256 softcap, uint256 hardcap,uint256 saleStartTime, uint256 saleEndTime,uint256 listRate, uint256 dexListRate, uint liquidity,uint _liquidityReleaseTime ,uint256 totalCoins, uint256 totalParticipant, bool useWhiteList, bool hasKyc, bool isAuditd ){
+      return (saleInfo.tokenAddress, saleInfo.softCap, saleInfo.hardCap,saleInfo.saleStartTime, saleInfo.saleEndTime, saleInfo.listRate, saleInfo.dexListRate, saleInfo.liquidity, liquidityReleaseTime, totalCoinReceived,totalParticipants, otherInfo.useWhiteList,otherInfo.hasKYC, otherInfo.isAudited );
   }
 
   function getCampaignStatus() public view returns(CampaignStatus ){

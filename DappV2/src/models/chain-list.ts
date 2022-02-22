@@ -23,4 +23,34 @@ ChainList.push({
   testnet: true
 })
 
+ChainList.push({
+  id: 31337,
+  name: 'NEAR EVM Testnet',
+  nativeCurrency: {
+      decimals: 18,
+      name:'NEAR',
+      symbol: 'NEAR'
+  },
+  rpcUrls: [
+      'http://127.0.0.1:8545'
+  ],
+  testnet: true
+})
+
+ChainList.push({
+  id: 1313161555,
+  name: 'Aurora Near Testnet',
+  nativeCurrency: {
+      decimals: 18,
+      name:'aETH',
+      symbol: 'aETH'
+  },
+  rpcUrls: [
+      'https://testnet.aurora.dev/'
+  ],
+  testnet: true
+})
+
+
+
 export default ChainList;

@@ -21,7 +21,7 @@ function PageHeader() {
       </Grid>
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          Welcome to, {user.name}
+          Welcome to ZSale Launchpad{/*user.name*/}
         </Typography>
         <Typography variant="subtitle2">
         These are the Currently created Campaigns

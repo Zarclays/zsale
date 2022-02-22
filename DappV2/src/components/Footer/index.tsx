@@ -27,6 +27,14 @@ function Footer() {
           <Typography sx={{ pt: { xs: 2, md: 0 } }} variant="subtitle1">
             Crafted by <Link style={{textDecoration: 'none'}} href="https://zarclays.com" target="_blank" rel="noopener noreferrer">Zarclays.com</Link>
           </Typography>
+
+          <Typography>
+            <a href="https://www.flaticon.com/free-icons/the" title="the icons">The icons created by Becris - Flaticon</a> | 
+
+            <a href="https://www.flaticon.com/free-icons/astronaut" title="astronaut icons">Astronaut icons created by ultimatearm - Flaticon</a> |
+
+            <a href="https://www.flaticon.com/free-icons/miscellaneous" title="miscellaneous icons">Miscellaneous icons created by photo3idea_studio - Flaticon</a>
+          </Typography>
         </Box>
       </Container>
     </FooterWrapper>

@@ -73,7 +73,7 @@ const UserBoxLabel = styled(Typography)(
 const AccountDescription = styled(Typography)(
   ({ theme }) => `
         font-weight: ${theme.typography.fontWeightBold};
-        color: ${theme.palette.secondary.main};
+        color: ${theme.palette.primary.main};
         background: ${theme.colors.alpha.black[5]};
         padding: ${theme.spacing(2)};
 `

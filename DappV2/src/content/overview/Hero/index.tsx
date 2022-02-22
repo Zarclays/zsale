@@ -98,7 +98,7 @@ function Hero() {
           </TypographyH2>
           <Button
             component={RouterLink}
-            to="/campaigns"
+            to="/campaigns/create"
             size="large"
             variant="contained"
           >

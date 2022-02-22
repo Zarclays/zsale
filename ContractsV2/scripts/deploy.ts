@@ -20,6 +20,37 @@ async function main() {
   await greeter.deployed();
 
   console.log("Greeter deployed to:", greeter.address);
+
+
+
+  const CampaignFactoryArtifact = await ethers.getContractFactory("CampaignList");
+  const TokenArtifact = await ethers.getContractFactory("Token");
+  const CampaignArtifact = await ethers.getContractFactory("Campaign");
+  const DexLockerFactoryArtifact = await ethers.getContractFactory("DexLockerFactory");
+
+
+  let token = await TokenArtifact.deploy();
+  await token.deployed();
+  console.log('Token Deployed at  ', token.address );
+
+  let token2 = await TokenArtifact.deploy();
+  await token2.deployed();
+  console.log('Token2 Deployed at  ', token2.address );
+
+  let token3 = await TokenArtifact.deploy();
+  await token3.deployed();
+  console.log('Token3 Deployed at  ', token3.address );
+
+  const dexLockerFactory = await DexLockerFactoryArtifact.deploy();
+  await dexLockerFactory.deployed();
+  
+  let campaignFactory = await CampaignFactoryArtifact.deploy(dexLockerFactory.address);
+  await campaignFactory.deployed();
+  console.log('Campaign List Deployed at  ', campaignFactory.address );
+
+
+
+  
 }
 
 // We recommend this pattern to be able to use async/await everywhere

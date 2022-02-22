@@ -25,6 +25,22 @@ npx solhint 'contracts/**/*.sol'
 npx solhint 'contracts/**/*.sol' --fix
 ```
 
+# Deploy
+
+You can deploy in the localhost network following these steps:
+
+    Start a local node
+
+    npx hardhat node
+
+    Open a new terminal and deploy the smart contract in the localhost network
+
+    npx hardhat run --network localhost scripts/deploy.js
+
+As general rule, you can target any network configured in the hardhat.config.js
+
+npx hardhat run --network <your-network> scripts/deploy.js
+
 # Etherscan verification
 
 To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.

@@ -46,6 +46,11 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    auroratest: {
+      url: 'https://testnet.aurora.dev/',
+      chainId: 1313161555,
+      accounts:['0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'] ,
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,

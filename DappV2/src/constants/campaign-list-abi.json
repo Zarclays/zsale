@@ -1,0 +1,348 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "contract DexLockerFactory",
+        "name": "dexLockerFactory",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "createdCampaignAddress",
+        "type": "address"
+      }
+    ],
+    "name": "CampaignCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "_tokenCampaigns",
+    "outputs": [
+      {
+        "internalType": "address payable",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "allOwnersCampaigns",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "campaignAt",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "key",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "value",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "campaignCreationPrice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "campaignSize",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "key",
+        "type": "uint256"
+      }
+    ],
+    "name": "contains",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_tokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[9]",
+        "name": "capAndDate",
+        "type": "uint256[9]"
+      },
+      {
+        "internalType": "enum Campaign.RefundType",
+        "name": "_refundType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "_dexRouterAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[4]",
+        "name": "liquidityAllocationAndRates",
+        "type": "uint256[4]"
+      },
+      {
+        "internalType": "string[6]",
+        "name": "founderInfo",
+        "type": "string[6]"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "releaseDate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "releaseAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "hasBeenClaimed",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct VestSchedule[8]",
+        "name": "teamTokenVestingDetails",
+        "type": "tuple[8]"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "releaseDate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "releaseAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "hasBeenClaimed",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct VestSchedule[8]",
+        "name": "raisedFundVestingDetails",
+        "type": "tuple[8]"
+      }
+    ],
+    "name": "createNewCampaign",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_tokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "hasExistingCampaign",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "newPrice",
+        "type": "uint256"
+      }
+    ],
+    "name": "setCampaignCreationPrice",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "key",
+        "type": "uint256"
+      }
+    ],
+    "name": "tryGetCampaignByKey",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_tokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "tryGetCampaignByTokenAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

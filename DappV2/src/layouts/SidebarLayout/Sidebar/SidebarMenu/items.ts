@@ -51,7 +51,7 @@ const menuItems: MenuItems[] = [
       {
         name: 'Create Campaign',
         icon: MmsTwoToneIcon,
-        link: '/campaigns/start'
+        link: '/campaigns/create'
       },
       {
         name: 'Create Fair Campaign',

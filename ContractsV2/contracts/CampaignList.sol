@@ -36,7 +36,7 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
 
     event CampaignCreated(address indexed creator,uint256 indexed index, address createdCampaignAddress);
     
-    uint public campaignCreationPrice = 0.0001 ether; 
+    uint public campaignCreationPrice = 0.00001 ether; 
 
     constructor(DexLockerFactory dexLockerFactory)  {      
        _dexLockerFactory=dexLockerFactory;
@@ -67,10 +67,12 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
     // }
 
     function createNewCampaign(address _tokenAddress,
-    uint256[8] memory capAndDate,  // uint256 _softCap,uint256 _hardCap,uint256 _saleStartTime,uint256 _saleEndTime, uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo
+    uint256[9] memory capAndDate,  // uint256 _softCap,uint256 _hardCap,uint256 _saleStartTime,uint256 _saleEndTime, uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo
      Campaign.RefundType _refundType, address _dexRouterAddress,uint[4] memory liquidityAllocationAndRates,
+     string[6] memory founderInfo,
       VestSchedule[8] memory teamTokenVestingDetails, 
       VestSchedule[8] memory raisedFundVestingDetails
+      
     ) public payable  {
 
         require(msg.value >= campaignCreationPrice, 'CampaignFactory: Requires CampaignCreation Price' );
@@ -82,10 +84,12 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
             }
         }
         
-        {            
-            Campaign cmpgn = new Campaign(msg.sender, address(this) , _tokenAddress, capAndDate,    _refundType, _dexRouterAddress,liquidityAllocationAndRates, teamTokenVestingDetails, raisedFundVestingDetails, _dexLockerFactory
+        {     
+            _counter.increment(); 
+            capAndDate[8] = _counter.current();
+            Campaign cmpgn = new Campaign( msg.sender, address(this) , _tokenAddress, capAndDate,    _refundType, _dexRouterAddress,liquidityAllocationAndRates, teamTokenVestingDetails, raisedFundVestingDetails,founderInfo, _dexLockerFactory
             );
-            _counter.increment();            
+                       
             _campaigns.set(_counter.current(), address( cmpgn));
             ownersCampaign[msg.sender].push( _counter.current());        
             _tokenCampaigns[_tokenAddress]= payable(address( cmpgn));

@@ -21,13 +21,19 @@ const Overview = Loader(lazy(() => import('src/content/overview')));
 
 const Crypto = Loader(lazy(() => import('src/content/dashboards/Crypto')));
 
+
+// Campaigns
+const CreateCampaign = Loader(lazy(() => import('src/content/campaigns/create-campaign/index')));
+const CampaignList = Loader(lazy(() => import('src/content/campaigns/campaign-list')));
+const CampaignPage = Loader(lazy(() => import('src/content/campaigns/campaign-page')));
+
 // Applications
 
 const Messenger = Loader(lazy(() => import('src/content/applications/Messenger')));
 const Transactions = Loader(lazy(() => import('src/content/applications/Transactions')));
 const UserProfile = Loader(lazy(() => import('src/content/applications/Users/profile')));
 const UserSettings = Loader(lazy(() => import('src/content/applications/Users/settings')));
-
+ 
 // Components
 
 const Buttons = Loader(lazy(() => import('src/content/pages/Components/Buttons')));
@@ -119,11 +125,15 @@ const routes: RouteObject [] = [
       },
       {
         path: 'list',
-        element: <Crypto />
+        element: <CampaignList />
       },
       {
         path: 'create',
-        element: <Messenger />
+        element: <CreateCampaign />
+      },
+      {
+        path: ':campaignId',
+        element: <CampaignPage />
       }
     ]
   },
