@@ -36,6 +36,7 @@ const UserSettings = Loader(lazy(() => import('src/content/applications/Users/se
  
 // Components
 
+const CreateToken = Loader(lazy(() => import('src/content/pages/Components/CreateToken')));
 const Buttons = Loader(lazy(() => import('src/content/pages/Components/Buttons')));
 const Modals = Loader(lazy(() => import('src/content/pages/Components/Modals')));
 const Accordions = Loader(lazy(() => import('src/content/pages/Components/Accordions')));
@@ -190,14 +191,14 @@ const routes: RouteObject [] = [
         path: '/components',
         element: (
           <Navigate
-            to="/components/buttons"
+            to="/components"
             replace
           />
         )
       },
       {
-        path: 'buttons',
-        element: <Buttons />
+        path: 'createtoken',
+        element: <CreateToken />
       },
       {
         path: 'modals',

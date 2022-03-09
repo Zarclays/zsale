@@ -106,10 +106,12 @@ function Hero() {
           </Button>
           <Button
             sx={{ ml: 2 }}
-            component="a"
+            component={RouterLink}
+            // component="a"
             target="_blank"
             rel="noopener"
-            href="https://bloomui.com/product/tokyo-free-white-react-typescript-material-ui-admin-dashboard"
+            to="/campaigns/list"
+            // href=""
             size="large"
             variant="text"
           >

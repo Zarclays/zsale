@@ -61,7 +61,7 @@ const menuItems: MenuItems[] = [
       {
         name: 'Create/Mint Token',
         icon: TableChartTwoToneIcon,
-        link: ''
+        link: '/components/createtoken'
       },
       {
         name: 'View My Campaigns',
