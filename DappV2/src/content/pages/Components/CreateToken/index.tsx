@@ -23,8 +23,10 @@ import {
 import { Label } from "@mui/icons-material";
 import PageTitle from "src/components/PageTitle";
 
+const tokenDetails=([
+])
 
-function createToken() {
+function CreateToken() {
     return (
         <>
         <Helmet>
@@ -76,16 +78,17 @@ function createToken() {
 
                     <TextField required
                     id="outlined-required"
-                    label="Token Symbol"
+                    label="Website"
+                    placeholder="http://www.example.com"
                     autoCapitalize="true"/>
 
                     <TextField required
                     id="outlined-required"
-                    label="Token Name"/>
+                    label="Twitter Page"/>
 
                     <TextField required
                     id="outlined-required"
-                    label="Token Symbol"
+                    label="Telegram Page"
                     autoCapitalize="true"/>
                 </div>
                 <Button>Create Token</Button>
@@ -98,4 +101,4 @@ function createToken() {
     )
 }
 
-export default createToken;
+export default CreateToken;

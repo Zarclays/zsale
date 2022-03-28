@@ -76,12 +76,12 @@ const menuItems: MenuItems[] = [
       {
         name: 'Create Lock',
         icon: LocalPharmacyTwoToneIcon,
-        link: ''
+        link: '/components/createlock'
       },
       {
         name: 'Token',
         icon: TrafficTwoToneIcon,
-        link: ''     
+        link: '/components/createtoken/listtoken'     
       },
       {
         name: 'Liquidity',
