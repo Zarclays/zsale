@@ -59,7 +59,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   }
   enum CampaignStatus{ 
     CREATED,
-    DETAILS_FILLED,
+    TOKENS_SUBMITTED,//Owner has transferred the correct no of tokens and campaign is ready to receive
     CANCELLED, // Cancelled before the start date
     
     FAILED, // WIll need refund
@@ -83,7 +83,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   uint public totalParticipants; // total participants in ido
   
 
-  address public zsalesTokenAddress;
+  address public zsalesTokenAddress = 0x97CEe927A48dc119Fd0b0b1047a879153975e893;
   uint zsaleFee = 200;  //2%   - percent of native currency to take
   uint zsaleTokenFee = 200;  //2% - percent fee of token to take
 
@@ -145,7 +145,6 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     // uint liquidityReleaseTime,
     // uint _listRate, 
     // uint _dexListRate,
-    // uint _maxAllocationPerUserTierTwo,
     uint[4] memory liquidityAllocationAndRates,
     VestSchedule[8] memory teamTokenVestingDetails, 
     VestSchedule[8] memory raisedFundVestingDetails,
@@ -156,7 +155,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
       campaignKey=capAndDate[8];
       _campaignFactory= campaignFactory;
       _dexLockerFactory=dexLockerFactory;
-      require(capAndDate[2] > block.timestamp, "CAMPAIGN: Sale Start time needs to be above current time");
+      
       // require(releaseTime > block.timestamp, "CAMPAIGN: release time above current time");
       require(capAndDate[3] > capAndDate[2], "CAMPAIGN: Sale End time above start time");
       require(liquidityAllocationAndRates[0] >= 5100, "CAMPAIGN: Liquidity allowed is > 51 %");
@@ -164,13 +163,17 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
         
       // //block scopin to avoid stack too deep 
       {
-        // saleInfo= CampaignSaleInfo(_tokenAddress,_softCap,_hardCap, _saleStartTime, _saleEndTime,_liquidityPercent,_listRate, _dexListRate );
-
+        
         // saleInfo= CampaignSaleInfo();
         saleInfo.tokenAddress=_tokenAddress;
         saleInfo.softCap=capAndDate[0];
         saleInfo.hardCap=capAndDate[1];
-        saleInfo.saleStartTime=capAndDate[2];
+        if(capAndDate[2] <= block.timestamp){
+          saleInfo.saleStartTime=block.timestamp;
+        }else{
+          saleInfo.saleStartTime=capAndDate[2];
+        }
+        
         saleInfo.saleEndTime=capAndDate[3];
         saleInfo.liquidityPercent=liquidityAllocationAndRates[0];
         saleInfo.listRate=liquidityAllocationAndRates[2];
@@ -181,72 +184,79 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
         dexRouterAddress=_dexRouterAddress; 
          
       }
-        /**string logoUrl;
-      string desc;
-      string website;
-      string twitter;
-      string telegram;
-      string discord; */
+        
       otherInfo= CampaignOtherInfo(false, false,false,'', _refundType,founderInfo[0],founderInfo[1],founderInfo[2],founderInfo[3],founderInfo[4], founderInfo[5]);
       
       
-      updateTierDetails (capAndDate[4], capAndDate[5], capAndDate[6],capAndDate[7]);
+      _updateTierDetails (capAndDate[4], capAndDate[5], capAndDate[6],capAndDate[7]);
 
       transferOwnership(campaignOwner);
 
-      updateCampaignDetails(liquidityAllocationAndRates[1], false, teamTokenVestingDetails, raisedFundVestingDetails );
+      updateLockDetails(liquidityAllocationAndRates[1], teamTokenVestingDetails, raisedFundVestingDetails );
   }
 
   // function to update other details not initialized in constructor - this is bcos solidity limits how many variables u can pass in at once
-  function updateCampaignDetails(uint liquidityReleaseTimeDays, //Time to add to startTime in days
-    bool _useWhiteList, 
-    // string memory logoUrl,
-    // string memory desc,
-    // string memory website,
-    // string memory twitter,
-    // string memory telegram,
-    // string memory discord,
+  function updateLockDetails(uint liquidityReleaseTimeDays, //Time to add to startTime in days
     VestSchedule[8] memory teamTokenVestingDetails, 
     VestSchedule[8] memory raisedFundVestingDetails
   ) private /*public onlyOwner*/ {
     liquidityReleaseTime  = saleInfo.saleEndTime + (liquidityReleaseTimeDays * 1 days);
-    // otherInfo.logoUrl= logoUrl;
-    // otherInfo.desc= desc;
-    // otherInfo.website= website;
-    // otherInfo.twitter= twitter;
-    // otherInfo.telegram= telegram;
-    // otherInfo.useWhiteList=_useWhiteList;
-
-    
-
+   
     //Set dexLock
     DexLocker dexLocker =_dexLockerFactory.createDexLocker(dexRouterAddress,saleInfo.tokenAddress,address(this), msg.sender);
     //DexLocker dexLocker = new DexLocker(dexRouterAddress,saleInfo.tokenAddress, msg.sender);
     dexLocker.setupLock( liquidityReleaseTime,  saleInfo.dexListRate, teamTokenVestingDetails, raisedFundVestingDetails);
     _dexLockerAddress= payable(dexLocker);
 
-    status = CampaignStatus.DETAILS_FILLED;
+    status = CampaignStatus.CREATED;
 
+  }
+
+  function updateCampaignDetails(
+    string memory logoUrl,
+    string memory desc,
+    string memory website,
+    string memory twitter,
+    string memory telegram
+  ) external onlyOwner {
+    require(block.timestamp <= saleInfo.saleStartTime, 'CAMPAIGN: Can only updateTierDetails before Sale StartTime');
+
+    otherInfo.logoUrl= logoUrl;
+    otherInfo.desc= desc;
+    otherInfo.website= website;
+    otherInfo.twitter= twitter;
+    otherInfo.telegram= telegram;
   }
     
   // function to update the tiers users value manually
-  function updateTierDetails(uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo) public onlyOwner {
-    require(block.timestamp < saleInfo.saleStartTime, 'Can only updateTierDetails before Sale StartTime');
+  function _updateTierDetails(uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo) private {
+    
     require(_tierOneHardCap > (saleInfo.hardCap * 3000 / 10000), "CAMPAIGN: Tier Caps must be greater than 30 %" );
     require(_tierOneHardCap + _tierTwoHardCap == saleInfo.hardCap, "CAMPAIGN: Tier 1 & 2 Caps must be equal to hard cap" );
     
-    console.log("maxAllocationPerUserTierOne:", maxAllocationPerUserTierOne);
     require(_maxAllocationPerUserTierOne > 0, "CAMPAIGN: Tier 1 Max Allocation must be greater than 0" );
     require(_maxAllocationPerUserTierTwo > 0, "CAMPAIGN: Tier 2 Max Allocation must be greater than 0" );
     
     
     tierOnehardCap =_tierOneHardCap;
-    tierTwohardCap = _tierTwoHardCap;
-    
+    tierTwohardCap = _tierTwoHardCap;    
     
     maxAllocationPerUserTierOne = _maxAllocationPerUserTierOne;
-    maxAllocationPerUserTierTwo = _maxAllocationPerUserTierTwo; 
-    
+    maxAllocationPerUserTierTwo = _maxAllocationPerUserTierTwo;
+  }
+
+  function updateTierDetails(uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo) public onlyOwner {
+    require(block.timestamp <= saleInfo.saleStartTime, 'Can only updateTierDetails before Sale StartTime');
+    _updateTierDetails(_tierOneHardCap, _tierTwoHardCap, _maxAllocationPerUserTierOne, _maxAllocationPerUserTierTwo);    
+  }
+
+  function transferTokens() public onlyOwner
+  {
+      uint256 amount = totalTokensExpectedToBeLocked();
+      IERC20 _token = IERC20(saleInfo.tokenAddress);
+      _token.safeTransferFrom(msg.sender, address(this), amount);
+
+      status = CampaignStatus.TOKENS_SUBMITTED;
   }
 
 
@@ -259,12 +269,9 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     return saleInfo.saleEndTime;
   }
 
-  // function setCampaignFactory(address _newCampaignFactory) public onlyAdmin {
-  //   _campaignFactory=_newCampaignFactory;
-  // }
-
-
-
+  function totalTokensExpectedToBeLocked() public view returns (uint256) {
+    return DexLocker(_dexLockerAddress).totalTokensExpectedToBeLocked();
+  }
 
   // //add the address in Whitelist tier One to invest
   // function addWhitelistOne(address _address) public onlyOwner {
@@ -274,6 +281,10 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   //   require(_address != address(0), "Invalid address");
   //   whitelistTierOne.push(_address);
   // }
+
+  function setZSalesTokenAddress(address _tokenAddress) public onlyAdmin {
+    zsalesTokenAddress = _tokenAddress;
+  }
 
   //add the address in Whitelist tier two to invest
   function addWhitelistTwo(address _address) public onlyOwner {
@@ -285,6 +296,11 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   function isAllowedInTier1(address _address) public view returns(bool) {
     IERC20 token = IERC20(zsalesTokenAddress);
     return token.balanceOf(_address) > 0;
+  }
+
+  function setWhiteListMode(bool allowed) public onlyOwner  {
+      require(block.timestamp< saleInfo.saleStartTime, 'CAMPAIGN: Can only alter whitelisting before Sale StartTime');
+      otherInfo.useWhiteList= allowed;
   }
 
   // check the address in whitelist tier one
@@ -334,7 +350,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
 
   
   function setKYC(bool kyc) public onlyAdmin  {
-      require(block.timestamp< saleInfo.saleStartTime, 'Can only change KYC before Sale StartTime');
+      require(block.timestamp< saleInfo.saleStartTime, 'CAMPAIGN: Can only change KYC before Sale StartTime');
       otherInfo.hasKYC= kyc;
   }
   function hasKYC() public view returns (bool) {
@@ -343,7 +359,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
 
   
   function setAudited(bool audit) public onlyAdmin  {
-    require(block.timestamp< saleInfo.saleStartTime, 'Can only change KYC before Sale StartTime');
+    require(block.timestamp< saleInfo.saleStartTime, 'CAMPAIGN: Can only change Audit state before Sale StartTime');
       otherInfo.isAudited= audit;
   }
   function isAudited() public view returns (bool, string memory ) {
@@ -382,32 +398,25 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   // send coin to the contract address
   receive() external payable {
     uint256 bid = msg.value;
-    require(status!=CampaignStatus.CANCELLED, 'Campaign: Sale Cancelled');
+    require(status != CampaignStatus.CANCELLED, 'Campaign: Sale Cancelled');
+    require(status != CampaignStatus.FAILED , "Campaign: Failed, Refunded is activated");
+    require(status == CampaignStatus.TOKENS_SUBMITTED , "Campaign: Tokens not submitted");
     require(totalCoinReceived < saleInfo.hardCap, 'Campaign: Sale Sold out');
-    require(block.timestamp >= saleInfo.saleStartTime, "Campaign:The sale is not started yet "); // solhint-disable
+
+    console.log("block.timestamp:", block.timestamp);
+    console.log("saleInfo.saleStartTime:", saleInfo.saleStartTime);
+
+    //require(block.timestamp >= saleInfo.saleStartTime, "Campaign:The sale is not started yet "); // solhint-disable
     require(block.timestamp <= saleInfo.saleEndTime, "Campaign:The sale is closed"); // solhint-disable
     require(totalCoinReceived + bid <= saleInfo.hardCap, "Campaign: purchase would exceed max cap");
-    require(status == CampaignStatus.FAILED , "Campaign: Failed, Refunded is activated");
+    
+
     
     
     require(bid > 0, "Campaign: Coin value sent needs to be above zero");
     
           
-
-    if ( block.timestamp >= saleInfo.saleStartTime - (tier1TimeLineInHours *1 hours ) ) {  // istokenholder and isstill in tokenholder sales part  //  isInTier1WhiteList(msg.sender)
-        require(isAllowedInTier1(msg.sender) , "Campaign: Only Tokenholders are allowed to buy in Tier 1 window");
-        require(totalCoinInTierOne + bid <= tierOnehardCap, "Campaign: purchase would exceed Tier one max cap");
-        require(buyInOneTier[msg.sender] + bid <= maxAllocationPerUserTierOne ,"Campaign:You are investing more than your tier-1 limit!");
-        buyInOneTier[msg.sender] += bid;
-        buyInAllTiers[msg.sender] += bid;
-        totalCoinReceived += bid;
-        totalCoinInTierOne += bid;
-        totalParticipants++;
-
-        emit ValueReceived(msg.sender, bid);
-
-    
-    } else {
+    if(block.timestamp >= saleInfo.saleStartTime) {
         if(otherInfo.useWhiteList){
           require(isInTier2WhiteList(msg.sender), "Campaign: You are not in whitelist");
         }
@@ -423,14 +432,26 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
 
         
     }
+    else if (block.timestamp >= saleInfo.saleStartTime - (tier1TimeLineInHours * 1 hours ) ) {  // istokenholder and isstill in tokenholder sales part  //  isInTier1WhiteList(msg.sender)
+        require(isAllowedInTier1(msg.sender) , "Campaign: Only Tokenholders are allowed to buy in Tier 1 window");
+        require(totalCoinInTierOne + bid <= tierOnehardCap, "Campaign: purchase would exceed Tier one max cap");
+        require(buyInOneTier[msg.sender] + bid <= maxAllocationPerUserTierOne ,"Campaign:You are investing more than your tier-1 limit!");
+        buyInOneTier[msg.sender] += bid;
+        buyInAllTiers[msg.sender] += bid;
+        totalCoinReceived += bid;
+        totalCoinInTierOne += bid;
+        totalParticipants++;
+
+        emit ValueReceived(msg.sender, bid);
+
+    
+    }    
+    else{
+      revert("Campaign:The sale is not started yet");
+    }
 
     
   }
-
-  // function finalizeAndwithdraw () public onlyOwner  {
-  //   require(status!=CampaignStatus.CANCELLED, 'Campaign: Sale Cancelled');
-  //   //todo
-  // }
 
   /**
   * @dev Withdraw tokens or coin by user after end time
@@ -503,16 +524,18 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
       
       DexLocker(_dexLockerAddress).addLiquidity();
       
-      status== CampaignStatus.LIQUIDITY_SETUP;
+      status=CampaignStatus.LIQUIDITY_SETUP;
   }
 
   
-  function getCampaignInfo() public view returns(address _tokenAddress, uint256 softcap, uint256 hardcap,uint256 saleStartTime, uint256 saleEndTime,uint256 listRate, uint256 dexListRate, uint liquidity,uint _liquidityReleaseTime ,uint256 totalCoins, uint256 totalParticipant, bool useWhiteList, bool hasKyc, bool isAuditd ){
-      return (saleInfo.tokenAddress, saleInfo.softCap, saleInfo.hardCap,saleInfo.saleStartTime, saleInfo.saleEndTime, saleInfo.listRate, saleInfo.dexListRate, saleInfo.liquidity, liquidityReleaseTime, totalCoinReceived,totalParticipants, otherInfo.useWhiteList,otherInfo.hasKYC, otherInfo.isAudited );
+  function getCampaignInfo() public view returns( uint256 softcap, uint256 hardcap,uint256 saleStartTime, uint256 saleEndTime,uint256 listRate, uint256 dexListRate, uint liquidity,uint _liquidityReleaseTime ,uint256 totalCoins, uint256 totalParticipant, bool useWhiteList, bool hasKyc, bool isAuditd ){
+      return ( saleInfo.softCap, saleInfo.hardCap,saleInfo.saleStartTime, saleInfo.saleEndTime, saleInfo.listRate, saleInfo.dexListRate, saleInfo.liquidityPercent, liquidityReleaseTime, totalCoinReceived,totalParticipants, otherInfo.useWhiteList,otherInfo.hasKYC, otherInfo.isAudited );
   }
 
+  
+
   function getCampaignStatus() public view returns(CampaignStatus ){
-      return (status );
+      return status ;
   }
 
   function getCampaignPeriod() public view returns(uint256 saleStartTime, uint256 saleEndTime ){
@@ -540,6 +563,10 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   
   function dexLockerAddress() public view onlyAdmin returns (address) {
       return _dexLockerAddress;
+  }
+
+  function tokenAddress() public view returns (address) {
+      return saleInfo.tokenAddress;
   }
 
   // //To get refund when the requirement not ment

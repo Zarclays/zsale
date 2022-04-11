@@ -5,6 +5,9 @@ const FooterWrapper = styled(Box)(
   ({ theme }) => `
         border-radius: 0;
         margin: ${theme.spacing(3)} 0;
+        position: absolute;
+        top: 90vh;
+        margin-top: auto;
 `
 );
 

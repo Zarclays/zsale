@@ -719,7 +719,7 @@ const CreateCampaign = () => {
   const handleNext = async (data) => {
     
     if (activeStep == steps.length - 1) {
-
+      
       setProcessing(true);
       const campaignListContract = new Contract(contractList[chainData.chain?.id]?.campaignList, CampaignListABI, signer);
       const now = new Date();
@@ -774,11 +774,22 @@ const CreateCampaign = () => {
 
         alert('Campaign Created succesfully');
 
+
         const campaignAddress = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['createdCampaignAddress'];
         const campaignIndex = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['index'];
-        navigate(`/campaigns/${campaignIndex}`);
+        
+
+
+        const campaignContract = new Contract(campaignAddress, CampaignABI, signer);
+        const transferTokenTx = await campaignContract.transferTokens();        
+        let transfrTxResult =   await transferTokenTx.wait();
+
+
 
         setProcessing(false);
+
+        navigate(`/campaigns/${campaignIndex}`);
+
       }catch(err){
         console.error('error creating campaign: ', err)
         alert('Campaign Created Failed');

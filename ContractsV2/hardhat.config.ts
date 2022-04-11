@@ -51,6 +51,17 @@ const config: HardhatUserConfig = {
       chainId: 1313161555,
       accounts:['0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'] ,
     },
+    meter_testnet: {
+      url: "https://rpctest.meter.io",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      chainId: 83,
+    },
+    meter_mainnet: {
+      url: "https://rpc.meter.io",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      chainId: 82,
+    }
+
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,

@@ -23,19 +23,19 @@ ChainList.push({
   testnet: true
 })
 
-ChainList.push({
-  id: 31337,
-  name: 'NEAR EVM Testnet',
-  nativeCurrency: {
-      decimals: 18,
-      name:'NEAR',
-      symbol: 'NEAR'
-  },
-  rpcUrls: [
-      'http://127.0.0.1:8545'
-  ],
-  testnet: true
-})
+// ChainList.push({
+//   id: 31337,
+//   name: 'NEAR EVM Testnet',
+//   nativeCurrency: {
+//       decimals: 18,
+//       name:'NEAR',
+//       symbol: 'NEAR'
+//   },
+//   rpcUrls: [
+//       'http://127.0.0.1:8545'
+//   ],
+//   testnet: true
+// })
 
 ChainList.push({
   id: 1313161555,
@@ -47,6 +47,34 @@ ChainList.push({
   },
   rpcUrls: [
       'https://testnet.aurora.dev/'
+  ],
+  testnet: true
+})
+
+ChainList.push({
+  id: 83,
+  name: 'Meter Testnet',
+  nativeCurrency: {
+      decimals: 18,
+      name:'MTR',
+      symbol: 'MTR'
+  },
+  rpcUrls: [
+      'https://rpctest.meter.io'
+  ],
+  testnet: true
+})
+
+ChainList.push({
+  id: 31337,
+  name: 'Hardhat',
+  nativeCurrency: {
+      decimals: 18,
+      name:'ETH',
+      symbol: 'ETH'
+  },
+  rpcUrls: [
+      'https://rpctest.meter.io'
   ],
   testnet: true
 })

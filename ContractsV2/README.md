@@ -11,11 +11,13 @@ npx hardhat accounts
 npx hardhat compile
 npx hardhat clean
 npx hardhat test
+npx hardhat test --network localhost
+
 npx hardhat node
 npx hardhat help
 REPORT_GAS=true npx hardhat test
 npx hardhat coverage
-npx hardhat run scripts/deploy.ts
+npx hardhat run scripts/deploy.ts --network localhost
 TS_NODE_FILES=true npx ts-node scripts/deploy.ts
 npx eslint '**/*.{js,ts}'
 npx eslint '**/*.{js,ts}' --fix
@@ -35,11 +37,11 @@ You can deploy in the localhost network following these steps:
 
     Open a new terminal and deploy the smart contract in the localhost network
 
-    npx hardhat run --network localhost scripts/deploy.js
+    npx hardhat run --network localhost scripts/deploy.ts
 
 As general rule, you can target any network configured in the hardhat.config.js
 
-npx hardhat run --network <your-network> scripts/deploy.js
+npx hardhat run --network <your-network> scripts/deploy.ts
 
 # Etherscan verification
 

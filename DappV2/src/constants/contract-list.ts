@@ -29,9 +29,21 @@ const contractList: ContractListArray =  {
     },
     31337: {// Hardhat test
         chainId: 31337,
-        campaignList: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',        
+        campaignList: '0x0ed64d01D0B4B655E410EF1441dD677B695639E7',        
+        routers:['0xb2869F895FC24790e81EF05a3AeF0F23897eC33b']
+    }, 
+    82: {// Meter
+        chainId: 83,
+        campaignList: '0xc4cc045f934f8bD03A333fCEd331fBf8D26d9931',        
         routers:['0xb2869F895FC24790e81EF05a3AeF0F23897eC33b']
     },
+
+    83: {// Meter test
+        chainId: 83,
+        campaignList: '0x7eB3F9e8f142CeF7867d6c8b1B57AAc4aBc99b6F',       
+        routers:['0xb2869F895FC24790e81EF05a3AeF0F23897eC33b']
+    },
+    
 
     1313161555: { //Aurora testnet
         chainId: 1313161555,

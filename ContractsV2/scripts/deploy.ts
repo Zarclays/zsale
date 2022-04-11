@@ -13,16 +13,7 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
-  // We get the contract to deploy
-  const Greeter = await ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
-
-  await greeter.deployed();
-
-  console.log("Greeter deployed to:", greeter.address);
-
-
-
+  
   const CampaignFactoryArtifact = await ethers.getContractFactory("CampaignList");
   const TokenArtifact = await ethers.getContractFactory("Token");
   const CampaignArtifact = await ethers.getContractFactory("Campaign");
@@ -37,9 +28,9 @@ async function main() {
   await token2.deployed();
   console.log('Token2 Deployed at  ', token2.address );
 
-  let token3 = await TokenArtifact.deploy();
-  await token3.deployed();
-  console.log('Token3 Deployed at  ', token3.address );
+  // let token3 = await TokenArtifact.deploy();
+  // await token3.deployed();
+  // console.log('Token3 Deployed at  ', token3.address );
 
   const dexLockerFactory = await DexLockerFactoryArtifact.deploy();
   await dexLockerFactory.deployed();

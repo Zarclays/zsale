@@ -67,7 +67,7 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
     // }
 
     function createNewCampaign(address _tokenAddress,
-    uint256[9] memory capAndDate,  // uint256 _softCap,uint256 _hardCap,uint256 _saleStartTime,uint256 _saleEndTime, uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo
+    uint256[9] memory capAndDate,  
      Campaign.RefundType _refundType, address _dexRouterAddress,uint[4] memory liquidityAllocationAndRates,
      string[6] memory founderInfo,
       VestSchedule[8] memory teamTokenVestingDetails, 
@@ -96,6 +96,20 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
             emit CampaignCreated(msg.sender, _counter.current(),address( cmpgn));
         }
     }
+
+
+    // function getCampaigns(uint start, uint end) public view returns(address[] memory ){ //paged lists - end is exclusive
+    //     uint256 count = getWhitelistCount();
+    //     if(count<end){
+    //         end= count;
+    //     }
+    //     address[] memory list = new address[](end - start);        
+        
+    //     for (uint i = start; i < end; i++) {
+    //         list[i] = addresses[i];
+    //     }
+    //     return list;
+    // }
 
     function hasExistingCampaign(address _tokenAddress) external view returns (bool){
         return _tokenCampaigns[_tokenAddress] != address(0);
