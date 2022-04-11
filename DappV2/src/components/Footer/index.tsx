@@ -6,7 +6,7 @@ const FooterWrapper = styled(Box)(
         border-radius: 0;
         margin: ${theme.spacing(3)} 0;
         position: absolute;
-        top: 90vh;
+        top: 96vh;
         margin-top: auto;
 `
 );

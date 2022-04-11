@@ -2,10 +2,10 @@
 pragma solidity ^0.8.8;
 
 import "@openzeppelin/contracts/utils/Context.sol";
-// import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -13,12 +13,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "./Campaign.sol";
 import './Lockers/DexLockerFactory.sol';
-
+import "hardhat/console.sol";
 
 
 
 contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
-
+    using SafeERC20 for IERC20;
   // Add the library methods
     using EnumerableMap for EnumerableMap.UintToAddressMap;
     using Counters for Counters.Counter;
@@ -114,9 +114,6 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
     function hasExistingCampaign(address _tokenAddress) external view returns (bool){
         return _tokenCampaigns[_tokenAddress] != address(0);
     }
-
-    
-
     function allOwnersCampaigns() public view returns (uint256[] memory) {
         return ownersCampaign[msg.sender];
     }
@@ -124,6 +121,19 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
     
     function campaignSize() public view returns (uint256) {
         return _campaigns.length();
+    }
+
+    function transferTokens(address payable campaignAddress) public 
+    {
+        Campaign ct = Campaign(campaignAddress);
+        require(ct.owner()== _msgSender(), 'CAMPAIGNList: Transfer token - Not Owner');
+
+        uint256 amount = ct.totalTokensExpectedToBeLocked();
+        IERC20 _token = IERC20(ct.tokenAddress());
+        _token.safeTransferFrom(_msgSender(), address(this), amount);
+
+        _token.safeTransfer( campaignAddress, amount);
+        ct.startReceivingBids();
     }
 
     

@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 // import PageHeader from './PageHeader';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import { Grid, Container,List,ListItem,  ListItemText,  ListItemIcon,  ListItemButton, TextField, Button, Typography } from '@mui/material';
+import {  Grid, Container,List,ListItem,  ListItemText,  ListItemIcon,  ListItemButton, TextField, Button, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -11,7 +11,7 @@ import InboxIcon from '@mui/icons-material/Inbox';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import Footer from 'src/components/Footer';
 import { useParams } from "react-router-dom";
-import { useContract, useNetwork, useSigner, useAccount } from 'wagmi';
+import { useContract, useNetwork, useSigner, useAccount, useProvider } from 'wagmi';
 import contractList from '../../constants/contract-list';
 import CampaignListABI from '../../constants/campaign-list-abi.json';
 import CampaignABI from '../../constants/campaign-abi.json';
@@ -19,11 +19,12 @@ import { useAsync } from "react-async";
 import {useState, useEffect} from "react";
 import {utils} from 'ethers';
 import {useGetCampaign} from '../../hooks/useGetCampaign';
-
+import LinearProgressBar from '../../components/LinearProgressBar';
 import Countdown from 'react-countdown';
 import {Contract} from 'ethers';
 import { getDateFromEther, formatEtherDateToJs } from '../../utils/date';
-
+import { useNavigate } from "react-router-dom";
+import PostponeSaleDialog from './postpone-sale-dialog';
 
 
 function formatPercent(value){
@@ -35,7 +36,7 @@ function formatPercent(value){
   return s;
 }
 
-const CountDown_Ongoing = () => <span style={{"color": "#10df01"}}>Ongoing!</span>;
+const CountDown_Ongoing = () => <div style={{"marginBottom": "1rem"}}><strong>Status: </strong> <span style={{"color": "#10df01"}}>Ongoing!</span></div>;
 
 function CampaignPage() {
   // get the username from route params
@@ -46,35 +47,66 @@ function CampaignPage() {
 
   const [chainId,setChainId] = useState(31337);
 
+  const provider = useProvider();
   
   useEffect(()=>{
     setChainId(chainData.chain?.id??31337 );
   }, [chainData])
 
   const [{ data: account, error: accountError, loading: acctLoading }] = useAccount()
-
+  const navigate = useNavigate();
 
   const [amount, setAmount] = useState(1);
+  const [openPostponeDialog, setOpenPostponeDialog] = useState(false);
 
   const handleSubmitParticipate = async (event) => {
+
     event.preventDefault();
-    console.log(`The amount you entered was: ${amount.toString()}`)
-    console.log(`campaignDetails.campaignAddress: ${campaignDetails.campaignAddress}`)
+
     
+        
     const campaignContract = new Contract(campaignDetails.campaignAddress, CampaignABI, signer);
     // not defining `data` field will use the default value - empty data
+
+    const gasPrice = provider.getGasPrice();    
+
     const tx = {
         from: account.address,
         to: campaignDetails.campaignAddress,
-        value: utils.parseEther(amount.toString()) // utils.formatUnits( utils.parseEther(amount.toString()), 'wei')
+        nonce: provider.getTransactionCount(account.address, "latest"),
+        value: utils.parseEther(amount.toString()), // utils.formatUnits( utils.parseEther(amount.toString()), 'wei'),
+        gasLimit: utils.hexlify(500000), // 100000
+        gasPrice: gasPrice,
     };
-
-    const txRes = await signer.sendTransaction(tx);
-    let result = await txRes.wait();
-    console.log("Send finished!" , txRes, ', result: ',  result)
+    const txRes = await signer.sendTransaction(tx);    
+    console.log("Send finished!" , txRes)
+    alert('Your bid has been sent succesfully');
+    window.location.reload(); // navigate(`/campaigns/${campaignId}`);
 
 
   }
+
+  const postponeSale = () => {
+    setOpenPostponeDialog(true);
+  };
+
+  const handlePostponeModalClose = async (newStart: Date, newEnd: Date) => {
+    setOpenPostponeDialog(false); 
+
+    if(newStart && newEnd){
+      
+      const campaignContract = new Contract(campaignDetails.campaignAddress, CampaignABI, signer);
+      // not defining `data` field will use the default value - empty data
+      let tx = await campaignContract.postponeSale( newStart.getTime()/1000, newEnd.getTime()/1000 );
+      let txRes = await tx.wait();    
+      console.log("Send finished!" , txRes)
+      alert('Your Campaign  has been postponed succesfully');
+      window.location.reload(); // navigate(`/campaigns/${campaignId}`);
+    }
+        
+
+  };
+  
 
   
   
@@ -119,12 +151,6 @@ function CampaignPage() {
     </>
   }
 
-  // console.log('campaignDetails: ',campaignDetails);
-
-  if(campaignDetails){
-    console.log('STart:' , campaignDetails.saleStartTime)
-  }
-
 
   return (
     <>
@@ -132,12 +158,17 @@ function CampaignPage() {
         <title>Participate in Campaign</title>
       </Helmet>
 
-
+      <PostponeSaleDialog
+        oldDate={campaignDetails.saleStartTime}
+        oldEndDate={campaignDetails.saleEndTime}
+        open={openPostponeDialog}
+        onClose={handlePostponeModalClose}
+      />
       
       <Container maxWidth="lg">
         <Grid
           container
-          direction="row"
+          direction="row" 
           justifyContent="center"
           alignItems="stretch"
           spacing={6}
@@ -223,6 +254,10 @@ function CampaignPage() {
                                 </>
                                 }
 
+                                <Box sx={{ width: '100%', marginTop: '1rem', marginBottom: '1rem' }}>
+                                  <LinearProgressBar nativeCoinSymbol={nativeCoin.symbol} amount={ utils.formatUnits( campaignDetails.totalCoinReceived.toString(),nativeCoin.decimals) } softCap={utils.formatUnits(  campaignDetails['softcap'].toString(),nativeCoin.decimals)} hardCap={utils.formatUnits(  campaignDetails['hardcap'].toString(),nativeCoin.decimals)}/> 
+                                </Box>
+
                                 {isOpenForPayment && <TextField
                                   id="name-input"
                                   type="number"
@@ -255,26 +290,49 @@ function CampaignPage() {
 
                           </CardContent>
                           <CardActions>
-                            <Box  sx={{ p: 1, m:1,  border: '1px dashed grey' }}>
+                            {campaignDetails && campaignDetails.owner == account.address && <Box  sx={{ p: 1, m:1,  border: '1px dashed grey' }}>
                               
                               
-                              <Button variant="contained" sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="primary" >
-                                Postpone Sale
-                              </Button>
+                              {(getDateFromEther( campaignDetails.saleStartTime).getTime() > Date.now()) && <>
+                              
+                                <Button variant="contained" onClick={postponeSale} sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="primary" >
+                                  Postpone Sale
+                                </Button>
+                                <Button variant="contained"  sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="warning" >
+                                  Cancel Sale
+                                </Button>
+                              </>}
 
-                              <Button variant="contained"  sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="warning" >
-                                Cancel Sale
-                              </Button>
+                              
 
-                              <Button variant="contained"  sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="success" >
-                                Finalize Sale
-                              </Button>
+                              {(getDateFromEther( campaignDetails.saleEndTime).getTime() > Date.now()) && <>
+                              
+                                <Button variant="contained"  sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="success" >
+                                  Finalize Sale
+                                </Button> 
+                                <Button variant="contained" sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="info" >
+                                  Withdraw your tokens
+                                </Button>
+                              </>
+                              }
 
-                              <Button variant="contained" sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="info" >
-                                Withdraw your funds
-                              </Button>
+                              
 
                             </Box>
+                            }
+
+                            {campaignDetails && campaignDetails.owner != account.address && <Box  sx={{ p: 1, m:1,  border: '1px dashed grey' }}>
+                              {(getDateFromEther( campaignDetails.saleEndTime).getTime() > Date.now()) && <>
+                              
+                                <Button variant="contained" sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="info" >
+                                  Withdraw your funds
+                                </Button>
+                              </>
+                              }
+                              
+
+                            </Box>
+                            }
                           </CardActions>
                         </Card>
                         

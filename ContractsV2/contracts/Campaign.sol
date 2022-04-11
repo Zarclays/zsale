@@ -89,6 +89,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
 
 
   address zsalesWalletAddress = 0xB7e16f5fa9941B84baCd1601F277B00911Aed339 ; // receives commissions
+  address public _campaignFactory ;
 
   uint private tier1TimeLineInHours = 2; // e.g 2 hours before startime
   
@@ -129,7 +130,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   mapping(address => uint) public buyInAllTiers;
   DexLockerFactory private _dexLockerFactory;
   address payable private _dexLockerAddress;
-  address public _campaignFactory= 0x92Fe2933C795FF95A758362f9535A4D0a516053d ;
+  
   
   constructor(
     
@@ -250,19 +251,25 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     _updateTierDetails(_tierOneHardCap, _tierTwoHardCap, _maxAllocationPerUserTierOne, _maxAllocationPerUserTierTwo);    
   }
 
-  function transferTokens() public onlyOwner
+  function startReceivingBids() public 
   {
-      uint256 amount = totalTokensExpectedToBeLocked();
-      IERC20 _token = IERC20(saleInfo.tokenAddress);
-      _token.safeTransferFrom(msg.sender, address(this), amount);
-
-      status = CampaignStatus.TOKENS_SUBMITTED;
+    //can only be called by _campaignFactory
+    require(_campaignFactory== _msgSender(), 'CAMPAIGNList: startReceivingBids - Not Owner');
+    status = CampaignStatus.TOKENS_SUBMITTED;
   }
 
 
   function cancelCampaign() public onlyOwner{
     require(block.timestamp < saleInfo.saleStartTime, 'Can only cancel before Sale StartTime');
     status=CampaignStatus.CANCELLED;
+  }
+
+  function postponeSale(uint newDate, uint newEndDate) public onlyOwner  {
+      require(block.timestamp< saleInfo.saleStartTime, 'CAMPAIGN: Can only postpone before Sale StartTime');
+      require(newDate > saleInfo.saleStartTime , 'CAMPAIGN: New date must be grt than oldDate');
+      require(newEndDate > newDate, 'CAMPAIGN: End Date must be grt than Sale StartTime');
+      saleInfo.saleStartTime = newDate;
+      saleInfo.saleEndTime = newEndDate;
   }
 
   function end() public view returns (uint256) {

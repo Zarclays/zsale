@@ -43,6 +43,7 @@ export function useGetCampaign(campaignListaddress: string, campaignId: string, 
         const hasKYC = otherInfo.hasKYC;
         const isAudited = otherInfo.isAudited;
         const totalCoinReceived = await campaignContract.totalCoinReceived();
+        const owner = await campaignContract.owner();
         
         return {
             ...cmp,
@@ -58,7 +59,8 @@ export function useGetCampaign(campaignListaddress: string, campaignId: string, 
             logoUrl,
             hasKYC,
             isAudited,
-            totalCoinReceived : totalCoinReceived??0
+            totalCoinReceived : totalCoinReceived??0,
+            owner: owner
         };
     }, [ signer, listContract]) //loading
 }

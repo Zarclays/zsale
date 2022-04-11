@@ -1,8 +1,8 @@
 {
   "name": "zsales",
   "version": "1.1.0",
-  "title": "Tokyo Free White React Admin Dashboard",
-  "description": "This free and open source admin dashboard template is built for React and it’s bootstrapped from Facebook’s create-react-app. All NPM dependencies are up to date and it contains multiple fully customized components based on the popular frontend components framework, Material-UI.",
+  "title": "ZSales",
+  "description": "ZSales was bootstrapped from Facebook’s create-react-app. All NPM dependencies are up to date and it contains multiple fully customized components based on the popular frontend components framework, Material-UI.",
   "author": {
     "name": "Zarclays",
     "url": "https://zarclays.com"

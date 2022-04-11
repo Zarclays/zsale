@@ -726,6 +726,8 @@ const CreateCampaign = () => {
 
       const nowTimeStamp = Math.floor(now.getTime() / 1000)
 
+      
+
       try{
         const tx = await campaignListContract.createNewCampaign(formData.tokenAddress, 
         [
@@ -744,6 +746,8 @@ const CreateCampaign = () => {
         [formData.logo,'',formData.website, formData.twitter, formData.telegram, formData.discord ],
         formData.tokenVestings.map(v=>{ 
           let n = new Date(now.getTime()) ;
+          
+          
           return {
             releaseDate:  Math.floor( n.setDate(n.getDate() + +v.releaseDate) / 1000), 
             releaseAmount: utils.parseEther(v.amount.toString()), 
@@ -762,7 +766,7 @@ const CreateCampaign = () => {
         ],
 
         {
-          value: utils.parseEther("0.00001")
+          value: utils.parseEther("0.0001")
         }
         );
 
@@ -778,13 +782,11 @@ const CreateCampaign = () => {
         const campaignAddress = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['createdCampaignAddress'];
         const campaignIndex = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['index'];
         
+        console.log('camp: ', campaignAddress)
 
-
-        const campaignContract = new Contract(campaignAddress, CampaignABI, signer);
-        const transferTokenTx = await campaignContract.transferTokens();        
+        // const campaignContract = new Contract(campaignAddress, CampaignABI, signer);
+        const transferTokenTx = await campaignListContract.transferTokens(campaignAddress);        
         let transfrTxResult =   await transferTokenTx.wait();
-
-
 
         setProcessing(false);
 
@@ -962,7 +964,7 @@ const CreateCampaign = () => {
                   ) : (
                     <>
                       
-                        <form autoComplete="on"> 
+                        <form autoComplete="on" > 
                         {/* onSubmit={methods.handleSubmit(handleNext)} */}
 
                           {activeStep===0 && <>

@@ -45,10 +45,6 @@ describe("CampaignList", function () {
       campaignFactory = await CampaignFactoryArtifact.deploy(dexLockerFactory.address);
       await campaignFactory.deployed();
       console.log('Using Campaign List Deployed at  ', campaignFactory.address );
-
-      
-
-      // console.log('Using Campaign Deployed at  ', campaign.address );
       
   });
 
@@ -99,7 +95,7 @@ describe("CampaignList", function () {
     let txResult =   await createCampaignTx.wait();
     // campaignAddress = txResult.events[2].args['createdCampaignAddress'];
     campaignAddress = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['createdCampaignAddress'];
-    // console.log('Create Campaign Res: ', txResult );
+    console.log('CcampaignAddress: ', campaignAddress );
 
     expect(await campaignFactory.campaignSize()).to.equal(1);
   });
@@ -118,7 +114,7 @@ describe("CampaignList", function () {
       const updateCampaignTx = await cmp.updateCampaignDetails('logourl', 'desc', 'websiteurl','twitter','telegram');
         
       let txResult =   await updateCampaignTx.wait();
-      // console.log('Update Campaign List Res: ', txResult );
+      
       expect(txResult.status).to.equal(1);
       
       
@@ -176,7 +172,8 @@ describe("CampaignList", function () {
           });
 
         let txResult =   await createCampaignTx.wait();
-         
+
+                 
       }catch(err){
         // console.error('Error duplicating: ', err);
         
@@ -188,37 +185,76 @@ describe("CampaignList", function () {
 
   });
 
+  // it('submits initial token to contract successfully', async() => {
+
+    
+  //   let error;
+  //   try{
+
+  //     const [owner] = await ethers.getSigners();
+  //     let cmp = CampaignArtifact.attach(campaignAddress);
+
+  //     let campaignStatus = await cmp.getCampaignStatus();
+  //     console.log('campaignStatus at start :', campaignStatus)
+
+  //     let vestingTokens = await cmp.totalTokensExpectedToBeLocked();
+  //     console.log(' vestingTokens:', vestingTokens.toString(), ', decimal: ', await token.decimals())
+
+  //     // Arrpove contract with correct allowance
+      
+  //     let txAllowance = await token.approve(cmp.address, vestingTokens);
+  //     await txAllowance.wait();
+      
+  //     const transferTokenTx = await cmp.transferTokens();        
+  //     let txResult =   await transferTokenTx.wait();
+
+  //     console.log('owner balance after:', (await token.balanceOf(owner.address)).toString())
+  //     console.log('campaign balance after:', (await token.balanceOf(cmp.address)).toString())
+
+  //     console.log('txResult.status:', txResult.status)
+  //     expect(txResult.status).to.equal(1);
+
+  //     campaignStatus = await cmp.getCampaignStatus();
+  //     console.log('campaignStatus after:', campaignStatus)
+  //     expect(campaignStatus).to.equal(1);
+
+  //   }catch(err){
+      
+  //     console.error(err)
+  //     error=err;
+  //   }
+  //   expect(error).to.equal(undefined);
+    
+    
+
+  // });
+
   it('submits initial token to contract successfully', async() => {
 
     
     let error;
     try{
-
+      
       const [owner] = await ethers.getSigners();
       let cmp = CampaignArtifact.attach(campaignAddress);
 
       let campaignStatus = await cmp.getCampaignStatus();
-      console.log('campaignStatus at start :', campaignStatus)
-
+      
       let vestingTokens = await cmp.totalTokensExpectedToBeLocked();
-      console.log(' vestingTokens:', vestingTokens.toString(), ', decimal: ', await token.decimals())
-
+      
       // Arrpove contract with correct allowance
       
-      let txAllowance = await token.approve(cmp.address, vestingTokens);
+      let txAllowance = await token.approve(campaignFactory.address, vestingTokens);
       await txAllowance.wait();
       
-      const transferTokenTx = await cmp.transferTokens();        
+      const transferTokenTx = await campaignFactory.transferTokens(campaignAddress);        
       let txResult =   await transferTokenTx.wait();
 
-      console.log('owner balance after:', (await token.balanceOf(owner.address)).toString())
-      console.log('campaign balance after:', (await token.balanceOf(cmp.address)).toString())
-
-      console.log('txResult.status:', txResult.status)
+      // console.log('owner balance after:', (await token.balanceOf(owner.address)).toString())
       expect(txResult.status).to.equal(1);
 
       campaignStatus = await cmp.getCampaignStatus();
-      console.log('campaignStatus after:', campaignStatus)
+      
       expect(campaignStatus).to.equal(1);
 
     }catch(err){
@@ -238,27 +274,21 @@ describe("CampaignList", function () {
     let error;
     try{
       this.timeout(5000)
-      const [owner, newSigner] = await ethers.getSigners();
-      let cmp = CampaignArtifact.attach(campaignAddress);
+      const [owner2, newSigner] = await ethers.getSigners();
+      const b4Balance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));
       
       const tx = {
-        from: newSigner.address,
+        // from: newSigner.address,
         to: campaignAddress,
         value: ethers.utils.parseEther('0.10') // utils.formatUnits( utils.parseEther(amount.toString()), 'wei')
       };
 
       const txRes = await newSigner.sendTransaction(tx);
-      let result = await txRes.wait();
-
-      console.log('bid txResult.status:', result.status)
-
-      // let balance = await newSigner.getBalance(newSigner.address);
-      // // console.log(newSigner.address + ':' + ethers.utils.formatEther(balance));
-      // console.log(newSigner.address + ':' + balance);
-
-      // // console.log('campaign balance after:', (await cmp.balance()).toString())
+          
+      const afterBalance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));
       
-      expect(result.status).to.equal(1);
+      expect(parseFloat( afterBalance)).to.gt(parseFloat(b4Balance));
+      expect(txRes.confirmations).to.gt(0);
 
     }catch(err){
       
