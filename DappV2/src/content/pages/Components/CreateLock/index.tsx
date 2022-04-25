@@ -72,44 +72,33 @@ function CreateLock() {
             alignItems="stretch"
             spacing={3}
             marginTop={10}>
-                <select onChange={selectChange} style={styles.select} >
-                    <option selected disabled>
-                        Choose Type Of Lock
-                        </option>
-                        <option value={"bsctestnet"}>Bsc Testnet</option>
-                        <option value={"ethtestnet"}>Ethererium</option>
-                        <option value={"solatctestnet"}>Solana</option>
-                        <option value={"pancaketestnet"}>Pancake Swap</option>
-                        </select>
+                <Grid item
+                xs={12}>
+                <TextField required
+            id="outlined-require"
+            label="Token Address"
+            fullWidth/>
+                </Grid>
+                <Grid item 
+                xs={12}>
+                    <TextField required
+                    id="outlined-required"
+                    label="Amount to Lock"/>
+                    <select>
+                        <option selected disabled> Choose your Locking Plantform </option>
+                        <option value={"uniswap"}>Uniswap</option>
+                        <option value={"sushiswap"}>Sushiswap</option>
+                        <option value={"pinksale"}>Pinksale</option>
+                        <option value={"ethereium"}>Ethereium</option>
+                    </select>
+                </Grid>
+                <Grid item
+                justifyContent={"center"}>
+                    <Button>Next</Button>
+                </Grid>
             </Grid>
-            <Grid item
-            container
-            justifyContent={"center"}
-            alignItems="stretch"
-            spacing={3}
-            marginTop={8}>
-            <Button style={{fontSize: "30", width: "25"}}>Next</Button>
-            </Grid>
-            
         </Container>
-
-    
     </>
     )
 }
-
-const styles: { [name: string]: React.CSSProperties } = {
-    container: {
-        marginTop: 50,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-    },
-    select: {
-        padding: 10,
-        width: 300,
-        fontSize: 25,
-    }
-};
-
 export default CreateLock;
