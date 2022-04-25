@@ -68,7 +68,7 @@ function CampaignPage() {
     const campaignContract = new Contract(campaignDetails.campaignAddress, CampaignABI, signer);
     // not defining `data` field will use the default value - empty data
 
-    const gasPrice = provider.getGasPrice();    
+    const gasPrice = await provider.getGasPrice();    
 
     const tx = {
         from: account.address,
