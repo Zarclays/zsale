@@ -4,7 +4,7 @@ import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import { Grid, Container, Theme, CircularProgress } from '@mui/material';
 import Footer from 'src/components/Footer';
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   AlertTitle,
@@ -46,6 +46,8 @@ import DesktopDateTimePicker from '@mui/lab/DesktopDateTimePicker';
 import { useNavigate } from "react-router-dom";
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import SaleInfoForm from './steps/sale-info-form';
+import FounderInfoForm from './steps/founder-info-form';
+import SummaryForm from './steps/summary-form';
 
 const useStyles = makeStyles((theme: Theme) => ({
   button: {
@@ -79,9 +81,11 @@ function getSteps() {
     }
   ];
 }
-const TokenInfoForm = () => {
+const TokenInfoForm = (values, handleFormData) => {
   const { control ,watch } = useFormContext();
-  const tokenAddress = useWatch({ control, name: "tokenAddress" });
+  //const tokenAddress = useWatch({ control, name: "tokenAddress" });
+
+  const [tokenAddress, setTokenAddress] = useState('');
     
   // const watchTokenAddress = watch("tokenAddress", ''); // you can supply default value as second argument
 
@@ -93,294 +97,55 @@ const TokenInfoForm = () => {
 
   return (
     <>
-      <Controller
-        control={control}
-        name="tokenAddress"
-        rules={{ required: "this is required",minLength:42,maxLength: 43 }}
-
-        render={({ field,  fieldState: { error }  }) => (
-          <TextField
-            id="token-address"
-            label="Token Address"
-            variant="outlined"
-            placeholder="Enter Your Token Address"
-            required
-            error={!!error}
-            fullWidth
-            margin="normal"
-            ref={field.ref}
-            {...field}
-          />
-        )}
-      />
-
-      {tokenAddress && tokenAddress.length>=42 && <><DisplayTokenInfo tokenAddress= {tokenAddress}/></>}
-
-      
-    </>
-  );
-};
-
-
-
-const FounderInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null }) => {
-  
-  return (
-    <>
-      <TextField    
-        type="url"       
-        label={`Token Logo`}
+      <TextValidator
+             
+        label="Token Address"
         variant="outlined"
-        placeholder="https://"
-        required
-        margin="normal"
-        defaultValue={values.logo}
-        onChange={handleFormData("logo")}
-        helperText={`Public Url of your token logo`}
-        fullWidth
-      />
-
-      <TextField    
-        type="url"        
-        label={`Website Url`}
-        variant="outlined"
-        placeholder="https://"
-        required
-        margin="normal"
-        defaultValue={values.website}
-        onChange={handleFormData("website")}
-        helperText={` `}
-        fullWidth
-      />
-
-      <TextField    
-        type="text"       
-        label={`Twitter Page`}
-        variant="outlined"
-        placeholder="https://twitter.com/@handle"
-        required
-        margin="normal"
-        defaultValue={values.twitter}
-        onChange={handleFormData("twitter")}
-        helperText={`Your twitter handle`}
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-      <TextField    
-        type="text"        
-        label={`Telegram`}
-        variant="outlined"
-        placeholder="https://t.me/handle"
-        required
-        margin="normal"
-        defaultValue={values.telegram}
-        onChange={handleFormData("telegram")}
-        helperText={`Your telegram handle`}
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-      <TextField    
-        type="text"        
-        label={`Discord`}
-        variant="outlined"
-        placeholder="https://"
-        required
-        margin="normal"
-        defaultValue={values.discord}
-        onChange={handleFormData("discord")}
-        helperText={`Your discord handle`}
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-
-    </>
-  );
-};
-
-const SummaryForm = ({  handleFormData, values, nativeCoin, setFormData=null }) => {
-  
-  return (
-    <>
-      
-      <Box
-
-      sx={{
-        // m: 1, 
-      }}
-      
-    >
-      <TextField    
-        disabled     
-        label="Presale Rate"
-        variant="outlined"
-        placeholder={`How many Tokens will 1 ${nativeCoin??'Coin'} get you?`}
+        placeholder={`Enter Your Token Address`}
         fullWidth
         required
-        margin="normal"
-        defaultValue={values.presaleRate}
-        onChange={handleFormData("presaleRate")}
-        helperText={`How many Tokens will 1 ${nativeCoin??'Coin'} get you?`}
-      />
-
-      <TextField    
-        //type="number" 
-        disabled     
-        label={`Soft Cap (${nativeCoin??'Coin'} )`}
-        variant="outlined"
-        placeholder="Soft Cap"
-        required
-        margin="normal"
-        defaultValue={values.softCap}
-        onChange={handleFormData("softCap")}
-        helperText=" "
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-      <TextField    
-        disabled      
-        label={`Hard Cap (${nativeCoin??'Coin'} )`}
-        variant="outlined"
-        placeholder="Hard Cap"
-        required
-        margin="normal"
-        defaultValue={values.hardCap}
-        onChange={handleFormData("hardCap")}
-        helperText=" "
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-
-      <TextField    
-        disabled      
-        label={`Minimum Order (${nativeCoin??'Coin'} )`}
-        variant="outlined"
-        placeholder="Minimum Buy size"
-        required
-        margin="normal"
-        defaultValue={values.minBuy}
-        onChange={handleFormData("minBuy")}
-        helperText={`Minimum Amount of ${nativeCoin??'Coin'} a buyer can make`}
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-      <TextField    
-        disabled      
-        label={`Maximum Order (${nativeCoin??'Coin'} )`}
-        variant="outlined"
-        placeholder="Maximum Buy size"
-        required
-        margin="normal"
-        defaultValue={values.maxBuy}
-        onChange={handleFormData("maxBuy")}
-        helperText={`Maximum Amount of ${nativeCoin??'Coin'} a buyer can make`}
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-      <TextField    
-        disabled      
-        label="Liquidity %"
-        variant="outlined"
-        placeholder="Must be > 50%"
-        required
-        margin="normal"
-        defaultValue={values.liquidity}
-        onChange={handleFormData("liquidity")}
-        helperText="Must be > 50% "
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-      <TextField    
-        disabled      
-        label="Dex Listing Rate"
-        variant="outlined"
-        placeholder="Amount 1 Coin gets on DEX"
-        required
-        margin="normal"
-        defaultValue={values.dexRate}
-        onChange={handleFormData("dexRate")}
-        helperText={`Amount of tokens 1 ${nativeCoin??'Coin'} will get when listed on DEX`}
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-      <Typography>Sale Date</Typography>
-
-    <TextField label="Start Date"  variant="outlined" margin="normal" sx={{ ml: 1, width: '48%' }} required helperText={"Start Date"} type="datetime"  defaultValue={values.startDate} disabled/>
-    
-    <TextField  label="End Date"   margin="normal" sx={{ ml: 1, width: '48%' }} required helperText={"End Date"} type="datetime" defaultValue={values.endDate} disabled/>
-    
-      
-
-
-      <TextField    
-        disabled      
-        label="Liquidity Lockup (in Days)"
-        variant="outlined"
-        placeholder=""
-        required
-        margin="normal"
-        defaultValue={values.liquidtyLockup}
-        onChange={handleFormData("liquidtyLockup")}
-        helperText={`How long to lock up Liquidity on DEX`}
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-
-      <FormGroup>
-        <FormControlLabel control={
-          <Checkbox checked={values.useTokenVesting} disabled />
-        } label="Use Token Vesting" />
+        margin="normal"        
+        value={values.tokenAddress}      
+        onChange={handleFormData("tokenAddress")}        
         
-      </FormGroup>
+        name="tokenAddress"
+        validators={['required', 'minStringLength:42']}
+        errorMessages={['this field is required', 'Minimum of 42 chars is required']}
+      />
 
-      <Typography>Token Vesting Info</Typography>
-      {values.useTokenVesting && <Box >
+      {/* <Controller
+      //   control={control}
+      //   name="tokenAddress"
+      //   rules={{ required: "this is required",minLength:42,maxLength: 43 }}
 
-        {values.tokenVestings.map((vst, index) => 
-            
-                <div key={index} className="input-group">
+      //   render={({ field,  fieldState: { error }  }) => (
+      //     <TextValidator
+      //       id="token-address"
+      //       label="Token Address"
+      //       variant="outlined"
+      //       placeholder="Enter Your Token Address"
+      //       required
+      //       error={!!error}
+      //       validators={['required','minStringLength:6']}
+      //       errorMessages={['Required','min length 6']}
+      //       fullWidth
+      //       margin="normal"
+      //       ref={field.ref}
+      //       {...field}
+      //     />
+      //   )}
+      // />
 
-                  <strong> {index + 1} </strong>
+      // {tokenAddress && tokenAddress.length>=42 && <><DisplayTokenInfo tokenAddress= {tokenAddress}/></>} */}
 
-                  <TextField    
-                    disabled      
-                    label="Amount to vest"
-                    variant="outlined"
-                    placeholder=""
-                    required
-                    margin="normal"
-                    defaultValue={vst.amount}
-                    
-                    helperText={`How many tokens to lock`}
-                    sx={{ ml: 1, width: '48%' }}
-                  />
-
-                  <TextField    
-                    type="datetime"  
-          disabled  
-                    label="Lock Duration"
-                    variant="outlined"
-                    placeholder=""
-                    required
-                    margin="normal"
-                    defaultValue={vst.releaseDate}
-                   
-                    helperText={`Days till locked tokens are released `}
-                    sx={{ ml: 1, width: '48%' }}
-                  />
-                    
-                </div>
-            
-        ) }      
-
-
-      </Box>}
       
-    </Box>
-
-
     </>
   );
 };
+
+
+
+
 
 
 
@@ -448,8 +213,12 @@ const CreateCampaign = () => {
   const [skippedSteps, setSkippedSteps] = useState([]);
   const [errorProcessingAllowance, setErrorProcessingAllowance] = useState();
 
+  const [disabled, setDisabled] = useState(true); // tracks form validation 
+
   const [processing, setProcessing] = useState(false);
   const navigate = useNavigate();
+
+  const formRef = useRef<ValidatorForm>(null);
 
 
   const steps = getSteps();
@@ -465,6 +234,8 @@ const CreateCampaign = () => {
 
   const handleNext = async (data) => {
     
+    const isFormValid = await formRef.current.isFormValid(false);
+    console.log('valid: ', isFormValid);
     if (activeStep == steps.length - 1) {
       
       setProcessing(true);
@@ -588,6 +359,10 @@ const CreateCampaign = () => {
       );
     }
   };
+
+  const validatorListener = (result) => {
+        setDisabled( !result);
+  }
 
   const handleBack = () => {
     setActiveStep(activeStep - 1);
@@ -713,6 +488,7 @@ const CreateCampaign = () => {
                       
                         {/* <form autoComplete="on" >  */}
                         <ValidatorForm
+                            ref={formRef}
                             onSubmit={() => console.log('submitted')}
                             noValidate autoComplete="off"
                             onError={errors => console.log(errors)}
@@ -720,18 +496,23 @@ const CreateCampaign = () => {
                         {/* onSubmit={methods.handleSubmit(handleNext)} */}
 
                           {activeStep===0 && <>
-                            <TextField
+                            <TextValidator
                               id="token-address"
                               label="Token Address"
                               variant="outlined"
                               placeholder="Enter Your Token Address"
                               required                          
                               fullWidth
+                              value={formData.tokenAddress} 
                               margin="normal"
                               onChange={(e)=> setFormData(prevState => ({
                                   ...prevState,
                                   ['tokenAddress']: e.target.value
                               }))  }
+
+                              validators={['required', 'minStringLength:42']}
+                              errorMessages={['this field is required', 'Minimum of 42 chars is required']}
+                              validatorListener={validatorListener}
                             />
 
                             { formData.tokenAddress && formData.tokenAddress.length>=42 && <><DisplayTokenInfo tokenAddress= {formData.tokenAddress}/></>}
@@ -754,17 +535,17 @@ const CreateCampaign = () => {
                           {/* {getStepContent(activeStep)} */}
 
                           {( activeStep===2 )&& <>
-                            <SaleInfoForm handleFormData={handleInputData} values={formData} nativeCoin={chainData.chain?.nativeCurrency?.symbol} setFormData={setFormData}/>
+                            <SaleInfoForm handleFormData={handleInputData} values={formData} nativeCoin={chainData.chain?.nativeCurrency?.symbol} setFormData={setFormData} validatorListener={validatorListener}/>
                           </>} 
 
                           {( activeStep===3 )&& <>
-                            <FounderInfoForm handleFormData={handleInputData} values={formData} nativeCoin={chainData.chain?.nativeCurrency?.symbol} setFormData={setFormData}/>
+                            <FounderInfoForm handleFormData={handleInputData} values={formData} nativeCoin={chainData.chain?.nativeCurrency?.symbol} setFormData={setFormData} validatorListener={validatorListener}/>
                           </>}
 
                           {( activeStep===4 )&& <>
 
                             <h3>Review and Submit</h3>
-                            <SummaryForm handleFormData={handleInputData} values={formData} nativeCoin={chainData.chain?.nativeCurrency?.symbol} setFormData={setFormData}/>
+                            <SummaryForm handleFormData={handleInputData} values={formData} nativeCoin={chainData.chain?.nativeCurrency?.symbol} setFormData={setFormData} validatorListener={validatorListener}/>
                           </>}
 
                           
@@ -790,7 +571,7 @@ const CreateCampaign = () => {
                             </Button>
                           )}
                           <Button
-                            disabled={ processing}
+                            disabled={ disabled || processing}
                             className={classes.button}
                             variant="contained"
                             color="primary"

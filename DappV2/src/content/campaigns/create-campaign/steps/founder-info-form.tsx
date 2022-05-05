@@ -52,12 +52,22 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+const half = {
+    style:{
+     ml: 0, 
+     mr: 0,
+     marginLeft: 0,
+     marginRight: 0,
+     width: '48%' ,
+     display: 'inline-flex'
+    }
+  }
 
-const FounderInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null }) => {
+const FounderInfoForm = ({  handleFormData, values, nativeCoin, validatorListener,setFormData=null }) => {
   
   return (
     <>
-      <TextField    
+      <TextValidator    
         type="url"       
         label={`Token Logo`}
         variant="outlined"
@@ -68,9 +78,12 @@ const FounderInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null
         onChange={handleFormData("logo")}
         helperText={`Public Url of your token logo`}
         fullWidth
+		validators={['required']}
+        errorMessages={['This field is required',]}
+        validatorListener={validatorListener}
       />
 
-      <TextField    
+      <TextValidator    
         type="url"        
         label={`Website Url`}
         variant="outlined"
@@ -81,10 +94,13 @@ const FounderInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null
         onChange={handleFormData("website")}
         helperText={` `}
         fullWidth
+		validators={['required']}
+        errorMessages={['This field is required',]}
+        validatorListener={validatorListener}
       />
 
-      <TextField    
-        type="text"       
+      <TextValidator    
+        type="url"       
         label={`Twitter Page`}
         variant="outlined"
         placeholder="https://twitter.com/@handle"
@@ -93,11 +109,15 @@ const FounderInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null
         defaultValue={values.twitter}
         onChange={handleFormData("twitter")}
         helperText={`Your twitter handle`}
-        sx={{ ml: 1, width: '48%' }}
+		containerProps={half}
+        sx={{ ml: 1, width: '100%' }}
+		validators={['required']}
+        errorMessages={['This field is required',]}
+        validatorListener={validatorListener}
       />
 
-      <TextField    
-        type="text"        
+      <TextValidator    
+        type="url"        
         label={`Telegram`}
         variant="outlined"
         placeholder="https://t.me/handle"
@@ -106,11 +126,15 @@ const FounderInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null
         defaultValue={values.telegram}
         onChange={handleFormData("telegram")}
         helperText={`Your telegram handle`}
-        sx={{ ml: 1, width: '48%' }}
+		containerProps={half}
+        sx={{ ml: 1, width: '100%' }}
+		validators={['required']}
+        errorMessages={['This field is required',]}
+        validatorListener={validatorListener}
       />
 
-      <TextField    
-        type="text"        
+      <TextValidator    
+        type="url"        
         label={`Discord`}
         variant="outlined"
         placeholder="https://"
@@ -119,7 +143,11 @@ const FounderInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null
         defaultValue={values.discord}
         onChange={handleFormData("discord")}
         helperText={`Your discord handle`}
-        sx={{ ml: 1, width: '48%' }}
+		containerProps={half}
+        sx={{ ml: 1, width: '100%' }}
+		validators={['required']}
+        errorMessages={['This field is required',]}
+        validatorListener={validatorListener}
       />
 
 

@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 
 
-const SaleInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null }) => {
+const SaleInfoForm = ({  handleFormData, values, nativeCoin,validatorListener, setFormData=null }) => {
   
   const handleTokenVestingAmountChange= (index, event) => {
     var list = values.tokenVestings.slice(); // Make a copy of the list first.
@@ -111,6 +111,7 @@ const SaleInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null })
         name="presaleRate"
         validators={['required','isNumber', 'minNumber:0']}
         errorMessages={['this field is required','Only Numbers are allowed', 'Minimum of 0 is required']}
+        validatorListener={validatorListener}
       />
 
       <TextValidator
@@ -127,6 +128,7 @@ const SaleInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null })
         sx={{ ml: 1, width: '100%' }} 
         validators={['required','isNumber', 'minNumber:0']}
         errorMessages={['this field is required','Only Numbers are allowed', 'Minimum of 0 is required']}
+        validatorListener={validatorListener}
       />
       
 
@@ -144,6 +146,7 @@ const SaleInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null })
         sx={{ ml: 1, width: '100%' }} 
         validators={['required','isNumber', 'minNumber:0']}
         errorMessages={['this field is required','Only Numbers are allowed', 'Minimum of 0 is required']}
+        validatorListener={validatorListener}
       />
 
       <TextValidator
@@ -160,6 +163,7 @@ const SaleInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null })
         sx={{ ml: 1, width: '100%' }} 
         validators={['required','isNumber', 'minNumber:0']}
         errorMessages={['this field is required','Only Numbers are allowed', 'Minimum of 0 is required']}
+        validatorListener={validatorListener}
       />
 
       
@@ -178,6 +182,7 @@ const SaleInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null })
         sx={{ ml: 1, width: '100%' }}
         validators={['required','isNumber', 'minNumber:0']}
         errorMessages={['this field is required','Only Numbers are allowed', 'Minimum of 0 is required']}
+        validatorListener={validatorListener}
       />
 
       <TextValidator    
@@ -193,6 +198,7 @@ const SaleInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null })
         sx={{ ml: 1, width: '100%' }}
         validators={['required','isNumber', 'minNumber:0']}
         errorMessages={['this field is required','Only Numbers are allowed', 'Minimum of 0 is required']}
+        validatorListener={validatorListener}
       />
 
       <TextValidator    
@@ -209,6 +215,7 @@ const SaleInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null })
         sx={{ ml: 1, width: '100%' }}
         validators={['required','isNumber', 'minNumber:0']}
         errorMessages={['this field is required','Only Numbers are allowed', 'Minimum of 0 is required']}
+        validatorListener={validatorListener}
       />
 
       <Typography>Sale Date</Typography>
@@ -253,6 +260,7 @@ const SaleInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null })
         sx={{ ml: 1, width: '100%' }}
         validators={['required','isNumber', 'minNumber:60']}
         errorMessages={['this field is required','Only Numbers are allowed', 'Minimum of 60 days is required']}
+        validatorListener={validatorListener}
       />
 
 
@@ -292,6 +300,7 @@ const SaleInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null })
                     sx={{ ml: 1, width: '100%' }}
                     validators={['isNumber', 'minNumber:0']}
                     errorMessages={['Only Numbers are allowed', 'Minimum of 0 is required']}
+                    validatorListener={validatorListener}
                   />
 
                   <TextValidator    

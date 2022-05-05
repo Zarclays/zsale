@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 
 
-const SummaryForm = ({  handleFormData, values, nativeCoin, setFormData=null }) => {
+const SummaryForm = ({  handleFormData, values, nativeCoin,validatorListener, setFormData=null }) => {
   
   return (
     <>
