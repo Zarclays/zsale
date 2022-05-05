@@ -44,12 +44,15 @@ import DateTimePicker from '@mui/lab/DateTimePicker';
 import MobileDateTimePicker from '@mui/lab/MobileDateTimePicker';
 import DesktopDateTimePicker from '@mui/lab/DesktopDateTimePicker';
 import { useNavigate } from "react-router-dom";
+import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
+import SaleInfoForm from './steps/sale-info-form';
 
 const useStyles = makeStyles((theme: Theme) => ({
   button: {
     marginRight: theme.spacing(1),
   },
 }));
+
 
 
 function getSteps() {
@@ -119,231 +122,6 @@ const TokenInfoForm = () => {
 };
 
 
-const SaleInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null }) => {
-  
-  const handleTokenVestingAmountChange= (index, event) => {
-    var list = values.tokenVestings.slice(); // Make a copy of the list first.
-    list[index].amount = event.target.value; // Update it with the modified field.
-    // this.setState({emails: emails}); // Update the state.
-    
-
-    setFormData(prevState => ({
-        ...prevState,
-        ["tokenVestings"]: list
-    }));
-  }
-
-  const handleTokenVestingDayChange= (index, event) => {
-    var list = values.tokenVestings.slice(); // Make a copy of the list first.
-    list[index].releaseDate = event.target.value; // Update it with the modified field.
-    // this.setState({emails: emails}); // Update the state.
-    setFormData(prevState => ({
-        ...prevState,
-        ["tokenVestings"]: list
-    }));
-  }
-
-  return (
-    <Box
-
-      sx={{
-        // m: 1, 
-      }}
-      
-    >
-      <TextField    
-        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}       
-        label="Presale Rate"
-        variant="outlined"
-        placeholder={`How many Tokens will 1 ${nativeCoin??'Coin'} get you?`}
-        fullWidth
-        required
-        margin="normal"
-        defaultValue={values.presaleRate}
-        onChange={handleFormData("presaleRate")}
-        helperText={`How many Tokens will 1 ${nativeCoin??'Coin'} get you?`}
-      />
-
-      <TextField    
-        //type="number" 
-        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}       
-        label={`Soft Cap (${nativeCoin??'Coin'} )`}
-        variant="outlined"
-        placeholder="Soft Cap"
-        required
-        margin="normal"
-        defaultValue={values.softCap}
-        onChange={handleFormData("softCap")}
-        helperText=" "
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-      <TextField    
-        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}        
-        label={`Hard Cap (${nativeCoin??'Coin'} )`}
-        variant="outlined"
-        placeholder="Hard Cap"
-        required
-        margin="normal"
-        defaultValue={values.hardCap}
-        onChange={handleFormData("hardCap")}
-        helperText=" "
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-
-      <TextField    
-        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}        
-        label={`Minimum Order (${nativeCoin??'Coin'} )`}
-        variant="outlined"
-        placeholder="Minimum Buy size"
-        required
-        margin="normal"
-        defaultValue={values.minBuy}
-        onChange={handleFormData("minBuy")}
-        helperText={`Minimum Amount of ${nativeCoin??'Coin'} a buyer can make`}
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-      <TextField    
-        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}        
-        label={`Maximum Order (${nativeCoin??'Coin'} )`}
-        variant="outlined"
-        placeholder="Maximum Buy size"
-        required
-        margin="normal"
-        defaultValue={values.maxBuy}
-        onChange={handleFormData("maxBuy")}
-        helperText={`Maximum Amount of ${nativeCoin??'Coin'}  a buyer can make`}
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-      <TextField    
-        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}        
-        label="Liquidity %"
-        variant="outlined"
-        placeholder="Must be > 50%"
-        required
-        margin="normal"
-        defaultValue={values.liquidity}
-        onChange={handleFormData("liquidity")}
-        helperText="Must be > 50% "
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-      <TextField    
-        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}        
-        label="Dex Listing Rate"
-        variant="outlined"
-        placeholder="Amount 1 Coin gets on DEX"
-        required
-        margin="normal"
-        defaultValue={values.dexRate}
-        onChange={handleFormData("dexRate")}
-        helperText={`Amount of tokens 1 ${nativeCoin??'Coin'} will get when listed on DEX`}
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-      <Typography>Sale Date</Typography>
-
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <DateTimePicker
-          renderInput={(params) => <TextField label="Start Date" {...params} variant="outlined" margin="normal" sx={{ ml: 1, width: '48%' }} required helperText={"Start Date"} />}
-          value={values.startDate}
-          onChange={(newValue) => {
-            setFormData(prevState => ({
-                ...prevState,
-                ["startDate"]: newValue
-            }));
-          }}
-        />
-
-        <DateTimePicker
-          renderInput={(params) => <TextField label="End Date" {...params}  margin="normal" sx={{ ml: 1, width: '48%' }} required helperText={"End Date"}/>}
-          value={values.endDate}
-          onChange={(newValue) => {
-            setFormData(prevState => ({
-                ...prevState,
-                ["endDate"]: newValue
-            }));
-          }}
-        />
-
-      </LocalizationProvider>
-
-
-      <TextField    
-        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}        
-        label="Liquidity Lockup (in Days)"
-        variant="outlined"
-        placeholder=""
-        required
-        margin="normal"
-        defaultValue={values.liquidtyLockup}
-        onChange={handleFormData("liquidtyLockup")}
-        helperText={`How long to lock up Liquidity on DEX`}
-        sx={{ ml: 1, width: '48%' }}
-      />
-
-
-      <FormGroup>
-        <FormControlLabel control={
-          <Checkbox checked={values.useTokenVesting} onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
-          setFormData(prevState => ({
-              ...prevState,
-              ['useTokenVesting']: evt.target.checked
-          }))
-
-          }} />
-        } label="Use Token Vesting" />
-        
-      </FormGroup>
-
-
-      {values.useTokenVesting && <Box >
-
-        {values.tokenVestings.map((vst, index) => 
-            
-                <div key={index} className="input-group">
-
-                  <strong> {index + 1} </strong>
-
-                  <TextField    
-                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}        
-                    label="Amount to vest"
-                    variant="outlined"
-                    placeholder=""
-                    required
-                    margin="normal"
-                    defaultValue={vst.amount}
-                    onChange={(ev) => handleTokenVestingAmountChange(index, ev)}
-                    helperText={`How many tokens to lock`}
-                    sx={{ ml: 1, width: '48%' }}
-                  />
-
-                  <TextField    
-                    type="datetime"       
-                    label="Lock Duration"
-                    variant="outlined"
-                    placeholder=""
-                    required
-                    margin="normal"
-                    defaultValue={vst.releaseDate}
-                    onChange={(ev) => handleTokenVestingDayChange(index, ev)}
-                    helperText={`Days till locked tokens are released `}
-                    sx={{ ml: 1, width: '48%' }}
-                  />
-                    
-                </div>
-            
-        ) }      
-
-
-      </Box>}
-      
-    </Box>
-  );
-};
 
 const FounderInfoForm = ({  handleFormData, values, nativeCoin, setFormData=null }) => {
   
@@ -604,42 +382,11 @@ const SummaryForm = ({  handleFormData, values, nativeCoin, setFormData=null }) 
   );
 };
 
-function getStepContent( step) {
-  
-  switch (step) {
-    case 0:
-      return <TokenInfoForm />;
 
-    case 1:
-      return <SaleInfoForm handleFormData={null} values={undefined} nativeCoin={null}/>;
-    case 2:
-      return <FounderInfoForm handleFormData={null} values={undefined} nativeCoin={null}/>;
-    case 3:
-      return <SummaryForm handleFormData={null} values={undefined} nativeCoin={null}/>;
-    default:
-      return "unknown step";
-  }
-}
 
 const CreateCampaign = () => {
   const classes = useStyles();
-  const methods = useForm({
-    defaultValues: {
-      tokenAddress: "",
-      softCap: "",
-      hardCap: "",
-      presaleRate: "",
-      minBuy: 0,
-      maxBuy: 10,
-      liquidity: "",
-      dexRate: "",
-      startDate: "",
-      endDate: "",
-      liquidtyLockup: 365,
-      cardYear: "",
-      useTokenVesting: false
-    },
-  });
+  
 
   const [{ data: accountData, error: accountError, loading: accountLoading }, disconnect] = useAccount()
   const [{ data: chainData, error: chainError, loading: chainLoading }] = useNetwork()
@@ -964,7 +711,12 @@ const CreateCampaign = () => {
                   ) : (
                     <>
                       
-                        <form autoComplete="on" > 
+                        {/* <form autoComplete="on" >  */}
+                        <ValidatorForm
+                            onSubmit={() => console.log('submitted')}
+                            noValidate autoComplete="off"
+                            onError={errors => console.log(errors)}
+                        >
                         {/* onSubmit={methods.handleSubmit(handleNext)} */}
 
                           {activeStep===0 && <>
@@ -1003,7 +755,7 @@ const CreateCampaign = () => {
 
                           {( activeStep===2 )&& <>
                             <SaleInfoForm handleFormData={handleInputData} values={formData} nativeCoin={chainData.chain?.nativeCurrency?.symbol} setFormData={setFormData}/>
-                          </>}
+                          </>} 
 
                           {( activeStep===3 )&& <>
                             <FounderInfoForm handleFormData={handleInputData} values={formData} nativeCoin={chainData.chain?.nativeCurrency?.symbol} setFormData={setFormData}/>
@@ -1048,7 +800,8 @@ const CreateCampaign = () => {
                             {activeStep === steps.length - 1 ? "Finish" : "Next"} 
                             {processing && <CircularProgress color="secondary" />}
                           </Button>
-                        </form>
+                        {/* </form> */}
+                        </ValidatorForm>
                       
                     </>
                   )}
