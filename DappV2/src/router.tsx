@@ -19,7 +19,6 @@ const Overview = Loader(lazy(() => import('src/content/overview')));
 
 // Dashboards
 
-
 // Campaigns
 const CreateCampaign = Loader(lazy(() => import('src/content/campaigns/create-campaign/index')));
 const CampaignList = Loader(lazy(() => import('src/content/campaigns/campaign-list')));
@@ -123,7 +122,7 @@ const routes: RouteObject [] = [
         element: <CreateCampaign />
       },
       {
-        path: ':campaignId',
+        path: ':chain/:campaignId',
         element: <CampaignPage />
       }
     ]

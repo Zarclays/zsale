@@ -25,6 +25,7 @@ import {Contract} from 'ethers';
 import { getDateFromEther, formatEtherDateToJs } from '../../utils/date';
 import { useNavigate } from "react-router-dom";
 import PostponeSaleDialog from './postpone-sale-dialog';
+import chainNames from 'src/constants/chain-names';
 
 
 function formatPercent(value){
@@ -40,21 +41,59 @@ const CountDown_Ongoing = () => <div style={{"marginBottom": "1rem"}}><strong>St
 
 function CampaignPage() {
   // get the username from route params
-  const { campaignId } = useParams();
-  const [{ data: chainData, error: chainError, loading: chainLoading }] = useNetwork()
+  const { campaignId, chain } = useParams();
+  // console.log('chain:', chain, ', id:', chainNames[chain])
+  
+  const [chainId,setChainId] = useState(chainNames[chain]);
 
-  const [{ data: signer, error: signerError, loading: signerLoading }, getSigner] = useSigner();
+  
+  
+  
+  const navigate = useNavigate();
+  const [{ data: chainData, error: chainError, loading: chainLoading }, switchNetwork] = useNetwork()
 
-  const [chainId,setChainId] = useState(31337);
+
+  //init load
+  useEffect(()=>{
+
+    if(switchNetwork){
+      try{
+        switchNetwork(chainId);
+      }catch{
+
+      }
+      
+    }
+    
+    
+  }, [switchNetwork])
+
+  const [{ data: signer, error: signerError, loading: signerLoading }, getSigner] = useSigner();  
 
   const provider = useProvider();
-  
-  useEffect(()=>{
-    setChainId(chainData.chain?.id??31337 );
-  }, [chainData])
+
+  // useEffect(()=>{
+  //   // setChainId(chainData.chain?.id??31337 );
+  //   console.log('chainId from url :', chainId, ', chain id on wallet:', chainData.chain?.id)
+  //   if(chainId != chainData.chain?.id??31337){ //if user changes network, navigate to  campaigns list page
+  //     let selectedChain ;
+  //     for (const c in chainNames) {
+  //       if(chainNames[c]=== chainData.chain?.id){
+  //         selectedChain=c;
+  //         break;
+  //       }
+  //     }
+  //     console.log('selectedChain:', selectedChain)
+  //     if(selectedChain){
+  //       navigate(`/campaigns/${selectedChain}/${campaignId}`)
+  //     }
+  //   }
+    
+    
+  // }, [chainLoading, chainData])
 
   const [{ data: account, error: accountError, loading: acctLoading }] = useAccount()
-  const navigate = useNavigate();
+  
 
   const [amount, setAmount] = useState(1);
   const [openPostponeDialog, setOpenPostponeDialog] = useState(false);
