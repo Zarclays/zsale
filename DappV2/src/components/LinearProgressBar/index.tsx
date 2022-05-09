@@ -10,11 +10,20 @@ export default function LinearProgressBar(props: LinearProgressProps & { amount:
     progress = 100 * parseFloat(props.amount)/ parseFloat(props.hardCap);
   }
 
+  const {classes, color, sx, valueBuffer} = props;
+
+    
+
   
   return (
     <div >
       <Box sx={{ width: '100%', mr: 1 }}>
-        <LinearProgress variant="determinate" {...props} value={progress} />
+        <LinearProgress sx={sx}
+          color={color}
+          classes={classes} 
+          variant="determinate" 
+          valueBuffer={valueBuffer} 
+          value={progress} />
       </Box>
       <br/>
       <Box  sx={{ display: 'flex', alignItems: 'center', minWidth: 35 }}>

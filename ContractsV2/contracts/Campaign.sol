@@ -494,6 +494,26 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   }
 
   /**
+  * @dev Withdraw owner tokens If this project does not reach softcap
+  */
+  function withdrawOwnerTokens () public   onlyOwner {
+    
+    
+    require(status== CampaignStatus.FAILED, 'Campaign: Can only withdraw if Campaign Cancelled');
+
+    
+    require(block.timestamp >= saleInfo.saleEndTime || totalCoinReceived>= saleInfo.hardCap  , "CAMPAIGN: ongoing sales");
+
+    
+    
+    IERC20 _token = IERC20(saleInfo.tokenAddress);
+    uint256 tokensAmount = _token.balanceOf(address(this));
+    
+    require(tokensAmount > 0, "CAMPAIGN: No Tokens to claim");
+    _token.safeTransfer(msg.sender, tokensAmount);
+  }
+
+  /**
     * Setup liquidity and transfer all amounts according to defined percents, if softcap not reached set Refunded flag
     */
   function finalizeAndSetupLiquidity() public {

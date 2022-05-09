@@ -92,17 +92,19 @@ function CampaignPage() {
     
   // }, [chainLoading, chainData])
 
+  
+
   const [{ data: account, error: accountError, loading: acctLoading }] = useAccount()
   
 
   const [amount, setAmount] = useState(1);
   const [openPostponeDialog, setOpenPostponeDialog] = useState(false);
 
+  const [isOwner, setIsOwner] = useState(false);
+
   const handleSubmitParticipate = async (event) => {
 
-    event.preventDefault();
-
-    
+    event.preventDefault();  
         
     const campaignContract = new Contract(campaignDetails.campaignAddress, CampaignABI, signer);
     // not defining `data` field will use the default value - empty data
@@ -135,19 +137,58 @@ function CampaignPage() {
     if(newStart && newEnd){
       
       const campaignContract = new Contract(campaignDetails.campaignAddress, CampaignABI, signer);
-      // not defining `data` field will use the default value - empty data
+      
       let tx = await campaignContract.postponeSale( newStart.getTime()/1000, newEnd.getTime()/1000 );
       let txRes = await tx.wait();    
-      console.log("Send finished!" , txRes)
+      // console.log("Send finished!" , txRes)
       alert('Your Campaign  has been postponed succesfully');
       window.location.reload(); // navigate(`/campaigns/${campaignId}`);
     }
         
 
   };
-  
 
-  
+  const cancelSale = async () => {
+    if(window.confirm('Are you sure you want to Cancel this Campaign?')){
+      const campaignContract = new Contract(campaignDetails.campaignAddress, CampaignABI, signer);
+      
+      let tx = await campaignContract.cancelCampaign( );
+      let txRes = await tx.wait();
+      
+      alert('Your Campaign  has been cancelled succesfully');
+      window.location.reload(); // navigate(`/campaigns/${campaignId}`);
+    }
+  };
+
+  const finalizeSale = async () => {
+    const campaignContract = new Contract(campaignDetails.campaignAddress, CampaignABI, signer);
+      
+      let tx = await campaignContract.finalizeAndSetupLiquidity( );
+      let txRes = await tx.wait();
+      
+      alert('Campaign  has been finalized succesfully');
+      window.location.reload(); // navigate(`/campaigns/${campaignId}`);
+  };
+
+  const withdrawInvestorTokens = async () => {
+	  const campaignContract = new Contract(campaignDetails.campaignAddress, CampaignABI, signer);
+      
+      let tx = await campaignContract.withdrawFunds( );
+      let txRes = await tx.wait();
+      
+      alert('Campaign  funds has been sent to you succesfully');
+      window.location.reload(); // navigate(`/campaigns/${campaignId}`);
+  };
+
+  const withdrawOwnerTokens = async () => {
+    const campaignContract = new Contract(campaignDetails.campaignAddress, CampaignABI, signer);
+      
+      let tx = await campaignContract.withdrawOwnerTokens( );
+      let txRes = await tx.wait();
+      
+      alert('Campaign  funds has been sent to you succesfully');
+      window.location.reload(); // navigate(`/campaigns/${campaignId}`);
+  };
   
 
   const { value: campaignDetails, error: campaignGetError, loading: cLoading }  = useGetCampaign(contractList[chainId]?.campaignList??'0x0', campaignId, signer );
@@ -160,10 +201,17 @@ function CampaignPage() {
   }
 
   useEffect(()=>{
-    if(campaignDetails && getDateFromEther( campaignDetails.saleStartTime).getTime() < Date.now() && getDateFromEther( campaignDetails.saleEndTime).getTime() > Date.now()  ){
-      setIsOpenForPayment(true);
+    if(campaignDetails && account){
+      if(getDateFromEther( campaignDetails.saleStartTime).getTime() < Date.now() && getDateFromEther( campaignDetails.saleEndTime).getTime() > Date.now()  ){
+        setIsOpenForPayment(true);
+      }else{
+        setIsOpenForPayment(false);
+      }
+  
+      setIsOwner (campaignDetails.owner === account.address);
     }
-  }, [campaignDetails])
+    
+  }, [provider, account, campaignDetails])
   
   const nativeCoin = chainData.chain?.nativeCurrency;
 
@@ -186,7 +234,7 @@ function CampaignPage() {
   }else if( campaignGetError ){
     // console.log('campaignGetError:', campaignGetError, 'cLoading', cLoading )
     return <>
-      {/* <h3>Error Loading Campaign Data</h3> */}
+      <h3>Error Loading Campaign Data or Cannot find Campaign</h3>
     </>
   }
 
@@ -332,24 +380,33 @@ function CampaignPage() {
                             {campaignDetails && campaignDetails.owner == account.address && <Box  sx={{ p: 1, m:1,  border: '1px dashed grey' }}>
                               
                               
-                              {(getDateFromEther( campaignDetails.saleStartTime).getTime() > Date.now()) && <>
+                              {(true || (getDateFromEther( campaignDetails.saleStartTime).getTime() > Date.now()) ) && <>
                               
                                 <Button variant="contained" onClick={postponeSale} sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="primary" >
                                   Postpone Sale
                                 </Button>
-                                <Button variant="contained"  sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="warning" >
+                                <Button variant="contained" onClick={cancelSale}  sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="warning" >
                                   Cancel Sale
                                 </Button>
                               </>}
 
                               
 
-                              {(getDateFromEther( campaignDetails.saleEndTime).getTime() > Date.now()) && <>
+                              {(true || (getDateFromEther( campaignDetails.saleEndTime).getTime() > Date.now() && isOwner) ) && <>
                               
-                                <Button variant="contained"  sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="success" >
+                                <Button variant="contained" onClick={finalizeSale}  sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="success" >
                                   Finalize Sale
                                 </Button> 
                                 <Button variant="contained" sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="info" >
+                                  Withdraw Owner tokens
+                                </Button>
+                              </>
+                              }
+
+                              {(true || (getDateFromEther( campaignDetails.saleEndTime).getTime() > Date.now() && !isOwner) ) && <>
+                              
+                                
+                                <Button variant="contained" onClick={withdrawInvestorTokens} sx={{ marginLeft: '1rem',  marginTop: '1rem'}} color="info" >
                                   Withdraw your tokens
                                 </Button>
                               </>
