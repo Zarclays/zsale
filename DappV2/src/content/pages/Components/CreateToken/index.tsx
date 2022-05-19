@@ -4,6 +4,7 @@ import DangerousIcon from '@mui/icons-material/Dangerous';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Footer from "src/components/Footer";
 import React, {useEffect, useState} from "react";
+import SimpleERC20 from "./simpleerc20";
 
 import {
     Typography,
@@ -21,6 +22,8 @@ import {
 import PageTitle from "src/components/PageTitle";
 import { SafetyDividerOutlined, SafetyDividerTwoTone } from "@mui/icons-material";
 import { display } from "@mui/system";
+import BurnMintableERC20 from "./burnmintableerc20";
+import StandardERC20 from "./standarderc20";
 
 function CreateToken() {
 
@@ -43,7 +46,8 @@ function CreateToken() {
             justifyContent={"left"}
             alignItems="stretch"
             spacing={3}
-            marginTop={5}>
+            marginTop={5}
+            marginBottom={5}>
 
                 {/* Simple ERC20 Token */}
                 <Grid item
@@ -239,73 +243,9 @@ function CreateToken() {
                     </Card>
                 </Grid>
 
-                 {/* Common ERC20 Token */}
-                 <Grid item
-                xs={4}>
-                    <Card>
-                        <Box>
-                            <CardContent sx={{flex: '1 0 auto'}}>
-                                <Typography component={"h1"}
-                                 variant="h1" 
-                                 align={"center"}>BurnMintableERC20</Typography>
-                                 <Typography variant="h3" align="center">0.2 ETH</Typography>
-                                 <Divider/>
-                                 <Typography >ERC20 Compliant </Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Verified Source Code </Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Detailed</Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Customizable Decimals </Typography>
-                                 <DangerousIcon 
-                                 style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography >Remove Copyright </Typography>
-                                 <DangerousIcon 
-                                 style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography >Supply Type</Typography>
-                                 <Typography 
-                                 component="p" 
-                                 style={{backgroundColor: "yellow", 
-                                 width: 40, fontWeight: 600}}>Fixed</Typography>
-                                 <Divider/>
-                                 <Typography >Access Type</Typography>
-                                 <Typography component="p" style={{backgroundColor: "yellow", 
-                                 width: 40, fontWeight: 600}}>None</Typography>
-                                 <Divider/>
-                                 <Typography >Transfer Limit</Typography>
-                                 <Typography component="p" 
-                                 style={{backgroundColor: "yellow", 
-                                 width: 40, fontWeight: 600}}>1K Daily</Typography>
-                                 <Divider/>
-                                 <Typography>Burnable</Typography>
-                                 <DangerousIcon style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography>Mintable</Typography>
-                                 <DangerousIcon style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography>ERC1363</Typography>
-                                 <DangerousIcon style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography>Token Recover</Typography>
-                                 <DangerousIcon style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Button>Create</Button>
-                            </CardContent>
-                        </Box>
-                    </Card>
-                </Grid>
-
                 {/* End Of Plans */}
             </Grid>
-            <Footer/>
+            <StandardERC20/>
         </Container>
         </>
     )

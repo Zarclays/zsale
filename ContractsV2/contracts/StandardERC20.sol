@@ -6,9 +6,13 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract StandardERC20 is ERC20{
 
-    // uint public decimals;
-    constructor(string memory name, string memory symbol, uint decimals, uint256 totalSupply) ERC20(name, symbol){
+    uint8 _decimals;
+    constructor(string memory name, string memory symbol, uint decimals, uint256 totalSupply, uint8 decimals) ERC20(name, symbol){
         _mint(msg.sender, totalSupply);
-        // it should print out authors decimal not default erc20 decimal till woking on it
+        _decimals = decimals;
+    }
+
+    function decimals() public view virtual override returns(uint8){
+        return _decimals;
     }
 }
