@@ -13,21 +13,40 @@ import CampaignListABI from '../../constants/campaign-list-abi.json';
 import { useAsync } from 'react-use';
 import {Contract} from 'ethers';
 import CampaignListItem from './campaign-list-item';
+import chainNames from '../../constants/chain-names';
 
 
 
 function CampaignList() {
 
-  // const { chain } = useParams();
-  const [{ data: chainData, error: chainError, loading: chainLoading }] = useNetwork()
+  const { chain } = useParams();
+
+  const [chainId,setChainId] = useState(chainNames[chain]);
+
+  const [{ data: chainData, error: chainError, loading: chainLoading }, switchNetwork] = useNetwork()
 
   const [{ data: signer, error: signerError, loading: signerLoading }, getSigner] = useSigner({
     skip: false,
   });
+
+  //init load
+  useEffect(()=>{
+
+    if(switchNetwork){
+      try{
+        switchNetwork(chainId);
+      }catch{
+
+      }      
+    }   
+    
+  }, [switchNetwork])
   
   const nativeCoin = chainData.chain?.nativeCurrency;
 
-  const [chainId,setChainId] = useState(31337);
+  
+
+  const [loading,setLoading] = useState(true);
 
   const [campaigns,setCampaigns] = useState([]);
 
@@ -36,10 +55,14 @@ function CampaignList() {
         contractInterface: CampaignListABI,
         signerOrProvider: signer
     });  
+
+  
   
   useAsync(async ()=>{
     const count = await campaignListContract.campaignSize();
-    
+    setCampaigns([])
+    // setLoading((p)=>false)
+    console.log('lading 1', loading)
     await Promise.all(
       Array(parseInt(count.toString() ))
         .fill(undefined)
@@ -54,14 +77,25 @@ function CampaignList() {
           
         })
     );
+    
+    
   }, [chainId, campaignListContract])
 
     
   useEffect(()=>{
     if(chainData && chainData.chain){
       setChainId(chainData.chain?.id??31337 );
+      
     }
   }, [chainData])
+
+  useEffect(()=>{
+    console.log('lading 3', loading)
+    if(campaigns && campaigns.length>0){
+      console.log('updating loading 3', loading)
+      setLoading(false)
+    }
+  }, [campaigns])
 
   
 
@@ -83,10 +117,15 @@ function CampaignList() {
         >
           <Grid item xs={12}>
             <h2>
-                All Campaigns
+                All Campaigns 
             </h2>
 
-            <div>
+
+            {loading && <>
+              <h3 className="loading" >Loading... </h3>
+            </>}
+
+            {!loading && <div>
               {campaigns.map((campaignAddress, i) => (
                 <div key={i}>
                   
@@ -100,7 +139,7 @@ function CampaignList() {
                 </div>
                 
               ))}
-            </div>
+            </div>}
 
 
           </Grid>

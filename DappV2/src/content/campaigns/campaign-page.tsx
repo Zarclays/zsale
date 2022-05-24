@@ -25,7 +25,7 @@ import {Contract} from 'ethers';
 import { getDateFromEther, formatEtherDateToJs } from '../../utils/date';
 import { useNavigate } from "react-router-dom";
 import PostponeSaleDialog from './postpone-sale-dialog';
-import chainNames from 'src/constants/chain-names';
+import chainNames from '../../constants/chain-names';
 
 
 function formatPercent(value){

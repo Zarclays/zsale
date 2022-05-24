@@ -502,7 +502,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     require(status== CampaignStatus.FAILED, 'Campaign: Can only withdraw if Campaign Cancelled');
 
     
-    require(block.timestamp >= saleInfo.saleEndTime || totalCoinReceived>= saleInfo.hardCap  , "CAMPAIGN: ongoing sales");
+    require(block.timestamp >= saleInfo.saleEndTime , "CAMPAIGN: Can only withdraw after End date");
 
     
     

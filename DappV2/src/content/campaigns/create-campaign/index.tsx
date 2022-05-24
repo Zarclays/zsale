@@ -86,7 +86,14 @@ const TokenInfoForm = (values, handleFormData) => {
   //const tokenAddress = useWatch({ control, name: "tokenAddress" });
 
   const [tokenAddress, setTokenAddress] = useState('');
-    
+  const [alignment, setAlignment] = React.useState('web');
+
+  const handleChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newAlignment: string,
+  ) => {
+    setAlignment(newAlignment);
+  };  
   // const watchTokenAddress = watch("tokenAddress", ''); // you can supply default value as second argument
 
   // // Callback version of watch.  It's your responsibility to unsubscribe when done.
@@ -97,6 +104,16 @@ const TokenInfoForm = (values, handleFormData) => {
 
   return (
     <>
+      <ToggleButtonGroup
+        color="primary"
+        value={alignment}
+        exclusive
+        onChange={handleChange}
+      >
+        <ToggleButton value="web">Web</ToggleButton>
+        <ToggleButton value="android">Android</ToggleButton>
+        <ToggleButton value="ios">iOS</ToggleButton>
+      </ToggleButtonGroup>
       <TextValidator
              
         label="Token Address"
@@ -196,7 +213,7 @@ const CreateCampaign = () => {
 
   const [{ data: allowanceData, error:allowanceError, loading: allowanceLoading }, read] = useContractRead(
     {
-      addressOrName: (!formData.tokenAddress || formData.tokenAddress=='' ) ?'0x1f9840a85d5af5bf1d1762f925bdaddc4201f984': formData.tokenAddress,
+      addressOrName:  formData.tokenAddress,
       contractInterface: erc20ABI,
     },
     'allowance',
@@ -235,7 +252,7 @@ const CreateCampaign = () => {
   const handleNext = async (data) => {
     
     const isFormValid = await formRef.current.isFormValid(false);
-    console.log('valid: ', isFormValid);
+    
     if (activeStep == steps.length - 1) {
       
       setProcessing(true);

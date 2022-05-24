@@ -108,13 +108,22 @@ const routes: RouteObject [] = [
         path: '/campaigns',
         element: (
           <Navigate
-            to="/campaigns/list"
+            to="/campaigns/list/mtrt"
             replace
           />
         )
       },
+      // {
+      //   path: '/campaigns',
+      //   element: (
+      //     <Navigate
+      //       to="/campaigns/list"
+      //       replace
+      //     />
+      //   )
+      // },
       {
-        path: 'list',
+        path: 'list/:chain',
         element: <CampaignList />
       },
       {
