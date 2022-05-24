@@ -24,6 +24,8 @@ interface IUser {
 export class DashboardComponent implements OnInit {
   //@ts-ignore
   checkbox ;
+  singleModel = '1'
+  checkModel: { left?: boolean; middle?: boolean; right?: boolean } = { left: false, middle: true, right: false };
 
   model = {
     left: true,

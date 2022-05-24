@@ -4,7 +4,27 @@
     <div class="row">
       <div class="col-12 col-md-6">
         <h3>1</h3>
-        <div class="btn-group" role="group">
+
+        <pre class="card card-block card-header">{{singleModel}}</pre>
+<button type="button" class="btn btn-primary"
+        [(ngModel)]="singleModel" btnCheckbox
+        [btnCheckboxTrue]="1" [btnCheckboxFalse]="0">
+  Single Toggle
+</button>
+
+
+        <pre class="card card-block card-header">{{checkModel | json}}</pre>
+ 
+<div class="btn-group">
+  <label class="btn btn-primary" [(ngModel)]="checkModel.left"
+         btnCheckbox tabindex="0" role="button">Left</label>
+  <label class="btn btn-primary" [(ngModel)]="checkModel.middle"
+         btnCheckbox tabindex="0" role="button">Middle</label>
+  <label class="btn btn-primary" [(ngModel)]="checkModel.right"
+         btnCheckbox tabindex="0" role="button">Right</label>
+</div>
+
+        <!-- <div class="btn-group" role="group">
           <label class="btn-primary" ngbButtonLabel>
             <input type="checkbox" class="btn-check" ngbButton [(ngModel)]="model.left"> Left (pre-checked)
           </label>
@@ -16,7 +36,7 @@
           </label>
         </div>
         <hr>
-        <pre>{{model | json}}</pre>
+        <pre>{{model | json}}</pre> -->
       </div>
       <div class="col-12 col-md-6">
         <h3>2</h3>

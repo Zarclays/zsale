@@ -46,7 +46,7 @@ import {
 
 import { IconModule, IconSetService } from '@coreui/icons-angular';
 // import { NgHelmetModule } from "ng-helmet";
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+// import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
@@ -90,7 +90,7 @@ const APP_CONTAINERS = [
     // NgHelmetModule.forRoot({
     //   baseTitle: "| ZSale",
     // }),
-    NgbModule,
+    // NgbModule,
   ],
   providers: [
     {
