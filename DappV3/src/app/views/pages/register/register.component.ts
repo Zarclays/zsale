@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-register',
@@ -7,6 +8,10 @@ import { Component } from '@angular/core';
 })
 export class RegisterComponent {
 
-  constructor() { }
+  constructor(private titleService: Title) { }
+
+  ngOnInit(){
+    this.titleService.setTitle('Register | ZSale');
+  }
 
 }

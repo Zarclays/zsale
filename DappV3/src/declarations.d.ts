@@ -7,3 +7,8 @@ declare module '*.json' {
   export default value;
 }
 
+interface Window {
+  ethereum?: any,
+  web3?: any,
+  celo?: any
+}

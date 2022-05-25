@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-
+import { Title } from '@angular/platform-browser';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -7,6 +7,10 @@ import { Component } from '@angular/core';
 })
 export class LoginComponent {
 
-  constructor() { }
+  constructor(private titleService: Title) { }
+
+  ngOnInit(){
+    this.titleService.setTitle('Login | ZSale');
+  }
 
 }
