@@ -34,11 +34,14 @@
     "allowSyntheticDefaultImports": true
   },
   "angularCompilerOptions": {
+
+    "allowSyntheticDefaultImports": true,
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
+    "noImplicitAny": false,
     "strictTemplates": true,
-    "allowSyntheticDefaultImports": true
+    "strictNullChecks": false
   },
   "files": [],
   "references": [

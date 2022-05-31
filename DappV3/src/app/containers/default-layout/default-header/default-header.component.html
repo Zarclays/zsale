@@ -28,9 +28,16 @@
       </c-nav-item>
     </c-header-nav>
 
-    <button class="btn btn-primary btn-lg" (click)="connect()">Connect</button>
-    <div>
-      <div id="todo-list">
+    <select aria-label="Network" cSelect class="my-2 me-2 w-auto" [ngModel]="selectedNetwork"  (ngModelChange)="onSwitchNetwork($event)" > 
+      <option value="">Choose Network</option>
+      <option *ngFor="let network of networkList" [value]="network.chainId">
+        {{network.name}}
+      </option>
+      
+    </select>
+    <button *ngIf="!web3Service.provider" class="btn btn-primary btn-lg" (click)="connect()">Connect</button>
+    <div *ngIf="web3Service.provider" class="card border">
+      <div class="card-body" >
         <span *ngFor="let acct of web3Service.accounts$ | async" >
             {{acct}} |
         </span>

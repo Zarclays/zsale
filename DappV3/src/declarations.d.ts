@@ -8,7 +8,7 @@ declare module '*.json' {
 }
 
 interface Window {
-  ethereum?: any,
-  web3?: any,
-  celo?: any
+  ethereum: any,
+  web3: any,
+  celo: any
 }

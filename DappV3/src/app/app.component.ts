@@ -33,7 +33,7 @@ export class AppComponent implements OnInit {
     });
   }
 
-  async connect (){
-    await this.web3Service.connect();
-  }
+  // async connect (){
+  //   await this.web3Service.connect();
+  // }
 }
