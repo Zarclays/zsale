@@ -2,11 +2,16 @@ import { Helmet } from "react-helmet-async";
 import PageTitleWrapper from "src/components/PageTitleWrapper";
 import DangerousIcon from '@mui/icons-material/Dangerous';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
 import Footer from "src/components/Footer";
 import React, {useEffect, useState} from "react";
 import SimpleERC20 from "./simpleerc20";
 
 import {
+    List,
+    ListItem,
+    IconButton,
+    ListItemText,
     Typography,
     Button,
     Card,
@@ -17,10 +22,12 @@ import {
     Divider,
     Grid,
     CardContent,
-    CardHeader
+    CardHeader,
+    ListItemIcon,
+    ListSubheader
 } from '@mui/material';
 import PageTitle from "src/components/PageTitle";
-import { SafetyDividerOutlined, SafetyDividerTwoTone } from "@mui/icons-material";
+import { Check, Fullscreen, Grid3x3, SafetyDividerOutlined, SafetyDividerTwoTone } from "@mui/icons-material";
 import { display } from "@mui/system";
 import BurnMintableERC20 from "./burnmintableerc20";
 import StandardERC20 from "./standarderc20";
@@ -43,209 +50,225 @@ function CreateToken() {
         <Container maxWidth="lg">
             <Grid
             container
-            justifyContent={"left"}
+            justifyContent={"center"}
             alignItems="stretch"
             spacing={3}
             marginTop={5}
             marginBottom={5}>
 
+
                 {/* Simple ERC20 Token */}
                 <Grid item
                 alignItems={"stretch"}
-                xs={4}
-                >
-                    <Card>
-                        <Box sx={{display: 'flex', flexDirection: 'row'}}>
-                            <CardContent sx={{flex: '1 0 auto', width: 'fullWidth'}}>
-                                <Typography component={"h1"}
-                                 variant="h1" 
-                                 align={"center"}>SimpleERC20</Typography>
-                                 <Typography variant="h3" align="center">0.035 ETH</Typography>
-                                 <Divider/>
-                                 <Typography >ERC20 Compliant </Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Verified Source Code </Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Detailed</Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Customizable Decimals </Typography>
-                                 <DangerousIcon 
-                                 style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography >Remove Copyright </Typography>
-                                 <DangerousIcon 
-                                 style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography >Supply Type</Typography>
-                                 <Typography 
-                                 component="p" 
-                                 style={{backgroundColor: "yellow", 
-                                 width: 40, fontWeight: 600}}>Fixed</Typography>
-                                 <Divider/>
-                                 <Typography >Access Type</Typography>
-                                 <Typography component="p" style={{backgroundColor: "yellow", 
-                                 width: 40, fontWeight: 600}}>None</Typography>
-                                 <Divider/>
-                                 <Typography >Transfer Limit</Typography>
-                                 <Typography component="p" 
-                                 style={{backgroundColor: "yellow", 
-                                 width: 40, fontWeight: 600}}>1K Daily</Typography>
-                                 <Divider/>
-                                 <Typography>Burnable</Typography>
-                                 <DangerousIcon style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography>Mintable</Typography>
-                                 <DangerousIcon style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography>ERC1363</Typography>
-                                 <DangerousIcon style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography>Token Recover</Typography>
-                                 <DangerousIcon style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Button>Create</Button>
-                            </CardContent>
-                        </Box>
-                    </Card>
-                </Grid>
-
-                 {/* Standard ERC20 Token */}
-                 <Grid item
                 xs={4}>
-                    <Card>
-                        <Box>
-                            <CardContent sx={{flex: '1 0 auto'}}>
-                                <Typography component={"h1"}
-                                 variant="h1" 
-                                 align={"center"}>StandardERC20</Typography>
-                                 <Typography variant="h3" align="center">0.075 ETH</Typography>
-                                 <Divider/>
-                                 <Typography >ERC20 Compliant </Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Verified Source Code </Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Detailed</Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Customizable Decimals </Typography>
-                                 <DangerousIcon 
-                                 style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography >Remove Copyright </Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Supply Type</Typography>
-                                 <Typography 
-                                 component="p" 
-                                 style={{backgroundColor: "yellow", 
-                                 width: 40, fontWeight: 600}}>Fixed</Typography>
-                                 <Divider/>
-                                 <Typography >Access Type</Typography>
-                                 <Typography component="p" style={{backgroundColor: "yellow", 
-                                 width: 40, fontWeight: 600}}>None</Typography>
-                                 <Divider/>
-                                 <Typography >Transfer Limit</Typography>
-                                 <Typography component="p" 
-                                 style={{backgroundColor: "yellow", 
-                                 width: 40, fontWeight: 600}}>10K Daily</Typography>
-                                 <Divider/>
-                                 <Typography>Burnable</Typography>
-                                 <DangerousIcon style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography>Mintable</Typography>
-                                 <DangerousIcon style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography>ERC1363</Typography>
-                                 <DangerousIcon style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography>Token Recover</Typography>
-                                 <DangerousIcon style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Button>Create</Button>
-                            </CardContent>
-                        </Box>
-                    </Card>
+                    <List
+                    sx={{width: "100%", 
+                    bgcolor: "background.paper", 
+                    paddingTop: 4, 
+                    paddingBottom: 3, 
+                    borderRadius: 2,}}
+                    subheader={
+                    <ListSubheader 
+                    style={{fontSize: 25, 
+                    color: "black", 
+                    textAlign: "center", fontWeight: 500,}}>Simple ERC20</ListSubheader>}>
+                        <Typography textAlign={"center"} fontSize={20}>ETH 0.035</Typography>
+                        <ListItem>
+                        <ListItemText id="erc20-compliance" primary="ERC20 Compliance"/>
+                        <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="verified-code" primary="Verified Source Code"/>
+                            <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="detailed" primary="Detailed"/>
+                            <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="customize-decimal" primary="Customizable Decimal"/>
+                            <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="remove-copyright" primary="Remove Copyright"/>
+                            <DangerousIcon style={{color: "red"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="supply-type" primary="Supply Type"/>
+                            <Typography style={{backgroundColor: "darkgoldenrod", padding: 4, borderRadius: 3, fontWeight: 600}}>Fixed</Typography>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="access-type" primary="Access Type"/>
+                            <Typography style={{backgroundColor: "darkgoldenrod", padding: 4, borderRadius: 3, fontWeight: 600}}>None</Typography>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="transfer-type" primary="Transfer Type"/>
+                            <Typography style={{backgroundColor: "darkgreen", padding: 4, borderRadius: 3, fontWeight: 600, color: "white"}}>Unstoppable</Typography>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="burnable" primary="Burnable"/>
+                        <DangerousIcon style={{color: "red"}}/>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="mintable" primary="Mintable"/>
+                        <DangerousIcon style={{color: "red"}}/>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="erc1363" primary="ERC1363"/>
+                        <DangerousIcon style={{color: "red"}}/>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="token-recover" primary="Token Recover"/>
+                        <DangerousIcon style={{color: "red"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <Button>Create</Button>
+                        </ListItem>
+                    </List>
                 </Grid>
 
-                 {/* Mintable and Burnable ERC20 Token */}
-                 <Grid item
+                {/* Standard ERC20 Token */}
+                <Grid item
+                alignItems={"stretch"}
                 xs={4}>
-                    <Card>
-                        <Box>
-                            <CardContent sx={{flex: '1 0 auto'}}>
-                                <Typography component={"h1"}
-                                 variant="h1" 
-                                 align={"center"}>BurnMintableERC20</Typography>
-                                 <Typography variant="h3" align="center">0.5 ETH</Typography>
-                                 <Divider/>
-                                 <Typography >ERC20 Compliant </Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Verified Source Code </Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Detailed</Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Customizable Decimals </Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Remove Copyright </Typography>
-                                 <CheckCircleIcon 
-                                 style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography >Supply Type</Typography>
-                                 <Typography 
-                                 component="p" 
-                                 style={{backgroundColor: "green", 
-                                 width: 40, fontWeight: 600}}>Capped</Typography>
-                                 <Divider/>
-                                 <Typography >Access Type</Typography>
-                                 <Typography component="p" style={{backgroundColor: "yellow", 
-                                 width: 40, fontWeight: 600}}>Ownable</Typography>
-                                 <Divider/>
-                                 <Typography >Transfer Limit</Typography>
-                                 <Typography component="p" 
-                                 style={{backgroundColor: "yellow", 
-                                 width: 40, fontWeight: 600}}>100K Daily</Typography>
-                                 <Divider/>
-                                 <Typography>Burnable</Typography>
-                                 <CheckCircleIcon style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography>Mintable</Typography>
-                                 <CheckCircleIcon style={{color: "green"}}/>
-                                 <Divider/>
-                                 <Typography>ERC1363</Typography>
-                                 <DangerousIcon style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Typography>Token Recover</Typography>
-                                 <DangerousIcon style={{color: "red"}}/>
-                                 <Divider/>
-                                 <Button>Create</Button>
-                            </CardContent>
-                        </Box>
-                    </Card>
+                    <List
+                    sx={{width: "100%", 
+                    bgcolor: "background.paper", 
+                    paddingTop: 4, 
+                    paddingBottom: 3, 
+                    borderRadius: 2,}}
+                    subheader={
+                    <ListSubheader 
+                    style={{fontSize: 25, 
+                    color: "black", 
+                    textAlign: "center", fontWeight: 500,}}>Standard ERC20</ListSubheader>}>
+                        <Typography textAlign={"center"} fontSize={20}>ETH 0.075</Typography>
+                        <ListItem>
+                        <ListItemText id="erc20-compliance" primary="ERC20 Compliance"/>
+                        <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="verified-code" primary="Verified Source Code"/>
+                            <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="detailed" primary="Detailed"/>
+                            <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="customize-decimal" primary="Customizable Decimal"/>
+                            <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="remove-copyright" primary="Remove Copyright"/>
+                            <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="supply-type" primary="Supply Type"/>
+                            <Typography style={{backgroundColor: "darkgoldenrod", padding: 4, borderRadius: 3, fontWeight: 600}}>Fixed</Typography>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="access-type" primary="Access Type"/>
+                            <Typography style={{backgroundColor: "darkgoldenrod", padding: 4, borderRadius: 3, fontWeight: 600}}>None</Typography>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="transfer-type" primary="Transfer Type"/>
+                            <Typography style={{backgroundColor: "darkgreen", padding: 4, borderRadius: 3, fontWeight: 600, color: "white"}}>Unstoppable</Typography>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="burnable" primary="Burnable"/>
+                        <DangerousIcon style={{color: "red"}}/>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="mintable" primary="Mintable"/>
+                        <DangerousIcon style={{color: "red"}}/>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="erc1363" primary="ERC1363"/>
+                        <DangerousIcon style={{color: "red"}}/>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="token-recover" primary="Token Recover"/>
+                        <DangerousIcon style={{color: "red"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <Button>Create</Button>
+                        </ListItem>
+                    </List>
                 </Grid>
 
-                {/* End Of Plans */}
+                {/* BurnMintable ERC20 Token */}
+                <Grid item
+                alignItems={"stretch"}
+                xs={4}>
+                    <List
+                    sx={{width: "100%", 
+                    bgcolor: "background.paper", 
+                    paddingTop: 4, 
+                    paddingBottom: 3, 
+                    borderRadius: 2,}}
+                    subheader={
+                    <ListSubheader 
+                    style={{fontSize: 25, 
+                    color: "black", 
+                    textAlign: "center", fontWeight: 500,}}>BurnMintable ERC20</ListSubheader>}>
+                        <Typography textAlign={"center"} fontSize={20}>ETH 0.25</Typography>
+                        <ListItem>
+                        <ListItemText id="erc20-compliance" primary="ERC20 Compliance"/>
+                        <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="verified-code" primary="Verified Source Code"/>
+                            <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="detailed" primary="Detailed"/>
+                            <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="customize-decimal" primary="Customizable Decimal"/>
+                            <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="remove-copyright" primary="Remove Copyright"/>
+                            <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <ListItemText id="supply-type" primary="Supply Type"/>
+                            <Typography style={{backgroundColor: "darkgoldenrod", padding: 4, borderRadius: 3, fontWeight: 600}}>Fixed</Typography>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="access-type" primary="Access Type"/>
+                            <Typography style={{backgroundColor: "darkgoldenrod", padding: 4, borderRadius: 3, fontWeight: 600}}>Ownable</Typography>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="transfer-type" primary="Transfer Type"/>
+                            <Typography style={{backgroundColor: "darkgreen", padding: 4, borderRadius: 3, fontWeight: 600, color: "white"}}>Unstoppable</Typography>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="burnable" primary="Burnable"/>
+                        <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="mintable" primary="Mintable"/>
+                        <CheckCircleIcon style={{color: "green"}}/>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="erc1363" primary="ERC1363"/>
+                        <DangerousIcon style={{color: "red"}}/>
+                        </ListItem>
+                        <ListItem>
+                        <ListItemText id="token-recover" primary="Token Recover"/>
+                        <DangerousIcon style={{color: "red"}}/>
+                        </ListItem>
+                        <ListItem>
+                            <Button>Create</Button>
+                        </ListItem>
+                    </List>
+                </Grid>
+                {/* End Of Plan */}
+                <Footer/>
             </Grid>
-            <StandardERC20/>
         </Container>
         </>
     )
