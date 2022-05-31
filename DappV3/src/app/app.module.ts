@@ -101,7 +101,7 @@ const APP_CONTAINERS = [
   providers: [
     {
       provide: LocationStrategy,
-      useClass: HashLocationStrategy,
+      useClass: PathLocationStrategy //,HashLocationStrategy,
     },
     {
       provide: PERFECT_SCROLLBAR_CONFIG,
@@ -109,73 +109,73 @@ const APP_CONTAINERS = [
     },
     IconSetService,
     Title,
-    {
-      provide: Web3ModalService,
-      useFactory: () => {
-        return new Web3ModalService({
-          network: "mainnet", // optional
-          cacheProvider: true, // optional
-          disableInjectedProvider: false,
+    // {
+    //   provide: Web3ModalService,
+    //   useFactory: () => {
+    //     return new Web3ModalService({
+    //       network: "mainnet", // optional
+    //       cacheProvider: true, // optional
+    //       disableInjectedProvider: false,
 
-          /**const providerOptions = {
-            walletconnect: {
-              package: WalletConnectProvider,
-              options: {
-                // Mikko's test key - don't copy as your mileage may vary
-                infuraId: "8043bb2cf99347b1bfadfb233c5325c0",
-              }
-            },
+    //       /**const providerOptions = {
+    //         walletconnect: {
+    //           package: WalletConnectProvider,
+    //           options: {
+    //             // Mikko's test key - don't copy as your mileage may vary
+    //             infuraId: "8043bb2cf99347b1bfadfb233c5325c0",
+    //           }
+    //         },
 
-            fortmatic: {
-              package: Fortmatic,
-              options: {
-                // Mikko's TESTNET api key
-                key: "pk_test_391E26A3B43A3350"
-              }
-            }
-          }; */
+    //         fortmatic: {
+    //           package: Fortmatic,
+    //           options: {
+    //             // Mikko's TESTNET api key
+    //             key: "pk_test_391E26A3B43A3350"
+    //           }
+    //         }
+    //       }; */
 
-          providerOptions : {
-            walletconnect: {
-              package: WalletConnectProvider, // required
-              options: {
-                infuraId: '8043bb2cf99347b1bfadfb233c5325c0', // required change this with your own infura id
-                description: 'Scan the qr code and sign in',
-                qrcodeModalOptions: {
-                  mobileLinks: [
-                    'rainbow',
-                    'metamask',
-                    'argent',
-                    'trust',
-                    'imtoken',
-                    'pillar'
-                  ]
-                }
-              }
-            },
-            fortmatic: {
-              package: Fortmatic,
-              options: {
-                // Mikko's TESTNET api key
-                key: "pk_test_391E26A3B43A3350",
-                network: {
-                  rpcUrl: 'https://rpc-mainnet.maticvigil.com',
-                  chainId: 137
-                }
-              }
-            },
-            injected: {
-              display: {
-                logo: 'https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg',
-                name: 'metamask',
-                description: "Connect with the provider in your Browser"
-              },
-              package: null
-            },
-          } // required
-        });
-      },
-    },
+    //       providerOptions : {
+    //         walletconnect: {
+    //           package: WalletConnectProvider, // required
+    //           options: {
+    //             infuraId: '8043bb2cf99347b1bfadfb233c5325c0', // required change this with your own infura id
+    //             description: 'Scan the qr code and sign in',
+    //             qrcodeModalOptions: {
+    //               mobileLinks: [
+    //                 'rainbow',
+    //                 'metamask',
+    //                 'argent',
+    //                 'trust',
+    //                 'imtoken',
+    //                 'pillar'
+    //               ]
+    //             }
+    //           }
+    //         },
+    //         fortmatic: {
+    //           package: Fortmatic,
+    //           options: {
+    //             // Mikko's TESTNET api key
+    //             key: "pk_test_391E26A3B43A3350",
+    //             network: {
+    //               rpcUrl: 'https://rpc-mainnet.maticvigil.com',
+    //               chainId: 137
+    //             }
+    //           }
+    //         },
+    //         injected: {
+    //           display: {
+    //             logo: 'https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg',
+    //             name: 'metamask',
+    //             description: "Connect with the provider in your Browser"
+    //           },
+    //           package: null
+    //         },
+    //       } // required
+    //     });
+    //   },
+    // },
   ],
   bootstrap: [AppComponent],
 })

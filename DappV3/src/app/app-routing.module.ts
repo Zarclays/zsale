@@ -6,6 +6,7 @@ import { Page404Component } from './views/pages/page404/page404.component';
 import { Page500Component } from './views/pages/page500/page500.component';
 import { LoginComponent } from './views/pages/login/login.component';
 import { RegisterComponent } from './views/pages/register/register.component';
+import { PreloadAllModules } from '@angular/router';
 
 const routes: Routes = [
   {
@@ -70,6 +71,12 @@ const routes: Routes = [
         loadChildren: () =>
           import('./views/pages/pages.module').then((m) => m.PagesModule)
       },
+
+      {
+        path: 'campaigns',
+        loadChildren: () =>
+          import('./components/campaigns/campaigns.module').then((m) => m.CampaignsModule)
+      },
     ]
   },
   {
@@ -108,8 +115,9 @@ const routes: Routes = [
     RouterModule.forRoot(routes, {
       scrollPositionRestoration: 'top',
       anchorScrolling: 'enabled',
-      initialNavigation: 'enabledBlocking'
-      // relativeLinkResolution: 'legacy'
+      initialNavigation: 'enabledBlocking',
+      // relativeLinkResolution: 'legacy',
+      preloadingStrategy: PreloadAllModules
     })
   ],
   exports: [RouterModule]

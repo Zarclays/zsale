@@ -37,7 +37,7 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
 
     this.web3Service.connect().then(async ()=>{
       this.selectedNetwork = await this.web3Service.getCurrentChainId();
-      console.log('loaded chin: ', this.selectedNetwork)
+      // console.log('loaded chin: ', this.selectedNetwork)
     });
   }
 

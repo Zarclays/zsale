@@ -10,6 +10,22 @@ export const navItems: INavData[] = [
       text: 'NEW'
     }
   },
+
+  {
+    title: true,
+    name: 'Campaigns'
+  },
+  {
+    name: 'All Campaigns',
+    url: '/campaigns',
+    iconComponent: { name: 'cil-drop' }
+  },
+  {
+    name: 'Start a Campaign',
+    url: '/campaigns/start',
+    iconComponent: { name: 'cil-drop' }
+  },
+
   {
     title: true,
     name: 'Theme'

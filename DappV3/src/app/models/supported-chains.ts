@@ -90,6 +90,14 @@ export function getSupportedChainById(chainId: number){
     return null;
 }
 
+export function getSupportedChainByChain(chain: string){
+    console.log('suported::', supportedChains);
+    if(supportedChains && supportedChains.length>0){
+        return supportedChains.filter(f=>f.chain==chain)[0];
+    }    
+    return null;
+}
+
 
 
 

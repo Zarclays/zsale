@@ -7,7 +7,7 @@ import Web3Modal from "web3modal";
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Fortmatic from 'fortmatic';
 import { utils } from 'ethers';
-import { getSupportedChainById } from '../models/supported-chains';
+import { getSupportedChainById, getSupportedChainByChain } from '../models/supported-chains';
 
 @Injectable({
   providedIn: 'root'
@@ -196,6 +196,18 @@ export class Web3Service {
     await this._switchNetwork(networkInfo);
   };
 
+  async switchNetworkByChainShortName(newChain:  string) {
+    const c = getSupportedChainByChain(newChain);
+    let networkInfo = {
+      chainId: c?.chainId??97,
+      chainName: c?.name??'',
+      rpcUrls: c?.rpc??[],
+      blockExplorerUrls: undefined
+    };   
+    
+    await this._switchNetwork(networkInfo);
+  };
+
   private async  _switchNetwork(networkInfo:  {
     chainId: number;
     chainName: string;
@@ -232,6 +244,8 @@ export class Web3Service {
           }
         }
       }
+    }else{
+      console.warn('web3provider not instantiated::');
     }
 
   };
