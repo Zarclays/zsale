@@ -6,8 +6,10 @@ import Web3Modal from "web3modal";
 
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Fortmatic from 'fortmatic';
-import { utils } from 'ethers';
+import { BigNumber , constants, ethers, utils } from 'ethers';
 import { getSupportedChainById, getSupportedChainByChain } from '../models/supported-chains';
+const ERC20AbiJSON = require('../../assets/ERC20.json');
+
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +17,7 @@ import { getSupportedChainById, getSupportedChainByChain } from '../models/suppo
 export class Web3Service {
   private _accountsObservable = new BehaviorSubject<string[]>([]);
   public readonly accounts$: Observable<string[]> = this._accountsObservable.asObservable();
-  ethers:  any;
+  // ethers:  any;
   provider: any | undefined;
   web3Provider: Web3Provider| undefined;
   // accounts: string[] | undefined;
@@ -197,7 +199,7 @@ export class Web3Service {
   };
 
   async switchNetworkByChainShortName(newChain:  string) {
-    const c = getSupportedChainByChain(newChain);
+    const c = getSupportedChainByChain(newChain.toUpperCase());
     let networkInfo = {
       chainId: c?.chainId??97,
       chainName: c?.name??'',
@@ -249,6 +251,54 @@ export class Web3Service {
     }
 
   };
+
+
+  public getERC20Contract (address: string) {
+    
+    const cContract = new ethers.Contract(address, ERC20AbiJSON.abi, this.provider);
+    return cContract;
+  }
+
+  public async getERC20Details(address: string){
+    
+    let tokenInfo = await this.getERC20Contract(address);
+    // @ts-ignore
+    let result = { 
+      name: await tokenInfo.name(),
+      symbol: await tokenInfo.symbol(), 
+      decimals: await tokenInfo.decimals(), 
+      totalSupply: await tokenInfo.totalSupply() 
+    }
+    
+
+    return result;
+  }
+
+
+  public async getERC20ApprovalAllowance(tokenAddressOrContract: string|ethers.Contract, approvedAddress: string){
+    if(typeof tokenAddressOrContract === 'string'){
+      tokenAddressOrContract = await this.getERC20Contract(tokenAddressOrContract)
+    }
+    const allowance = await tokenAddressOrContract.allowance(this.accounts[0], approvedAddress);
+    return allowance;
+  }
+
+
+  public async approveERC20Contract(addressOrContract: string|ethers.Contract, addressToApprove: string, amount: any){
+    if(typeof addressOrContract === 'string'){
+      addressOrContract = await this.getERC20Contract(addressOrContract)
+    }
+
+    const currAllowance = await this.getERC20ApprovalAllowance(addressOrContract,addressToApprove);
+    if(currAllowance.gte(BigNumber.from(amount))){
+      return 'succeeded';
+    }else{
+      let allowanceTx = await addressOrContract.approve(addressToApprove, amount ); // Approve 1000 times the fee
+      let txResult = await allowanceTx.wait();
+      return txResult.status == 1 ? 'succeeded' : 'failed';
+    }
+    
+  }
 
 }
 

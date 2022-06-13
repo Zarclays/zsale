@@ -50,7 +50,7 @@ import { IconModule, IconSetService } from '@coreui/icons-angular';
 import {Web3ModalModule, Web3ModalService} from '@mindsorg/web3modal-angular';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Fortmatic from 'fortmatic';
-
+import { ArchwizardModule } from 'angular-archwizard';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
@@ -92,7 +92,8 @@ const APP_CONTAINERS = [
     BadgeModule,
     ListGroupModule,
     CardModule,
-    Web3ModalModule
+    Web3ModalModule,
+    ArchwizardModule
     // NgHelmetModule.forRoot({
     //   baseTitle: "| ZSale",
     // }),

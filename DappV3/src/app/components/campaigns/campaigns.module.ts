@@ -5,6 +5,10 @@ import { CampaignsRoutingModule } from './campaigns-routing.module';
 import { ListCampaignComponent } from './list-campaign/list-campaign.component';
 import { StartCampaignComponent } from './start-campaign/start-campaign.component';
 import { CampaignDetailsComponent } from './campaign-details/campaign-details.component';
+import { ArchwizardModule } from 'angular-archwizard';
+import { FormModule } from '@coreui/angular';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ButtonGroupModule } from '@coreui/angular';
 
 
 @NgModule({
@@ -15,7 +19,11 @@ import { CampaignDetailsComponent } from './campaign-details/campaign-details.co
   ],
   imports: [
     CommonModule,
-    CampaignsRoutingModule
+    CampaignsRoutingModule,
+    ArchwizardModule,
+    FormModule,
+    ReactiveFormsModule,
+    ButtonGroupModule
   ]
 })
 export class CampaignsModule { }
