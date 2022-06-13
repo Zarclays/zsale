@@ -35,7 +35,9 @@
               "src/assets"
             ],
             "styles": [
-              "src/scss/styles.scss"
+              "src/scss/styles.scss",
+              "node_modules/ngx-spinner/animations/ball-scale-multiple.css",
+              "node_modules/ngx-spinner/animations/square-jelly-box.css"
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [

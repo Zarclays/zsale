@@ -6,6 +6,7 @@ import { WizardComponent } from 'angular-archwizard';
 import { Web3Service } from 'src/app/services/web3.service';
 import contractList from '../../../models/contract-list'
 import { BigNumber , constants, ethers, utils } from 'ethers';
+import { NgxSpinnerService } from "ngx-spinner";
 
 @Component({
   selector: 'app-start-campaign',
@@ -20,11 +21,14 @@ export class StartCampaignComponent implements OnInit {
   tokenAddress: string;
   tokenDetails: any;
 
+  isTokenApproved = false;
+
   
   constructor(private titleService: Title, 
     public web3Service: Web3Service,
     private route: ActivatedRoute,
-    private fb: FormBuilder) { }
+    private fb: FormBuilder,
+    private spinner: NgxSpinnerService) { }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params: ParamMap) => {
@@ -51,39 +55,61 @@ export class StartCampaignComponent implements OnInit {
       // existing formControls
       tokenInfoFG: this.fb.group({
         tokenToUse: ['', Validators.required],
-        tokenAddress: this.fb.control('', {updateOn: 'blur', validators: [Validators.required, Validators.minLength(41),Validators.maxLength(43)]}),
-        tokenType: ['basic', Validators.required],
+        tokenAddress: this.fb.control('', { validators: [Validators.required, Validators.minLength(41),Validators.maxLength(43)]}),
+        // tokenAddress: this.fb.control('', {updateOn: 'blur', validators: [Validators.required, Validators.minLength(41),Validators.maxLength(43)]}),
+        // tokenType: ['basic', Validators.required],
      }),
     })
 
     this.onFormChanges();
+
+    // this.spinner.show();
+
+    // setTimeout(() => {
+    //   /** spinner ends after 5 seconds */
+    //   this.spinner.hide();
+    // }, 55000);
   }
 
 
   onFormChanges(): void {
     this.mainFormGroup.get('tokenInfoFG.tokenAddress')!.valueChanges.subscribe(async val => {
       //this.formattedMessage = `My name is ${val}.`;
+      const currentChainId = await this.web3Service.getCurrentChainId();
+    
       this.tokenAddress = val;
-      try{
-        this.tokenDetails = await this.web3Service.getERC20Details(this.tokenAddress)
-      }catch(err){
-        
+      
+
+      if(this.mainFormGroup.get('tokenInfoFG.tokenAddress')?.valid){
+        try{
+          this.tokenDetails = await this.web3Service.getERC20Details(this.tokenAddress)
+          
+        }catch(err){
+          console.error('eror gting erc20 details:', err, new Date())
+        }
+
+        try{
+          this.isTokenApproved= (await this.web3Service.getERC20ApprovalAllowance(this.tokenAddress, contractList[currentChainId].campaignList)).gte(constants.Zero);
+          
+        }catch(err){
+          console.error('eror gting erc20 details:', err, new Date())
+        }
       }
       
-      console.log('tokenaddr changed')
+      
     });
 
     this.mainFormGroup.get('tokenInfoFG.tokenToUse')!.valueChanges.subscribe(val => {
       //this.formattedMessage = `My name is ${val}.`;
       if(val=='useMyToken'){
-        this.mainFormGroup.get('tokenInfoFG.tokenType')!.disable()
+        // this.mainFormGroup.get('tokenInfoFG.tokenType')!.disable()
         this.mainFormGroup.get('tokenInfoFG.tokenAddress')!.enable()
         
       }else{
-        this.mainFormGroup.get('tokenInfoFG.tokenType')!.enable()
+        // this.mainFormGroup.get('tokenInfoFG.tokenType')!.enable()
         this.mainFormGroup.get('tokenInfoFG.tokenAddress')!.disable()
       }
-      console.log('tokenToUse changed')
+      
     });
 
     //todo unsunbscribe
@@ -102,8 +128,14 @@ export class StartCampaignComponent implements OnInit {
   }
 
   async approveToken(){
+    /** spinner starts on init */
+    this.spinner.show();
+
     const currentChainId = await this.web3Service.getCurrentChainId();
-    this.web3Service.approveERC20Contract(this.tokenAddress, contractList[currentChainId].campaignList, constants.MaxUint256)
+    const result = await this.web3Service.approveERC20Contract(this.tokenAddress, contractList[currentChainId].campaignList, constants.MaxUint256)
+
+    this.isTokenApproved= result=='succeeded';
+    this.spinner.hide();
   }
 
 

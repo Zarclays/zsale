@@ -1,139 +1,122 @@
-<p>start-campaign works!</p>
-
-
-<form [formGroup]="mainFormGroup" class="main-form">
-    <aw-wizard  #wizard [navBarLayout]="'large-filled'" [navBarLocation]="'left'">
-        <aw-wizard-step stepTitle="Token information" [canExit]>
-            <div formGroupName="tokenInfoFG">
-                <div class="row">
-                    <div class="col-12 ">
-                        <small class="text-em">
-                            If you already have a token, use "Use My Token."" If you’d like to create one now with our Token Minter, use the "Mint New Token" option.
-                        </small>
-                    </div>
-                    <div class="col-12 ">
+<div class="row">
+    <div class="col-12">
+        <form [formGroup]="mainFormGroup" class="main-form">
+            <aw-wizard  #wizard [navBarLayout]="'large-filled'" [navBarLocation]="'left'">
+                <aw-wizard-step stepTitle="Token information" [canExit]>
+                    <div formGroupName="tokenInfoFG">
                         <div class="row">
-                            <div class="col-4">
-                                <div class="card">
-                                    <div class="card-body p-0">
-                                        <input class="btn-check" formControlName="tokenToUse" id="radio1" type="radio" value="useMyToken" />
-                                        <label class="p-4" style="width: 100%;" (click)="setTokenToUseValue('useMyToken')" cButton cFormCheckLabel for="radio1"
-                                variant="outline">Use My Token
-                                        </label>
+                            <div class="col-12 ">
+                                <small class="text-em">
+                                    If you already have a token, use "Use My Token."" If you’d like to create one now with our Token Minter, use the "Mint New Token" option.
+                                </small>
+                            </div>
+                            <div class="col-12 ">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="card">
+                                            <div class="card-body p-0">
+                                                <input class="btn-check" formControlName="tokenToUse" id="radio1" type="radio" value="useMyToken" />
+                                                <label class="p-4" style="width: 100%;" (click)="setTokenToUseValue('useMyToken')" cButton cFormCheckLabel for="radio1"
+                                        variant="outline">Use My Token
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+        
+                                    <div class="col-4">
+                                        <div class="card">
+                                            <div class="card-body p-0">
+                                                <input class="btn-check" formControlName="tokenToUse" id="radio2" type="radio" value="mintToken" />
+                                                <label class="p-4" style="width: 100%;" (click)="setTokenToUseValue('mintToken')" cButton cFormCheckLabel for="radio2"
+                                                        variant="outline">
+                                                        Mint New Token
+                                                    
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="col-4">
-                                <div class="card">
-                                    <div class="card-body p-0">
-                                        <input class="btn-check" formControlName="tokenToUse" id="radio2" type="radio" value="mintToken" />
-                                        <label class="p-4" style="width: 100%;" (click)="setTokenToUseValue('mintToken')" cButton cFormCheckLabel for="radio2"
-                                                variant="outline">
-                                                Mint New Token
-                                            
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        
-                        
-                            
-                        
-                    </div>
-                </div>
-
-                <div class="row my-2" *ngIf="mainFormGroup.get('tokenInfoFG.tokenToUse').value == 'mintToken' ">
-                    
-                    <div class="col-4">
-                        <div class="card">
-                            <div class="card-body p-0">
-                                <input class="btn-check" formControlName="tokenType" id="tokenType1" type="radio" value="basic" />
-                                <label class="p-2" style="width: 100%;" (click)="setTokenTypeValue('basic')" cButton cFormCheckLabel for="tokenType1"
-                        variant="outline">
-                                    <h4 class="text-left">Basic</h4>
-                                    <p>Standard Token with fixed supply</p>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-4">
-                        <div class="card">
-                            <div class="card-body p-0">
-                                <input class="btn-check" formControlName="tokenType" id="tokenType2" type="radio" value="rfi" />
-                                <label class="p-2" style="width: 100%;" (click)="setTokenTypeValue('rfi')" cButton cFormCheckLabel for="tokenType2"
-                                        variant="outline">
-                                    <h4 class="text-left">RFI Type</h4>
-                                    <p>Standard Token with Fixed Supply and Adjustable tax on transfers </p>
+                                
+                                
+                                
                                     
-                                </label>
+                                
                             </div>
                         </div>
-                    </div>
-                </div>
-    
-                   
-    
-                <div [cFormFloating]="true" class="mb-3" *ngIf="mainFormGroup.get('tokenInfoFG.tokenToUse').value == 'useMyToken' ">
-                    <input cFormControl id="floatingInput" placeholder="e.g. 0x3a233.." formControlName="tokenAddress" type="text" sizing="sm" />
-                    <label cLabel for="floatingInput">Token Address</label>
-                    <div cFormText class="mt-3">
-                        <b>Token Details</b>
-                        <dl *ngIf="tokenDetails">
-                            <dt>Name</dt>
-                            <dd>{{tokenDetails.name}}</dd>
+        
+                        <div class="row my-2" *ngIf="mainFormGroup.get('tokenInfoFG.tokenToUse').value == 'mintToken' ">
+                            
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body ">
+                                        <div class="card-text">Go here to <a [routerLink]="['mint-token']">Mint your Token</a> via our Token Minter and the come back to enter in your new Token Address</div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+        
+                            
+                        </div>
             
-                            <dt>Symbol</dt>
-                            <dd>{{tokenDetails.symbol}}</dd>
+                           
             
-                            <dt>Decimals</dt>
-                            <dd>{{tokenDetails.decimals}}</dd>
-                        </dl>
+                        <div [cFormFloating]="true" class="my-3" *ngIf="mainFormGroup.get('tokenInfoFG.tokenToUse').value == 'useMyToken' ">
+                            <input cFormControl id="floatingInput" placeholder="e.g. 0x3a233.." formControlName="tokenAddress" type="text" sizing="sm" />
+                            <label cLabel for="floatingInput">Token Address</label>
+                            <div cFormText class="mt-3">
+                                <b>Token Details</b>
+                                <dl *ngIf="tokenDetails">
+                                    <dt>Name</dt>
+                                    <dd>{{tokenDetails.name}}</dd>
+                    
+                                    <dt>Symbol</dt>
+                                    <dd>{{tokenDetails.symbol}}</dd>
+                    
+                                    <dt>Decimals</dt>
+                                    <dd>{{tokenDetails.decimals}}</dd>
+                                </dl>
+                            </div>
+                        </div>
+                        
+                        
+            
+                        <div class="row mt-4">
+                            <div class="col d-flex align-items-center justify-content-end">
+                                
+                                <button type="button" *ngIf="!isTokenApproved" (click)="approveToken()" class="me-1 btn btn-primary" [disabled]="tokenInfoFG.invalid || mainFormGroup.get('tokenInfoFG.tokenToUse').value !== 'useMyToken' " >
+                                    Approve Token
+                                </button>
+                                <button type="button" *ngIf="isTokenApproved" class="me-1 btn btn-primary" [disabled]="tokenInfoFG.invalid" awNextStep>
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+            
+                        
                     </div>
-                </div>
+                    
                 
                 
-    
-                <div class="row">
-                    <div class="col d-flex align-items-center justify-content-end">
-                        <button type="button" (click)="approveToken()" class="me-1 btn btn-primary" [disabled]="tokenInfoFG.invalid" >
-                            Mint Token
-                        </button>
-                        <button type="button" (click)="approveToken()" class="me-1 btn btn-primary" [disabled]="tokenInfoFG.invalid" >
-                            Approve Token
-                        </button>
-                        <button type="button" class="me-1 btn btn-primary" [disabled]="tokenInfoFG.invalid" awNextStep>
-                            Next
-                        </button>
-                    </div>
-                </div>
-    
-                
-            </div>
-            
+                </aw-wizard-step>
+                <aw-wizard-step stepTitle="Campaign Sale Info" [canEnter]="true">
+                Content of Step 2
+                <button type="button" class="me-1 btn btn-secondary" awPreviousStep>Back</button>
+                <button type="button" class="me-1 btn btn-primary" awNextStep>Next </button>
+                </aw-wizard-step>
+                <aw-wizard-step stepTitle="Founders information" [navigationSymbol]="{ symbol: '2' }">
+                Content of Step 3
+                <button type="button" class="me-1 btn btn-secondary" awPreviousStep>Back</button>
+                <button type="button" class="me-1 btn btn-primary" awNextStep>Preview</button>
+                </aw-wizard-step>
+        
+                <aw-wizard-step stepTitle="Preview">
+                    Content of Preview
+                    <button type="button" class="me-1 btn btn-secondary" awPreviousStep>Back</button>
+                    <button type="button" class="me-1 btn btn-success" (click)="finishFunction()">Finish</button>
+                </aw-wizard-step>
+            </aw-wizard>
         
         
-        </aw-wizard-step>
-        <aw-wizard-step stepTitle="Campaign Sale Info" [canEnter]="true">
-        Content of Step 2
-        <button type="button" class="me-1 btn btn-secondary" awPreviousStep>Back</button>
-        <button type="button" class="me-1 btn btn-primary" awNextStep>Next </button>
-        </aw-wizard-step>
-        <aw-wizard-step stepTitle="Founders information" [navigationSymbol]="{ symbol: '2' }">
-        Content of Step 3
-        <button type="button" class="me-1 btn btn-secondary" awPreviousStep>Back</button>
-        <button type="button" class="me-1 btn btn-primary" awNextStep>Preview</button>
-        </aw-wizard-step>
-
-        <aw-wizard-step stepTitle="Preview">
-            Content of Preview
-            <button type="button" class="me-1 btn btn-secondary" awPreviousStep>Back</button>
-            <button type="button" class="me-1 btn btn-success" (click)="finishFunction()">Finish</button>
-        </aw-wizard-step>
-    </aw-wizard>
-
-
-</form>
+        </form>
+    </div>
+</div>

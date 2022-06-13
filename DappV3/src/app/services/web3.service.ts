@@ -1,7 +1,7 @@
 import { EventEmitter, Inject, Injectable, Output } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Web3ModalService} from '@mindsorg/web3modal-angular';
-import { Web3Provider } from '@ethersproject/providers';
+import { Web3Provider , JsonRpcSigner} from '@ethersproject/providers';
 import Web3Modal from "web3modal";
 
 import WalletConnectProvider from '@walletconnect/web3-provider';
@@ -19,7 +19,8 @@ export class Web3Service {
   public readonly accounts$: Observable<string[]> = this._accountsObservable.asObservable();
   // ethers:  any;
   provider: any | undefined;
-  web3Provider: Web3Provider| undefined;
+  ethersProvider: Web3Provider| undefined;
+  ethersSigner: JsonRpcSigner| undefined;
   // accounts: string[] | undefined;
   // balance: string | undefined;
 
@@ -105,16 +106,17 @@ export class Web3Service {
     this.provider = await this.web3Modal.connect(); // set provider
     
     if (this.provider) {
-      this.web3Provider = new Web3Provider(this.provider);
+      this.ethersProvider = new Web3Provider(this.provider);
+      this.ethersSigner = this.ethersProvider.getSigner();  
       this.onConnect.emit(this.provider);
       this.createProviderHooks(this.provider);
-      this._accountsObservable.next(await this.web3Provider.listAccounts());
+      this._accountsObservable.next(await this.ethersProvider.listAccounts());
     } // create web3 instance
     
   }
 
   async getCurrentChainId(){
-    const n = await this.web3Provider?.getNetwork();
+    const n = await this.ethersProvider?.getNetwork();
     return n?.chainId??83;
   }
 
@@ -217,10 +219,10 @@ export class Web3Service {
     blockExplorerUrls?: string[];
   } ) {
     
-    if(this.web3Provider){
+    if(this.ethersProvider){
       try {
         //@ts-ignore
-        await this.web3Provider?.provider?.request({
+        await this.ethersProvider?.provider?.request({
           method: "wallet_switchEthereumChain",
           params: [{ chainId: utils.hexlify(networkInfo.chainId) }],
         });
@@ -229,7 +231,7 @@ export class Web3Service {
         if (switchError.code === 4902) {
           try {
             //@ts-ignore
-            await this.web3Provider.provider.request({
+            await this.ethersProvider.provider.request({
               method: "wallet_addEthereumChain",
               params: [
                 {
@@ -255,7 +257,7 @@ export class Web3Service {
 
   public getERC20Contract (address: string) {
     
-    const cContract = new ethers.Contract(address, ERC20AbiJSON.abi, this.provider);
+    const cContract = new ethers.Contract(address, ERC20AbiJSON.abi, this.ethersProvider);
     return cContract;
   }
 

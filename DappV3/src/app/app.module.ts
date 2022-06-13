@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { HashLocationStrategy, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -51,6 +51,7 @@ import {Web3ModalModule, Web3ModalService} from '@mindsorg/web3modal-angular';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Fortmatic from 'fortmatic';
 import { ArchwizardModule } from 'angular-archwizard';
+import { NgxSpinnerModule } from "ngx-spinner";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
@@ -93,7 +94,8 @@ const APP_CONTAINERS = [
     ListGroupModule,
     CardModule,
     Web3ModalModule,
-    ArchwizardModule
+    ArchwizardModule,
+    NgxSpinnerModule
     // NgHelmetModule.forRoot({
     //   baseTitle: "| ZSale",
     // }),
@@ -179,6 +181,7 @@ const APP_CONTAINERS = [
     // },
   ],
   bootstrap: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class AppModule {
 }
