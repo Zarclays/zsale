@@ -120,6 +120,11 @@ export class Web3Service {
     return n?.chainId??83;
   }
 
+  async getCurrentChain(){
+    const chainId = await this.getCurrentChainId();
+    return getSupportedChainById(chainId);
+  }
+
   // async accountInfo(account: any[]){
   //   const initialvalue = await this.web3js.eth.getBalance(account);
   //   this.balance = this.web3js.utils.fromWei(initialvalue , 'ether');

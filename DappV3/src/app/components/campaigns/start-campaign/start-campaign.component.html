@@ -1,8 +1,8 @@
 <div class="row">
     <div class="col-12">
-        <form [formGroup]="mainFormGroup" class="main-form">
+        <form [formGroup]="mainFormGroup" class="main-form" novalidate>
             <aw-wizard  #wizard [navBarLayout]="'large-filled'" [navBarLocation]="'left'">
-                <aw-wizard-step stepTitle="Token information" [canExit]>
+                <!-- <aw-wizard-step stepTitle="Token information" [canExit]>
                     <div formGroupName="tokenInfoFG">
                         <div class="row">
                             <div class="col-12 ">
@@ -62,7 +62,7 @@
             
                         <div [cFormFloating]="true" class="my-3" *ngIf="mainFormGroup.get('tokenInfoFG.tokenToUse').value == 'useMyToken' ">
                             <input cFormControl id="floatingInput" placeholder="e.g. 0x3a233.." formControlName="tokenAddress" type="text" sizing="sm" />
-                            <label cLabel for="floatingInput">Token Address</label>
+                            <label cLabel for="floatingInput">Token Contract Address</label>
                             <div cFormText class="mt-3">
                                 <b>Token Details</b>
                                 <dl *ngIf="tokenDetails">
@@ -97,11 +97,356 @@
                     
                 
                 
-                </aw-wizard-step>
+                </aw-wizard-step> -->
                 <aw-wizard-step stepTitle="Campaign Sale Info" [canEnter]="true">
-                Content of Step 2
-                <button type="button" class="me-1 btn btn-secondary" awPreviousStep>Back</button>
-                <button type="button" class="me-1 btn btn-primary" awNextStep>Next </button>
+                    <div formGroupName="campaignInfoFG">
+
+                        <div class="mb-4 ">
+                            <h3>Campaign Info</h3>
+
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 ">
+                                <h4 class="text-em">
+                                    Campaign Type
+                                </h4>
+                            </div>
+                            <div class="col-4">
+                                <div class="card">
+                                    <div class="card-body p-0">
+                                        <input class="btn-check" formControlName="campaignType" id="radiocl" type="radio" value="capped" />
+                                        <label class="p-4" style="width: 100%;" (click)="setCampaignTypeValue('useMyToken')" cButton cFormCheckLabel for="radiocl"
+                                variant="outline">
+                                            <div>
+                                                <h4 class="w-100 text-right">Capped</h4>
+
+                                                <p>Capped Campaigns have a Minimum (Soft cap) that must be reached for the Campaign to be successful, if not all funds are returned to participants</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-5">
+                                <div class="card">
+                                    <div class="card-body p-0">
+                                        <input class="btn-check" formControlName="campaignType" id="radiofl" type="radio" value="fairLaunch" />
+                                        <label class="p-4" style="width: 100%;" (click)="setCampaignTypeValue('mintToken')" cButton cFormCheckLabel for="radiofl"
+                                                variant="outline">
+                                                <div>
+                                                    <h4 class="w-100 text-right">Fair Launch</h4>
+    
+                                                    <p>Fair Launch Campaigns only set a Maximum (hard cap) that can be reached by the Campaign, there is no minimum amount required for the campaign to be successful</p>
+                                                </div>
+                                            
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <c-form-feedback [valid]="false">
+                                    <span *ngFor="let error of  objectKeys(campaignInfoFG.get('campaignType')?.errors)">                                        
+                                    {{validationMessages.campaignType[error]}}
+                                    </span>
+                                </c-form-feedback>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6" *ngIf="mainFormGroup.get('campaignInfoFG.campaignType').value === 'capped'">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="floatingInput" placeholder="Soft Cap" formControlName="softCap" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">Soft Cap ({{nativeCoin??'Coin'}})</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        If the Soft Cap is not met, Funds will be returned to Participants
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(campaignInfoFG.get('softCap')?.errors)">                                        
+                                        {{validationMessages.softCap[error]}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="floatingInput" placeholder="Hard Cap" formControlName="hardCap" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">Hard Cap ({{nativeCoin??'Coin'}})</label>
+                                    
+                                    <div cFormText class="mt-2" *ngIf="mainFormGroup.get('campaignInfoFG.campaignType').value === 'capped'">
+                                        Hard Cap must be at least 2 times the Soft Cap and can not be greater than x4 of Soft Cap
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(campaignInfoFG.get('hardCap')?.errors)">                                        
+                                        {{validationMessages.hardCap[error]}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="floatingInput" placeholder="How many Tokens will 1 {{nativeCoin??'Coin'}} get you?" formControlName="presaleRate" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">Presale Rate</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        How many Tokens will 1 {{nativeCoin??'Coin'}} get you?
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(campaignInfoFG.get('presaleRate')?.errors)">                                        
+                                        {{validationMessages.presaleRate[error]}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="floatingInput" placeholder="How many Tokens will 1 {{nativeCoin??'Coin'}} get you?" formControlName="dexRate" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">DEX Listing Rate</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        How many Tokens will 1 {{nativeCoin??'Coin'}} get you on DEX?
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(campaignInfoFG.get('dexRate')?.errors)">                                        
+                                        {{validationMessages.dexRate[error]}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="floatingInput" placeholder="Minimum Order ({{nativeCoin}} )" formControlName="minBuy" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">Minimum Order ({{nativeCoin}} )</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        Minimum {{nativeCoin??'Coin'}} a buyer can order
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(campaignInfoFG.get('minBuy')?.errors)">                                        
+                                        {{validationMessages.minBuy[error]}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="floatingInput" placeholder="Maximum Order ({{nativeCoin}} )" formControlName="maxBuy" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">Maximum Order ({{nativeCoin}} )</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        Maximum {{nativeCoin??'Coin'}} a buyer can order
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(campaignInfoFG.get('maxBuy')?.errors)">                                        
+                                        {{validationMessages.maxBuy[error]}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+                        </div>
+                           
+                        <div class="row">
+                            
+
+                            <div class="col">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="floatingInput" placeholder="Liquidity (%)" formControlName="liquidity" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">Liquidity (%)</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        Must be > 50%
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(campaignInfoFG.get('liquidity')?.errors)">                                        
+                                        {{validationMessages.liquidity[error]}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="floatingInput" placeholder="Liquidity Lockup(Days)" formControlName="liquidityLockupDays" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">Liquidity Lockup(Days)</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        Must be > 30 Days
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(campaignInfoFG.get('liquidityLockupDays')?.errors)">                                        
+                                        {{validationMessages.liquidityLockupDays[error]}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="floatingInput" [dpDayPicker]="datePickerConfig"  placeholder="" formControlName="startDate"  sizing="sm" mode="daytime" />
+                                    <label cLabel for="floatingInput">Start Date</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(campaignInfoFG.get('startDate')?.errors)">                                        
+                                        {{validationMessages.startDate[error]}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="floatingInput" [dpDayPicker]="datePickerConfig"  placeholder="" formControlName="endDate" type="number" sizing="sm"  mode="daytime" />
+                                    <label cLabel for="floatingInput">End Date</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(campaignInfoFG.get('endDate')?.errors)">                                        
+                                        {{validationMessages.endDate[error]}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <strong>Token Vesting </strong>
+                            </div>
+                            <div class="card-body">
+                                <c-form-check [switch]="true">
+                                    <input cFormCheckInput checked type="checkbox" formControlName="useTokenVesting" />
+                                    <label cFormCheckLabel>Use Token Vesting</label>
+                                </c-form-check>
+                                <div class="row mt-3" *ngIf="mainFormGroup.get('campaignInfoFG.useTokenVesting').value === true">
+                                    <div class="col">
+                                        <ng-container formArrayName="tokenVestings">
+                                            
+                                            <div *ngFor="let _ of tokenVestings.controls; index as i">
+                                                <ng-container [formGroupName]="i">
+                                                  <!-- <input formControlName="amount" />
+                                                  <input formControlName="releaseDate" /> -->
+
+                                                  <div class="row {{i%2==0?'striped-vest':''}}">
+                                                    <div class="col-5">
+                                                        <div [cFormFloating]="true" class="my-3" >
+                                                            <input cFormControl id="floatingInput" placeholder="" formControlName="amount"  sizing="sm"  />
+                                                            <label cLabel for="floatingInput">Amount(%)</label>
+                                                            
+                                                            <div cFormText class="mt-2">
+                                                                
+                                                            </div>
+                        
+                                                            <c-form-feedback [valid]="false">
+                                                                <span *ngFor="let error of  objectKeys(tokenVestings.controls[i].get('amount')?.errors)">                                        
+                                                                {{validationMessages.vesting.amount[error]}}
+                                                                </span>
+                                                            </c-form-feedback>
+                        
+                                                        </div>
+                                                    </div>
+                        
+                                                    <div class="col-5">
+                                                        <div [cFormFloating]="true" class="my-3" >
+                                                            <input cFormControl id="floatingInput"   placeholder="" formControlName="releaseDate" type="number" sizing="sm"  />
+                                                            <label cLabel for="floatingInput">Lock duration (Days)</label>
+                                                            
+                                                            <div cFormText class="mt-2">
+                                                                
+                                                            </div>
+                        
+                                                            <c-form-feedback [valid]="false">
+                                                                <span *ngFor="let error of  objectKeys(tokenVestings.controls[i].get('releaseDate')?.errors)">                                        
+                                                                {{validationMessages.vesting.releaseDate[error]}}
+                                                                </span>
+                                                            </c-form-feedback>
+                        
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-2">
+                                                        <button class="btn btn-danger" (click)="removeVestingSchedule(i)">Remove</button>
+                                                    </div>
+                                                </div>
+                                                </ng-container>
+                                            </div>
+
+                                            
+
+                                            <div style="color:red">
+                                                
+                                                <label *ngIf="tokenVestings?.errors?.nequal100" class="error">
+                                                    All Token Amount must sum upto 100%.
+                                                </label>
+                                                
+                                            </div>
+                                        </ng-container>
+                                    </div>
+
+                                    <div class="col-12 d-flex align-items-end justify-content-end mt-3">
+                                        <button class="btn btn-primary" (click)="addVestingSchedule()">Add Another Lock Schedule</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        
+                        
+            
+                        <div class="row mt-4">
+                            <div class="col d-flex align-items-center justify-content-end">
+                                
+                                <button type="button" class="me-1 btn btn-secondary" awPreviousStep>Back</button>
+                
+
+                                <button type="button"  class="me-1 btn btn-primary" [disabled]="campaignInfoFG.invalid" awNextStep>
+                                    Next
+                                </button>
+
+                            </div>
+                        </div>
+            
+                        
+                    </div>
+                
                 </aw-wizard-step>
                 <aw-wizard-step stepTitle="Founders information" [navigationSymbol]="{ symbol: '2' }">
                 Content of Step 3

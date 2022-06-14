@@ -9,6 +9,7 @@ import { ArchwizardModule } from 'angular-archwizard';
 import { FormModule } from '@coreui/angular';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ButtonGroupModule } from '@coreui/angular';
+import {DpDatePickerModule} from 'ng2-date-picker';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { ButtonGroupModule } from '@coreui/angular';
     ArchwizardModule,
     FormModule,
     ReactiveFormsModule,
-    ButtonGroupModule
+    ButtonGroupModule,
+    DpDatePickerModule 
   ]
 })
 export class CampaignsModule { }
