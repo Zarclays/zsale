@@ -6,7 +6,7 @@ import { ListCampaignComponent } from './list-campaign/list-campaign.component';
 import { StartCampaignComponent } from './start-campaign/start-campaign.component';
 import { CampaignDetailsComponent } from './campaign-details/campaign-details.component';
 import { ArchwizardModule } from 'angular-archwizard';
-import { FormModule } from '@coreui/angular';
+import { FormModule, ProgressModule, ToastModule } from '@coreui/angular';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ButtonGroupModule } from '@coreui/angular';
 import {DpDatePickerModule} from 'ng2-date-picker';
@@ -16,7 +16,7 @@ import {DpDatePickerModule} from 'ng2-date-picker';
   declarations: [
     ListCampaignComponent,
     StartCampaignComponent,
-    CampaignDetailsComponent
+    CampaignDetailsComponent 
   ],
   imports: [
     CommonModule,
@@ -25,7 +25,9 @@ import {DpDatePickerModule} from 'ng2-date-picker';
     FormModule,
     ReactiveFormsModule,
     ButtonGroupModule,
-    DpDatePickerModule 
+    DpDatePickerModule ,
+    ProgressModule,
+    ToastModule
   ]
 })
 export class CampaignsModule { }

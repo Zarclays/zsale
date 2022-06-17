@@ -55,12 +55,13 @@ const ValidateEndDateLaterThanStartDate = (fromControl : string, toControl : str
     //ts-ignore
     return (form: FormGroup): {[key: string]: any}  => {
 
-        const start:Date = form.get(fromControl)?.value;
+        const start = form.get(fromControl)?.value;
 
-        const end:Date = form.get(toControl)?.value;
+        const end = form.get(toControl)?.value;
 
         if (start && end) {
-            const isRangeValid = (end.getTime() - start.getTime() > 0);
+            
+            const isRangeValid = (new Date(end).getTime() - new Date(start).getTime() > 0);
 
             return isRangeValid ? {} : { endDateLater:true };
         }
@@ -69,7 +70,43 @@ const ValidateEndDateLaterThanStartDate = (fromControl : string, toControl : str
     }
 }
 
+// const ValidateHardCap = () => {
+//     //ts-ignore
+//     return (form: FormGroup): {[key: string]: any}  => {
+//         console.log('vahradcap:')
+// 		const campaignType = form.get('campaignType')?.value;
+//         const softCap = +form.get('softCap')?.value??0;
 
+//         const hardCap = +form.get('hardCap')?.value??0;
+
+//         if (campaignType && campaignType =='capped' && softCap && hardCap) {
+//             const isRangeValid = hardCap > softCap  && hardCap <= (softCap *4 ) ;
+//             console.log('israngevalid:',  isRangeValid)
+//             return isRangeValid ? {} : { hardCapInvalid:true };
+//         }
+
+//         return {};
+//     }
+// }
+
+const ValidateHardCap = (): ValidatorFn  => {
+
+	return (control: AbstractControl): { [key: string]: any } | null => {
+		
+		const campaignType = control.parent?.get('campaignType')?.value;
+        const softCap = +control.parent?.get('softCap')?.value??0;
+
+        const hardCap = +control.value??0;
+		
+		if (campaignType && campaignType =='capped' && softCap && hardCap) {
+            const isRangeValid = hardCap > softCap  && hardCap <= (softCap *4 ) ;
+            
+            return isRangeValid ? {} : { outOfRange:true };
+        }
+		
+		return {};
+	}
+}
 
 const ValidateVestingPercentUpto100 = (): ValidatorFn => {
     return (arr: AbstractControl): { [key: string]: any } | null => {
@@ -96,4 +133,4 @@ const ValidateVestingPercentUpto100 = (): ValidatorFn => {
 
 
 
-export {CapRangeValidator, ValidateEndDateLaterThanStartDate , ValidateDateIsNotInPast, ValidateVestingPercentUpto100};
+export {CapRangeValidator, ValidateEndDateLaterThanStartDate , ValidateDateIsNotInPast, ValidateVestingPercentUpto100, ValidateHardCap};

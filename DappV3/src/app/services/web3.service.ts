@@ -9,6 +9,7 @@ import Fortmatic from 'fortmatic';
 import { BigNumber , constants, ethers, utils } from 'ethers';
 import { getSupportedChainById, getSupportedChainByChain } from '../models/supported-chains';
 const ERC20AbiJSON = require('../../assets/ERC20.json');
+const CampaignListAbi = require('../../assets/CampaignList.json');
 
 
 @Injectable({
@@ -100,6 +101,10 @@ export class Web3Service {
 
   get accounts(){
     return this._accountsObservable.getValue();
+  }
+
+  get signer(){
+    return this.ethersSigner;
   }
 
   async connect() {

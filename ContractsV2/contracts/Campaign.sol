@@ -105,7 +105,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
 
     //Tier 1 - holders of our coin
     //Tier 2 - Whitelisted or public
-    
+  uint public _minAllocationPerUser;  
 
   //max allocations per user in a tier
   uint public maxAllocationPerUserTierOne;
@@ -138,7 +138,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     address campaignFactory,
     address  _tokenAddress,
      
-    uint256[9] memory capAndDate,  // uint256 _softCap,uint256 _hardCap,uint256 _saleStartTime,uint256 _saleEndTime, uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo ,uint _campaignKey,
+    uint256[10] memory capAndDate,  // uint256 _softCap,uint256 _hardCap,uint256 _saleStartTime,uint256 _saleEndTime, uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo ,uint _campaignKey,
     
     RefundType _refundType, 
     address _dexRouterAddress,
@@ -189,7 +189,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
       otherInfo= CampaignOtherInfo(false, false,false,'', _refundType,founderInfo[0],founderInfo[1],founderInfo[2],founderInfo[3],founderInfo[4], founderInfo[5]);
       
       
-      _updateTierDetails (capAndDate[4], capAndDate[5], capAndDate[6],capAndDate[7]);
+      _updateTierDetails (capAndDate[4], capAndDate[5], capAndDate[6],capAndDate[7], capAndDate[8]);
 
       transferOwnership(campaignOwner);
 
@@ -230,7 +230,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   }
     
   // function to update the tiers users value manually
-  function _updateTierDetails(uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo) private {
+  function _updateTierDetails(uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _minAllocationPerUser, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo) private {
     
     require(_tierOneHardCap > (saleInfo.hardCap * 3000 / 10000), "CAMPAIGN: Tier Caps must be greater than 30 %" );
     require(_tierOneHardCap + _tierTwoHardCap == saleInfo.hardCap, "CAMPAIGN: Tier 1 & 2 Caps must be equal to hard cap" );
@@ -242,13 +242,14 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     tierOnehardCap =_tierOneHardCap;
     tierTwohardCap = _tierTwoHardCap;    
     
+    minAllocationPerUser=_minAllocationPerUser; 
     maxAllocationPerUserTierOne = _maxAllocationPerUserTierOne;
     maxAllocationPerUserTierTwo = _maxAllocationPerUserTierTwo;
   }
 
-  function updateTierDetails(uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo) public onlyOwner {
+  function updateTierDetails(uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _minAllocationPerUser, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo) public onlyOwner {
     require(block.timestamp <= saleInfo.saleStartTime, 'Can only updateTierDetails before Sale StartTime');
-    _updateTierDetails(_tierOneHardCap, _tierTwoHardCap, _maxAllocationPerUserTierOne, _maxAllocationPerUserTierTwo);    
+    _updateTierDetails(_tierOneHardCap, _tierTwoHardCap, _minAllocationPerUser, _maxAllocationPerUserTierOne, _maxAllocationPerUserTierTwo);    
   }
 
   function startReceivingBids() public 
@@ -416,12 +417,12 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     //require(block.timestamp >= saleInfo.saleStartTime, "Campaign:The sale is not started yet "); // solhint-disable
     require(block.timestamp <= saleInfo.saleEndTime, "Campaign:The sale is closed"); // solhint-disable
     require(totalCoinReceived + bid <= saleInfo.hardCap, "Campaign: purchase would exceed max cap");
+    // minAllocationPerUser
     
-
     
     
     require(bid > 0, "Campaign: Coin value sent needs to be above zero");
-    
+    require( bid >= minAllocationPerUser ,"Campaign:You are investing less than Min Buy limit!");
           
     if(block.timestamp >= saleInfo.saleStartTime) {
         if(otherInfo.useWhiteList){

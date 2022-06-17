@@ -4,18 +4,40 @@ import { getAllChains, getChain, IChainData } from 'evm-chains';
 interface ZChainData extends IChainData{
     
     isTestNet: boolean;
+    creationFee: number;
 }
 
 const cList =  {
-    "eth": 1,
-    "bsc":56,
-    "bsct":97,
-    "hrdt":31337, 
-    "mtr":82,
+    "eth": {
+        chainId: 1,
+        creationFee: 0.001
+    },
+    "bsc": {
+        chainId: 56,
+        creationFee: 0.001
+    },
+    "bsct": {
+        chainId: 97,
+        creationFee: 0.001
+    },
+    "hrdt": {
+        chainId: 31337,
+        creationFee: 0.001
+    }, 
+    "mtr": {
+        chainId: 82,
+        creationFee: 0.001
+    },
 
-    "mtrt":83, 
+    "mtrt": {
+        chainId: 83,
+        creationFee: 0.001
+    }, 
 
-    "aurt": 1313161555
+    "aurt": {
+        chainId: 1313161555,
+        creationFee: 0.001
+    }
     
 };
 
@@ -24,13 +46,14 @@ const supportedChains: ZChainData[] = [];
 function getSupportedChains(){
     if(!supportedChains || supportedChains.length<1){
         for (const iterator in cList) {
-            const chainId = +cList[iterator];
+            const chainId = +cList[iterator].chainId;
             try{
                 const chain: ZChainData = getChain(chainId) as ZChainData;
                 if(chain.name.toLowerCase().indexOf("testnet")>-1){
                     chain.isTestNet=true;
                     chain.chain+="T";
                 }
+                chain.creationFee= cList[iterator].creationFee;
                 supportedChains.push(chain);
             }catch(err){
                 // console.log('cant find chain ',cList[iterator], ' - ', chainId)
@@ -52,7 +75,8 @@ function getSupportedChains(){
             rpc: ["https://rpctest.meter.io"],
             faucets: [],
             infoURL: "",
-            isTestNet: true
+            isTestNet: true,
+            creationFee: 0.001
     
         });
 
@@ -71,7 +95,8 @@ function getSupportedChains(){
             rpc: ["https://rpc.meter.io"],
             faucets: [],
             infoURL: "",
-            isTestNet: false
+            isTestNet: false,
+            creationFee: 5
     
         })
 
@@ -83,19 +108,19 @@ function getSupportedChains(){
     return supportedChains;
 }
 
-export function getSupportedChainById(chainId: number){
+export function getSupportedChainById(chainId: number): ZChainData|undefined{
     if(supportedChains && supportedChains.length>0){
         return supportedChains.filter(f=>f.chainId==chainId)[0];
     }    
-    return null;
+    return undefined;
 }
 
-export function getSupportedChainByChain(chain: string){
+export function getSupportedChainByChain(chain: string): ZChainData|undefined{
     
     if(supportedChains && supportedChains.length>0){
         return supportedChains.filter(f=>f.chain==chain)[0];
     }    
-    return null;
+    return undefined;
 }
 
 

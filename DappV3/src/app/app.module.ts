@@ -52,6 +52,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import Fortmatic from 'fortmatic';
 import { ArchwizardModule } from 'angular-archwizard';
 import { NgxSpinnerModule } from "ngx-spinner";
+import { ToastModule } from '@coreui/angular';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
@@ -95,7 +96,8 @@ const APP_CONTAINERS = [
     CardModule,
     Web3ModalModule,
     ArchwizardModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    ToastModule
     // NgHelmetModule.forRoot({
     //   baseTitle: "| ZSale",
     // }),

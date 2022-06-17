@@ -1,8 +1,68 @@
+<c-toaster class="p-3" position="fixed" [placement]="placement"></c-toaster>
+
+
 <div class="row">
     <div class="col-12">
-        <form [formGroup]="mainFormGroup" class="main-form" novalidate>
+        <form style="display: none;" [formGroup]="testFG" (ngSubmit)="onSubmit(testFG)">
+            <!-- <div>
+                <label>
+                  Name:
+                  <input formControlName="name" placeholder="Your name">
+                </label>
+                <div *ngIf="testFG.get('name').invalid && (testFG.get('name').dirty || testFG.get('name').touched)">
+                  Please provide a name.
+                </div>
+            </div> -->
+
+            <div [cFormFloating]="true" class="my-3" >
+                <input cFormControl id="floatingInput" placeholder="name" formControlName="name" type="text" sizing="sm" />
+                <label cLabel for="floatingInput">NAme</label>
+                
+                <c-form-feedback [valid]="false">
+                    <div *ngIf="testFG.get('name').invalid && (testFG.get('name').dirty || testFG.get('name').touched)">
+                        Please provide a name.
+                      </div>
+                </c-form-feedback>
+
+            </div>
+
+            <div [cFormFloating]="true" class="my-3" >
+                <input cFormControl id="floatingInput" placeholder="Email" formControlName="email" type="text" sizing="sm" />
+                <label cLabel for="floatingInput">Email</label>
+                
+                <c-form-feedback [valid]="false">
+                    <div *ngIf="testFG.get('email').invalid && (testFG.get('email').dirty || testFG.get('email').touched)">
+                        Please provide a valid email address.
+                      </div>
+                </c-form-feedback>
+
+            </div>
+
+              <!-- <div>
+                <label>
+                  Email:
+                  <input formControlName="email" placeholder="Your email">
+                </label>
+                <div *ngIf="testFG.get('email').invalid && (testFG.get('email').dirty || testFG.get('email').touched)">
+                  Please provide a valid email address.
+                </div>
+              </div> -->
+
+              <div>
+                <label>
+                  Message:
+                  <input formControlName="message" placeholder="Your message">
+                </label>
+                <div *ngIf="testFG.get('message').invalid && (testFG.get('message').dirty || testFG.get('message').touched)">
+                  Messages must be at least 15 characters long.
+                </div>
+              </div>
+              <button type="submit" [disabled]="testFG.invalid">Send</button>
+          </form>
+
+        <form [formGroup]="mainFormGroup" class="main-form  was-validated" (ngSubmit)="finishFunction()" novalidate [validated]="true" cForm>
             <aw-wizard  #wizard [navBarLayout]="'large-filled'" [navBarLocation]="'left'">
-                <!-- <aw-wizard-step stepTitle="Token information" [canExit]>
+                <aw-wizard-step stepTitle="Token information" [navigationSymbol]="{ symbol: '1' }" [canExit]>
                     <div formGroupName="tokenInfoFG">
                         <div class="row">
                             <div class="col-12 ">
@@ -97,8 +157,8 @@
                     
                 
                 
-                </aw-wizard-step> -->
-                <aw-wizard-step stepTitle="Campaign Sale Info" [canEnter]="true">
+                </aw-wizard-step>
+                <aw-wizard-step stepTitle="Campaign Sale Info" [canEnter]="true" [navigationSymbol]="{ symbol: '2' }">
                     <div formGroupName="campaignInfoFG">
 
                         <div class="mb-4 ">
@@ -107,9 +167,11 @@
 
                         </div>
 
+                        
+
                         <div class="row">
                             <div class="col-12 ">
-                                <h4 class="text-em">
+                                <h4 class="text-em mb-3" style="font-size: 1.2em;">
                                     Campaign Type
                                 </h4>
                             </div>
@@ -308,6 +370,24 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="row">
+                            <div class="col">
+                                
+
+                                  <label cLabel for="router">DEX Router
+                                    <select id="router" placeholder="Select router" aria-label="Router" formControlName="router" cSelect  sizing="lg">
+                                        <option value="">Select DEX Router</option>
+                                        <option *ngFor='let rtr of routers' [value]="rtr.address">
+                                            {{rtr.name}}
+                                        </option>
+                                        <!-- <option value="1">Pancakeswap</option>
+                                        <option value="2">Bakery Swap</option> -->
+                                      </select>
+                                  </label>
+                                  
+                            </div>
+                        </div>
                         
                         <div class="row">
                             <div class="col-6">
@@ -330,7 +410,7 @@
 
                             <div class="col-6">
                                 <div [cFormFloating]="true" class="my-3" >
-                                    <input cFormControl id="floatingInput" [dpDayPicker]="datePickerConfig"  placeholder="" formControlName="endDate" type="number" sizing="sm"  mode="daytime" />
+                                    <input cFormControl id="floatingInput" [dpDayPicker]="datePickerConfig"  placeholder="" formControlName="endDate" type="text" sizing="sm"  mode="daytime" />
                                     <label cLabel for="floatingInput">End Date</label>
                                     
                                     <div cFormText class="mt-2">
@@ -362,8 +442,7 @@
                                             
                                             <div *ngFor="let _ of tokenVestings.controls; index as i">
                                                 <ng-container [formGroupName]="i">
-                                                  <!-- <input formControlName="amount" />
-                                                  <input formControlName="releaseDate" /> -->
+                                                  
 
                                                   <div class="row {{i%2==0?'striped-vest':''}}">
                                                     <div class="col-5">
@@ -414,7 +493,7 @@
                                             <div style="color:red">
                                                 
                                                 <label *ngIf="tokenVestings?.errors?.nequal100" class="error">
-                                                    All Token Amount must sum upto 100%.
+                                                    * All Token Amount must sum upto 100%.
                                                 </label>
                                                 
                                             </div>
@@ -422,14 +501,26 @@
                                     </div>
 
                                     <div class="col-12 d-flex align-items-end justify-content-end mt-3">
-                                        <button class="btn btn-primary" (click)="addVestingSchedule()">Add Another Lock Schedule</button>
+                                        <button [disabled]="tokenVestings.controls.length >= 8" class="btn btn-primary" (click)="addVestingSchedule()">Add Another Lock Schedule</button>
                                     </div>
                                 </div>
 
                             </div>
                         </div>
                         
-                        
+                        <div class="mt-4">
+                            <div style="color:red">
+                                                
+                                <label *ngIf="campaignInfoFG?.errors?.hardCapInvalid" class="error">
+                                    * Hard Cap cannot be lesser than Soft Cap or greater than 4x Soft Cap.
+                                </label>
+
+                                <label *ngIf="campaignInfoFG?.errors?.endDateLater" class="error">
+                                    * End date cannot be earlier than Start Date.
+                                </label>
+                                
+                            </div>
+                        </div>
             
                         <div class="row mt-4">
                             <div class="col d-flex align-items-center justify-content-end">
@@ -448,16 +539,520 @@
                     </div>
                 
                 </aw-wizard-step>
-                <aw-wizard-step stepTitle="Founders information" [navigationSymbol]="{ symbol: '2' }">
-                Content of Step 3
-                <button type="button" class="me-1 btn btn-secondary" awPreviousStep>Back</button>
-                <button type="button" class="me-1 btn btn-primary" awNextStep>Preview</button>
+                <aw-wizard-step stepTitle="Team information" [navigationSymbol]="{ symbol: '3' }">
+                    <div formGroupName="teamInfoFG">
+
+                        <div class="mb-4 ">
+                            <h3>Team Info</h3>
+
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <!-- <input cFormControl id="floatingInput" placeholder="" formControlName="desc" type="text" sizing="sm" /> -->
+
+                                    <textarea cFormControl style="height: 100px;" rows="4" id="desc" placeholder="" formControlName="desc" type="text" sizing="lg" ></textarea>
+                                    <label cLabel for="desc">Token Description</label>
+                                    
+                                    <div cFormText class="mt-2" >
+                                        
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(teamInfoFG.get('desc')?.errors)">                                        
+                                        {{validationMessages.desc[error]??''}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6" >
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="tokenLogo" placeholder="" formControlName="tokenLogo" type="url" sizing="sm" />
+                                    <label cLabel for="tokenLogo">Token Logo</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        Public Url of your token logo. 
+                                        Accepted files : 'Jpeg( *.jpg,*.jpeg)/PNG (*.png)'
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(teamInfoFG.get('tokenLogo')?.errors)">                                        
+                                        {{validationMessages.tokenLogo[error]}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="website" placeholder="" formControlName="website" type="url" sizing="sm" />
+                                    <label cLabel for="website">Website Url</label>
+                                    
+                                    <div cFormText class="mt-2" >
+                                        
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(teamInfoFG.get('website')?.errors)">                                        
+                                        {{validationMessages.website[error]??''}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input  cFormControl id="twitter" placeholder="" formControlName="twitter" type="url" sizing="sm" />
+                                    <label cLabel for="twitter">Twitter Handle</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(teamInfoFG.get('twitter')?.errors)">                                        
+                                        {{validationMessages.twitter[error]??''}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="telegram" placeholder="" formControlName="telegram" type="url" sizing="sm" />
+                                    <label cLabel for="telegram">Telegram Group</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(teamInfoFG.get('telegram')?.errors)">                                        
+                                        {{validationMessages.telegram[error]??''}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="reddit" placeholder="" formControlName="reddit" type="url" sizing="sm" />
+                                    <label cLabel for="reddit">Reddit</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(teamInfoFG.get('reddit')?.errors)">                                        
+                                        {{validationMessages.reddit[error]}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div> -->
+
+                            <div class="col">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input cFormControl id="discord" placeholder="" formControlName="discord" type="url" sizing="sm" />
+                                    <label cLabel for="discord">Discord</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(teamInfoFG.get('discord')?.errors)">                                        
+                                        {{validationMessages.discord[error]}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+                        </div>
+                           
+                       
+                                              
+            
+                        <div class="row mt-4">
+                            <div class="col d-flex align-items-center justify-content-end">
+                                
+                                <button type="button" class="me-1 btn btn-secondary" awPreviousStep>Back</button>
+                
+
+                                <button type="button"  class="me-1 btn btn-primary" [disabled]="teamInfoFG.invalid" awNextStep>
+                                    Preview
+                                </button>
+
+                            </div>
+                        </div>
+            
+                        
+                    </div>
                 </aw-wizard-step>
         
                 <aw-wizard-step stepTitle="Preview">
-                    Content of Preview
-                    <button type="button" class="me-1 btn btn-secondary" awPreviousStep>Back</button>
-                    <button type="button" class="me-1 btn btn-success" (click)="finishFunction()">Finish</button>
+                    									
+                    <div >
+
+                        <div [cFormFloating]="true" class="my-3" >
+                            <input readonly cFormControl id="floatingInputTCA" placeholder="e.g. 0x3a233.." value="{{tokenInfoFG.get(tokenAddress)?.value}}" type="text" sizing="sm" />
+                            <label cLabel for="floatingInputTCA">Token Contract Address</label>
+                            <div *ngIf="tokenDetails" cFormText class="mt-3">
+                                <b>Token Details</b>
+                                <dl >
+                                    <dt>Name</dt>
+                                    <dd>{{tokenDetails.name}}</dd>
+                    
+                                    <dt>Symbol</dt>
+                                    <dd>{{tokenDetails.symbol}}</dd>
+                    
+                                    <dt>Decimals</dt>
+                                    <dd>{{tokenDetails.decimals}}</dd>
+                                </dl>
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="my-4 ">
+                            <h3>Campaign Info</h3>
+
+
+                        </div>
+
+                        
+
+                        <div class="row">
+                            <div class="col-12 ">
+                                <h4 class="text-em mb-3" style="font-size: 1.2em;">
+                                    Campaign Type : <small>{{campaignInfoFG.get('campaignType')?.value == 'capped'? 'Capped': 'Fair Launch' }}</small>
+                                </h4>
+                            </div>
+                            
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6" *ngIf="mainFormGroup.get('campaignInfoFG.campaignType').value === 'capped'">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="softCap" placeholder="Soft Cap" value="{{campaignInfoFG.get('softCap')?.value}}" type="number" sizing="sm" />
+                                    <label cLabel for="softCap">Soft Cap ({{nativeCoin??'Coin'}})</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        If the Soft Cap is not met, Funds will be returned to Participants
+                                    </div>
+
+                                    <c-form-feedback [valid]="false">
+                                        <span *ngFor="let error of  objectKeys(campaignInfoFG.get('softCap')?.errors)">                                        
+                                        {{validationMessages.softCap[error]}}
+                                        </span>
+                                    </c-form-feedback>
+
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="floatingInput" placeholder="Hard Cap" value="{{campaignInfoFG.get('hardCap')?.value}}" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">Hard Cap ({{nativeCoin??'Coin'}})</label>
+                                    
+                                    <div cFormText class="mt-2" *ngIf="mainFormGroup.get('campaignInfoFG.campaignType').value === 'capped'">
+                                        Hard Cap must be at least 2 times the Soft Cap and can not be greater than x4 of Soft Cap
+                                    </div>
+
+                                  
+
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="floatingInput" placeholder="How many Tokens will 1 {{nativeCoin??'Coin'}} get you?" value="{{campaignInfoFG.get('presaleRate')?.value}}" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">Presale Rate</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        How many Tokens will 1 {{nativeCoin??'Coin'}} get you?
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="floatingInput" placeholder="How many Tokens will 1 {{nativeCoin??'Coin'}} get you?" value="{{campaignInfoFG.get('dexRate')?.value}}" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">DEX Listing Rate</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        How many Tokens will 1 {{nativeCoin??'Coin'}} get you on DEX?
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="floatingInput" placeholder="Minimum Order ({{nativeCoin}} )" value="{{campaignInfoFG.get('minBuy')?.value}}" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">Minimum Order ({{nativeCoin}} )</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        Minimum {{nativeCoin??'Coin'}} a buyer can order
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="floatingInput" placeholder="Maximum Order ({{nativeCoin}} )" value="{{campaignInfoFG.get('maxBuy')?.value}}" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">Maximum Order ({{nativeCoin}} )</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        Maximum {{nativeCoin??'Coin'}} a buyer can order
+                                    </div>
+
+                                    
+
+                                </div>
+                            </div>
+                        </div>
+                           
+                        <div class="row">
+                            
+
+                            <div class="col">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="floatingInput" placeholder="Liquidity (%)" value="{{campaignInfoFG.get('liquidity')?.value}}" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">Liquidity (%)</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        Must be > 50%
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="floatingInput" placeholder="Liquidity Lockup(Days)" value="{{campaignInfoFG.get('liquidityLockupDays')?.value}}" type="number" sizing="sm" />
+                                    <label cLabel for="floatingInput">Liquidity Lockup(Days)</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        Must be > 30 Days
+                                    </div>
+
+                                   
+
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="floatingInput"   placeholder="" value="{{campaignInfoFG.get('startDate')?.value}}"  sizing="sm" mode="daytime" />
+                                    <label cLabel for="floatingInput">Start Date</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="floatingInput"  placeholder="" value="{{campaignInfoFG.get('endDate')?.value}}" type="number" sizing="sm"  mode="daytime" />
+                                    <label cLabel for="floatingInput">End Date</label>
+                            
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <strong>Token Vesting </strong>
+                            </div>
+                            <div class="card-body">
+                                <c-form-check [switch]="true">
+                                    <input cFormCheckInput checked type="checkbox" *ngIf="campaignInfoFG.get('useTokenVesting')?.value" />
+							<input cFormCheckInput  type="checkbox" *ngIf="!campaignInfoFG.get('useTokenVesting')?.value" />		
+                                    <label cFormCheckLabel>Use Token Vesting</label>
+                                </c-form-check>
+                                <div class="row mt-3" *ngIf="mainFormGroup.get('campaignInfoFG.useTokenVesting').value === true">
+                                    <div class="col">
+                                        <!--<ng-container >-->
+                                            
+                                            <div *ngFor="let _ of tokenVestings.controls; index as i">
+                                                <!--<ng-container >-->
+                                                  
+
+                                                  <div class="row {{i%2==0?'striped-vest':''}}">
+                                                    <div class="col-5">
+                                                        <div [cFormFloating]="true" class="my-3" >
+                                                            <input readonly cFormControl id="floatingInput" placeholder="" value="{{tokenVestings.controls[i].get('amount')?.value}}"  sizing="sm"  />
+                                                            <label cLabel for="floatingInput">Amount(%)</label>
+                                                            
+                        
+                                                        </div>
+                                                    </div>
+                        
+                                                    <div class="col-5">
+                                                        <div [cFormFloating]="true" class="my-3" >
+                                                            <input readonly cFormControl id="floatingInput"   placeholder="" value="{{campaignInfoFG.get('releaseDate')?.value}}" type="number" sizing="sm"  />
+                                                            <label cLabel for="floatingInput">Lock duration (Days)</label>
+                                                            
+                        
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--</ng-container>-->
+                                            </div>
+
+                                        <!--</ng-container>-->
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+
+
+                        <div class="my-4 ">
+                            <h3>Team Info</h3>
+                    
+                    
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    
+                                    <textarea readonly cFormControl style="height: 100px;" rows="4" id="desc" placeholder="" value="{{teamInfoFG.get('desc')?.value}}" type="text" sizing="lg" ></textarea>
+                                    <label cLabel for="desc">Token Description</label>
+                                    
+                                    
+                    
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col-6" >
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="tokenLogo" placeholder="" value="{{teamInfoFG.get('tokenLogo')?.value}}" type="url" sizing="sm" />
+                                    <label cLabel for="tokenLogo">Token Logo</label>
+                                    
+                                    <div cFormText class="mt-2">
+                                        Public Url of your token logo. 
+                                        Accepted files : 'Jpeg( *.jpg,*.jpeg)/PNG (*.png)'
+                                    </div>
+                    
+                                    
+                    
+                                </div>
+                            </div>
+                    
+                            <div class="col">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="website" placeholder="" value="{{teamInfoFG.get('website')?.value}}" type="url" sizing="sm" />
+                                    <label cLabel for="website">Website Url</label>
+                                    
+                                    
+                    
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="twitter" placeholder="" value="{{teamInfoFG.get('twitter')?.value}}" type="url" sizing="sm" />
+                                    <label cLabel for="twitter">Twitter Handle</label>
+                                    
+                                    
+                    
+                                </div>
+                            </div>
+                    
+                            <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="telegram" placeholder="" value="{{teamInfoFG.get('telegram')?.value}}" type="url" sizing="sm" />
+                                    <label cLabel for="telegram">Telegram Group</label>
+                                    
+                                    
+                    
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="row">
+                            <!-- <div class="col-6">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="reddit" placeholder="" value="{{teamInfoFG.get('reddit')?.value}}" type="url" sizing="sm" />
+                                    <label cLabel for="reddit">Reddit</label>
+                                    
+                                    
+                                </div>
+                            </div> -->
+                    
+                            <div class="col">
+                                <div [cFormFloating]="true" class="my-3" >
+                                    <input readonly cFormControl id="discord" placeholder="" value="{{teamInfoFG.get('discord')?.value}}" type="url" sizing="sm" />
+                                    <label cLabel for="discord">Discord</label>
+                                    
+                                    
+                    
+                                </div>
+                            </div>
+                        </div>
+                           
+                       
+                                              
+                    
+                        
+
+                        
+                    </div>
+                   
+
+                    <div class="row mt-4">
+                        <div class="col d-flex align-items-center justify-content-end">
+                            
+                            <button type="button" class="me-1 btn btn-secondary" awPreviousStep>Back</button>
+                
+                
+                            <button type="submit"  class="me-1 btn btn-success" (click)="finishFunction()"  >
+                                Confirm
+                            </button>
+                
+                        </div>
+                    </div>
                 </aw-wizard-step>
             </aw-wizard>
         

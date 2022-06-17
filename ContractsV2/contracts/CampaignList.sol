@@ -67,7 +67,7 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
     // }
 
     function createNewCampaign(address _tokenAddress,
-    uint256[9] memory capAndDate,  
+    uint256[10] memory capAndDate,  
      Campaign.RefundType _refundType, address _dexRouterAddress,uint[4] memory liquidityAllocationAndRates,
      string[6] memory founderInfo,
       VestSchedule[8] memory teamTokenVestingDetails, 
@@ -86,7 +86,7 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
         
         {     
             _counter.increment(); 
-            capAndDate[8] = _counter.current();
+            capAndDate[9] = _counter.current();
             Campaign cmpgn = new Campaign( msg.sender, address(this) , _tokenAddress, capAndDate,    _refundType, _dexRouterAddress,liquidityAllocationAndRates, teamTokenVestingDetails, raisedFundVestingDetails,founderInfo, _dexLockerFactory
             );
                        

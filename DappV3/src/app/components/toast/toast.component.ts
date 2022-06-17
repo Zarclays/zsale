@@ -2,17 +2,23 @@ import { ChangeDetectorRef, Component, ElementRef, forwardRef, Input, Renderer2 
 
 import { ToastComponent, ToasterService } from '@coreui/angular';
 
+
 @Component({
-  selector: 'app-toast-simple',
+  selector: 'app-toast-sample',
   templateUrl: './toast.component.html',
   styleUrls: ['./toast.component.scss'],
   providers: [{ provide: ToastComponent, useExisting: forwardRef(() => AppToastComponent) }]
 })
+// @ts-ignore
 export class AppToastComponent extends ToastComponent {
 
+  // @ts-ignore
   @Input() closeButton = true;
-  @Input() title = '';
-  @Input() body = '';
+  // @ts-ignore
+  @Input() title: any = '';
+
+  // @ts-ignore
+  @Input() body: any = ''; 
 
   constructor(
     public override hostElement: ElementRef,

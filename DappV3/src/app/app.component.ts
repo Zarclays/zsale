@@ -6,6 +6,9 @@ import { iconSubset } from './icons/icon-subset';
 import { Title } from '@angular/platform-browser';
 import { Web3Service } from './services/web3.service';
 
+
+
+
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'body',
