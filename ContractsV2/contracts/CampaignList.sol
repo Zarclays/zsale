@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+// import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "./Campaign.sol";
@@ -17,7 +17,7 @@ import "hardhat/console.sol";
 
 
 
-contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
+contract CampaignList is Context,Ownable  {
     using SafeERC20 for IERC20;
   // Add the library methods
     using EnumerableMap for EnumerableMap.UintToAddressMap;
