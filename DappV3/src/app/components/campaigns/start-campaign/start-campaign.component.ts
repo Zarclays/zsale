@@ -456,6 +456,10 @@ export class StartCampaignComponent implements OnInit {
         {releaseDate: nowTimeStamp,releaseAmount: 0,hasBeenClaimed: false},
         {releaseDate: nowTimeStamp,releaseAmount: 0,hasBeenClaimed: false}
       ],
+      [
+        this.mainFormGroup.get('campaignInfoFG.useTokenVesting')?.value === true,
+        this.mainFormGroup.get('campaignInfoFG.useRaisedFundsVesting')?.value === true
+      ],
 
       {
         value: utils.parseEther(currentChain.creationFee.toString())

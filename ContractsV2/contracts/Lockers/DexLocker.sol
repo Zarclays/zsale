@@ -14,11 +14,6 @@ import "./LiquidityLocker.sol";
 // locks liquidity for LP tokens and handles team vseting
 contract DexLocker{
 
-    // using SafeERC20 for IERC20;
-    // using SafeMath for uint256;
-
-    
-
      // timestamp when token release is enabled
     uint256 private _lpReleaseTime;
 
@@ -42,29 +37,7 @@ contract DexLocker{
     CoinLocker private _coinLocker;
     LiquidityLocker private _liquidityLocker;
 
-
-    // /**
-    // Total team vesting tokens
-
-    // firstTokenReleasetime
-    // firstTokenReleasePercent
-    // vestingPeriod (in days)
-    // vestingPercent
-    //  */
-    // uint256[8] private _teamTokenVestingDetails; 
-
-    // /**
-    // Total vesting tokens
-
-    // firstCoinReleasetime
-    // firstCoinReleasePercent
-    // CoinvestingPeriod (in days)
-    // CoinvestingPercent
-    //  */
-    // uint256[8] private _raisedFundVestingDetails; 
-
-
-    constructor(address dexRouterAddress, address token,address deployer,address owner)  {
+    constructor(address dexRouterAddress, address token,address deployer,address owner )  {
         _dexRouter = IDexRouter(dexRouterAddress);
         _deployer = deployer; //msg.sender;
         
@@ -73,31 +46,40 @@ contract DexLocker{
     }
 
     
-    function setupLock(uint256 lpReleaseTime,  uint256 dexListPrice, VestSchedule[8] memory teamTokenVestingDetails, VestSchedule[8] memory raisedFundVestingDetails) public {
+    function setupLock(uint liquidityPercentOfRaisedFunds,uint maxRaisedFunds, uint256 lpReleaseTime,  uint256 dexListPrice, bool useTeamTokenVesting, VestSchedule[8] memory teamTokenVestingDetails, bool useRaisedFundsVesting, VestSchedule[8] memory raisedFundVestingDetails) public {
         require(msg.sender == _deployer, "DexLocker: Only Deployer is allowed ");
 
         require(lpReleaseTime > block.timestamp, "DexLocker: release time is before current time");
-        require(teamTokenVestingDetails.length == 8, "DEXLocker: TeamTokenVestingDetails length must be 8" );
-        require(raisedFundVestingDetails.length == 8, "DEXLocker: RaisedFundDetails length must be 8" );
+        // require(teamTokenVestingDetails.length == 8, "DEXLocker: TeamTokenVestingDetails length must be 8" );
+        // require(raisedFundVestingDetails.length == 8, "DEXLocker: RaisedFundDetails length must be 8" );
 
         _lpReleaseTime = lpReleaseTime;
         _dexListPrice = dexListPrice;
 
         // _teamTokenVestingDetails=teamTokenVestingDetails; 
 
-        // _raisedFundVestingDetails=raisedFundVestingDetails;
-
-        _liquidityLocker = new LiquidityLocker(address(_dexRouter),_token, _owner, dexListPrice, lpReleaseTime);
-        //IERC20 token, address owner, uint256 price, uint256 totalVestingTokens, uint256 firstTokenReleasetime,uint256 firstTokenReleasePercent,uint256 vestingPeriod,uint256 vestingPercent
-        _tokenLocker = new TokenLocker(_token, _owner,teamTokenVestingDetails );
-        
         totalTokensExpectedToBeLocked = 0;
+        
+        _liquidityLocker = new LiquidityLocker(address(_dexRouter),_token, _owner, dexListPrice, lpReleaseTime, liquidityPercentOfRaisedFunds, maxRaisedFunds);
+
+        totalTokensExpectedToBeLocked = _liquidityLocker.totalTokensExpected();
+
+        if(useTeamTokenVesting){
+            
+             _tokenLocker = new TokenLocker(_token, _owner,teamTokenVestingDetails );
+        }
+       
+        
+        
         for (uint8 i=0; i < 8 /*100%*/; i++) {
             totalTokensExpectedToBeLocked += teamTokenVestingDetails[i].releaseAmount; 
         }
 
-
-        _coinLocker = new CoinLocker(_owner,raisedFundVestingDetails );
+        if(useRaisedFundsVesting){
+            
+            _coinLocker = new CoinLocker(_owner,raisedFundVestingDetails );
+        }
+        
     }
 
     receive() external payable {

@@ -46,32 +46,13 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
         campaignCreationPrice=newPrice;
     }
 
-    
-    // function createNewCampaign(address _tokenAddress, address _campaignAddress) public payable  {
-
-    //     require(msg.value >= campaignCreationPrice, 'CampaignFactory: Requires CampaignCreation Price' );
-        
-                
-    //     {
-            
-    //         _counter.increment();            
-    //         _campaigns.set(_counter.current(), _campaignAddress);
-
-    //         //avoid stack too deep
-    //         {
-    //             ownersCampaign[msg.sender].push( _counter.current());        
-    //             _tokenCampaigns[_tokenAddress]= payable(_campaignAddress);
-    //             emit CampaignCreated(msg.sender, _counter.current(),_campaignAddress);
-    //         }
-    //     }
-    // }
-
     function createNewCampaign(address _tokenAddress,
     uint256[10] memory capAndDate,  
      Campaign.RefundType _refundType, address _dexRouterAddress,uint[4] memory liquidityAllocationAndRates,
      string[6] memory founderInfo,
       VestSchedule[8] memory teamTokenVestingDetails, 
-      VestSchedule[8] memory raisedFundVestingDetails
+      VestSchedule[8] memory raisedFundVestingDetails,
+      bool[2] memory _useTokenOrRaisedFundsVesting
       
     ) public payable  {
 
@@ -87,7 +68,7 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
         {     
             _counter.increment(); 
             capAndDate[9] = _counter.current();
-            Campaign cmpgn = new Campaign( msg.sender, address(this) , _tokenAddress, capAndDate,    _refundType, _dexRouterAddress,liquidityAllocationAndRates, teamTokenVestingDetails, raisedFundVestingDetails,founderInfo, _dexLockerFactory
+            Campaign cmpgn = new Campaign( [msg.sender, address(this) , _tokenAddress], capAndDate,    _refundType, _dexRouterAddress,liquidityAllocationAndRates, teamTokenVestingDetails, raisedFundVestingDetails,founderInfo, _dexLockerFactory, _useTokenOrRaisedFundsVesting
             );
                        
             _campaigns.set(_counter.current(), address( cmpgn));
@@ -97,19 +78,6 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
         }
     }
 
-
-    // function getCampaigns(uint start, uint end) public view returns(address[] memory ){ //paged lists - end is exclusive
-    //     uint256 count = getWhitelistCount();
-    //     if(count<end){
-    //         end= count;
-    //     }
-    //     address[] memory list = new address[](end - start);        
-        
-    //     for (uint i = start; i < end; i++) {
-    //         list[i] = addresses[i];
-    //     }
-    //     return list;
-    // }
 
     function hasExistingCampaign(address _tokenAddress) external view returns (bool){
         return _tokenCampaigns[_tokenAddress] != address(0);

@@ -101,12 +101,13 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   uint public totalUserInTierOne;
   uint public totalUserInTierTwo;
   
-  
+  bool public useTokenVesting;
+  bool public raisedFundsVesting;
 
     //Tier 1 - holders of our coin
     //Tier 2 - Whitelisted or public
-  uint public _minAllocationPerUser;  
-
+   
+  uint public minAllocationPerUser;
   //max allocations per user in a tier
   uint public maxAllocationPerUserTierOne;
   uint public maxAllocationPerUserTierTwo; 
@@ -134,10 +135,10 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   
   constructor(
     
-    address campaignOwner,
-    address campaignFactory,
-    address  _tokenAddress,
-     
+    // address campaignOwner,
+    // address campaignFactory,
+    // address  _tokenAddress,
+    address[3] memory addresses,
     uint256[10] memory capAndDate,  // uint256 _softCap,uint256 _hardCap,uint256 _saleStartTime,uint256 _saleEndTime, uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo ,uint _campaignKey,
     
     RefundType _refundType, 
@@ -150,11 +151,12 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     VestSchedule[8] memory teamTokenVestingDetails, 
     VestSchedule[8] memory raisedFundVestingDetails,
     string[6] memory founderInfo,
-    DexLockerFactory dexLockerFactory
+    DexLockerFactory dexLockerFactory,
+    bool[2] memory _useTokenOrRaisedFundVesting
     
   ) payable  {
       campaignKey=capAndDate[8];
-      _campaignFactory= campaignFactory;
+      _campaignFactory= addresses[1];
       _dexLockerFactory=dexLockerFactory;
       
       // require(releaseTime > block.timestamp, "CAMPAIGN: release time above current time");
@@ -166,7 +168,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
       {
         
         // saleInfo= CampaignSaleInfo();
-        saleInfo.tokenAddress=_tokenAddress;
+        saleInfo.tokenAddress=addresses[2];
         saleInfo.softCap=capAndDate[0];
         saleInfo.hardCap=capAndDate[1];
         if(capAndDate[2] <= block.timestamp){
@@ -191,25 +193,35 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
       
       _updateTierDetails (capAndDate[4], capAndDate[5], capAndDate[6],capAndDate[7], capAndDate[8]);
 
-      transferOwnership(campaignOwner);
+      transferOwnership(addresses[0]);
 
-      updateLockDetails(liquidityAllocationAndRates[1], teamTokenVestingDetails, raisedFundVestingDetails );
+      updateLockDetails(liquidityAllocationAndRates[1], _useTokenOrRaisedFundVesting[0], teamTokenVestingDetails,_useTokenOrRaisedFundVesting[1], raisedFundVestingDetails );
   }
 
   // function to update other details not initialized in constructor - this is bcos solidity limits how many variables u can pass in at once
   function updateLockDetails(uint liquidityReleaseTimeDays, //Time to add to startTime in days
-    VestSchedule[8] memory teamTokenVestingDetails, 
+    bool _useTokenVesting,
+    VestSchedule[8] memory teamTokenVestingDetails,
+    bool _raisedFundsVesting, 
     VestSchedule[8] memory raisedFundVestingDetails
   ) private /*public onlyOwner*/ {
     liquidityReleaseTime  = saleInfo.saleEndTime + (liquidityReleaseTimeDays * 1 days);
-   
+    useTokenVesting=_useTokenVesting;
+    raisedFundsVesting=_raisedFundsVesting;
     //Set dexLock
     DexLocker dexLocker =_dexLockerFactory.createDexLocker(dexRouterAddress,saleInfo.tokenAddress,address(this), msg.sender);
-    //DexLocker dexLocker = new DexLocker(dexRouterAddress,saleInfo.tokenAddress, msg.sender);
-    dexLocker.setupLock( liquidityReleaseTime,  saleInfo.dexListRate, teamTokenVestingDetails, raisedFundVestingDetails);
+    
+
+    dexLocker.setupLock(saleInfo.liquidityPercent,saleInfo.hardCap, liquidityReleaseTime,  saleInfo.dexListRate,useTokenVesting, teamTokenVestingDetails, raisedFundsVesting,  raisedFundVestingDetails);
+
     _dexLockerAddress= payable(dexLocker);
 
     status = CampaignStatus.CREATED;
+
+    //if doesnt use tokenvesting , _startReceivingBids();
+    if(!useTokenVesting){
+      _startReceivingBids();
+    }
 
   }
 
@@ -252,11 +264,17 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     _updateTierDetails(_tierOneHardCap, _tierTwoHardCap, _minAllocationPerUser, _maxAllocationPerUserTierOne, _maxAllocationPerUserTierTwo);    
   }
 
+  function _startReceivingBids() private 
+  {
+    
+    status = CampaignStatus.TOKENS_SUBMITTED;
+  }
+
   function startReceivingBids() public 
   {
     //can only be called by _campaignFactory
     require(_campaignFactory== _msgSender(), 'CAMPAIGNList: startReceivingBids - Not Owner');
-    status = CampaignStatus.TOKENS_SUBMITTED;
+    _startReceivingBids();
   }
 
 

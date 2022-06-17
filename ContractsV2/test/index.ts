@@ -59,6 +59,7 @@ describe("CampaignList", function () {
           Math.floor(thirtyDaysLater/1000), 
           ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
           ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
+          ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
           ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei'),
           ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei'),
           '0'
@@ -88,6 +89,7 @@ describe("CampaignList", function () {
           {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
           {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false}
         ], 
+        [true,true],
           
           {  
             value: ethers.utils.parseEther("0.0001") 
@@ -140,10 +142,14 @@ describe("CampaignList", function () {
       let createError;
       try{
         const createCampaignTx = await campaignFactory.createNewCampaign(token.address,
-        [ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),ethers.utils.formatUnits( ethers.utils.parseEther("0.2"), 'wei'), twoHoursTime, fourHoursLater, ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
+        [ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),ethers.utils.formatUnits( ethers.utils.parseEther("0.2"), 'wei'), twoHoursTime, fourHoursLater, 
+        
+        ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
+          ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
           ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
           ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei'),
-          ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei')
+          ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei'),
+          '0'
         ] 
           ,0,router,[6000,30, 1000,800],
           [
@@ -166,6 +172,8 @@ describe("CampaignList", function () {
           {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
           {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false}
         ], 
+
+        [true,false],
           
           {  
             value: ethers.utils.parseEther("1.0") 
