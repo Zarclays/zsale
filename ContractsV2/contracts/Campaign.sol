@@ -135,25 +135,32 @@ contract Campaign is Context,Ownable, ReentrancyGuard, Initializable {
   address payable private _dexLockerAddress;
   
 
-  function initialize(// address campaignOwner,
-    // address campaignFactory,
-    // address  _tokenAddress,
+  function initialize(
+    
+    /** address campaignOwner,
+    /* address campaignFactory,
+    /* address  _tokenAddress */
     address[3] memory addresses,
-    uint256[10] memory capAndDate,  // uint256 _softCap,uint256 _hardCap,uint256 _saleStartTime,uint256 _saleEndTime, uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo ,uint _campaignKey,
+
+    /** uint256 _softCap,uint256 _hardCap,uint256 _saleStartTime,uint256 _saleEndTime, uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo ,uint _campaignKey,*/
+    uint256[10] memory capAndDate,  
     
     RefundType _refundType, 
     address _dexRouterAddress,
-    // uint _liquidityPercent, 
-    // uint liquidityReleaseTime,
-    // uint _listRate, 
-    // uint _dexListRate,
+
+    /**uint _liquidityPercent, 
+    /* uint liquidityReleaseTime,
+    /* uint _listRate, 
+    /* uint _dexListRate,**/
     uint[4] memory liquidityAllocationAndRates,
+    
+    bool[2] memory _useTokenOrRaisedFundVesting,
     VestSchedule[8] memory teamTokenVestingDetails, 
-    uint256[4] memory raisedFundVestingDetails,
+    uint256[3] memory raisedFundVestingDetails,
     string[6] memory founderInfo,
-    DexLockerFactory dexLockerFactory,
-    bool[2] memory _useTokenOrRaisedFundVesting ) public payable initializer {
-      campaignKey=capAndDate[8];
+    DexLockerFactory dexLockerFactory 
+  ) public payable initializer {
+      campaignKey=capAndDate[9];
       _campaignFactory= addresses[1];
       _dexLockerFactory=dexLockerFactory;
       
@@ -633,7 +640,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard, Initializable {
       _token.safeTransfer(_dexLockerAddress, liquidityAmount * saleInfo.dexListRate );
 
       DexLocker locker = DexLocker(_dexLockerAddress);    
-      if(){
+      if(useRaisedFundsVesting){
         locker.startRaisedFundsLock( totalCoinReceived );
       }
       locker.addLiquidity();

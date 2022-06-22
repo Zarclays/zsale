@@ -73,20 +73,13 @@ contract CampaignList is Context,Ownable  {
             capAndDate[9] = _counter.current();
 
             address payable newCampaignCloneAddress = payable(Clones.clone(_campaignImplementationAddress) );
-            Campaign(newCampaignCloneAddress).initialize([msg.sender, address(this) , _tokenAddress], capAndDate,    _refundType, _dexRouterAddress,liquidityAllocationAndRates, teamTokenVestingDetails, raisedFundVestingDetails,founderInfo, _dexLockerFactory, _useTokenOrRaisedFundsVesting);
+            Campaign(newCampaignCloneAddress).initialize([msg.sender, address(this) , _tokenAddress], capAndDate,    _refundType, _dexRouterAddress,liquidityAllocationAndRates, _useTokenOrRaisedFundsVesting, teamTokenVestingDetails, raisedFundVestingDetails,founderInfo, _dexLockerFactory);
 
              _campaigns.set(_counter.current(), newCampaignCloneAddress);
             ownersCampaign[msg.sender].push( _counter.current());        
             _tokenCampaigns[_tokenAddress]= payable(newCampaignCloneAddress);
             emit CampaignCreated(msg.sender, _counter.current(),newCampaignCloneAddress);
 
-            // Campaign cmpgn = new Campaign( [msg.sender, address(this) , _tokenAddress], capAndDate,    _refundType, _dexRouterAddress,liquidityAllocationAndRates, teamTokenVestingDetails, raisedFundVestingDetails,founderInfo, _dexLockerFactory, _useTokenOrRaisedFundsVesting
-            // );
-                       
-            // _campaigns.set(_counter.current(), address( cmpgn));
-            // ownersCampaign[msg.sender].push( _counter.current());        
-            // _tokenCampaigns[_tokenAddress]= payable(address( cmpgn));
-            // emit CampaignCreated(msg.sender, _counter.current(),address( cmpgn));
         }
     }
 
@@ -94,8 +87,14 @@ contract CampaignList is Context,Ownable  {
     function hasExistingCampaign(address _tokenAddress) external view returns (bool){
         return _tokenCampaigns[_tokenAddress] != address(0);
     }
+
+    //offset 
     function allOwnersCampaigns(uint256 limit, uint256 offset) public view returns (uint256[] memory) {
-        return ownersCampaign[msg.sender];
+        uint256[] memory list = new uint256[](offset) ;
+        for (uint256 i=limit; i < limit + offset ; i++) {
+            list[i-limit] = ownersCampaign[msg.sender][i]; 
+        }
+        return list;
     }
 
     
