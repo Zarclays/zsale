@@ -8,16 +8,17 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+// import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "./Campaign.sol";
 import './Lockers/DexLockerFactory.sol';
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/proxy/Clones.sol";
 
 
 
-contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
+contract CampaignList is Context,Ownable  {
     using SafeERC20 for IERC20;
   // Add the library methods
     using EnumerableMap for EnumerableMap.UintToAddressMap;
@@ -37,9 +38,12 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
     event CampaignCreated(address indexed creator,uint256 indexed index, address createdCampaignAddress);
     
     uint public campaignCreationPrice = 0.00001 ether; 
+    
+    address  _campaignImplementationAddress;
 
-    constructor(DexLockerFactory dexLockerFactory)  {      
+    constructor(DexLockerFactory dexLockerFactory, address campaignImplementationAddress)  {      
        _dexLockerFactory=dexLockerFactory;
+       _campaignImplementationAddress = campaignImplementationAddress;
     }
 
     function setCampaignCreationPrice(uint256 newPrice) public onlyOwner{
@@ -48,12 +52,11 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
 
     function createNewCampaign(address _tokenAddress,
     uint256[10] memory capAndDate,  
-     Campaign.RefundType _refundType, address _dexRouterAddress,uint[4] memory liquidityAllocationAndRates,
-     string[6] memory founderInfo,
-      VestSchedule[8] memory teamTokenVestingDetails, 
-      VestSchedule[8] memory raisedFundVestingDetails,
-      bool[2] memory _useTokenOrRaisedFundsVesting
-      
+        Campaign.RefundType _refundType, address _dexRouterAddress,uint[4] memory liquidityAllocationAndRates,
+        string[6] memory founderInfo,
+        bool[2] memory _useTokenOrRaisedFundsVesting,
+        VestSchedule[8] memory teamTokenVestingDetails, 
+        uint256[3] memory raisedFundVestingDetails //percentOfRaisedFundsToLock,duration, cliff
     ) public payable  {
 
         require(msg.value >= campaignCreationPrice, 'CampaignFactory: Requires CampaignCreation Price' );
@@ -68,13 +71,22 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
         {     
             _counter.increment(); 
             capAndDate[9] = _counter.current();
-            Campaign cmpgn = new Campaign( [msg.sender, address(this) , _tokenAddress], capAndDate,    _refundType, _dexRouterAddress,liquidityAllocationAndRates, teamTokenVestingDetails, raisedFundVestingDetails,founderInfo, _dexLockerFactory, _useTokenOrRaisedFundsVesting
-            );
-                       
-            _campaigns.set(_counter.current(), address( cmpgn));
+
+            address payable newCampaignCloneAddress = payable(Clones.clone(_campaignImplementationAddress) );
+            Campaign(newCampaignCloneAddress).initialize([msg.sender, address(this) , _tokenAddress], capAndDate,    _refundType, _dexRouterAddress,liquidityAllocationAndRates, teamTokenVestingDetails, raisedFundVestingDetails,founderInfo, _dexLockerFactory, _useTokenOrRaisedFundsVesting);
+
+             _campaigns.set(_counter.current(), newCampaignCloneAddress);
             ownersCampaign[msg.sender].push( _counter.current());        
-            _tokenCampaigns[_tokenAddress]= payable(address( cmpgn));
-            emit CampaignCreated(msg.sender, _counter.current(),address( cmpgn));
+            _tokenCampaigns[_tokenAddress]= payable(newCampaignCloneAddress);
+            emit CampaignCreated(msg.sender, _counter.current(),newCampaignCloneAddress);
+
+            // Campaign cmpgn = new Campaign( [msg.sender, address(this) , _tokenAddress], capAndDate,    _refundType, _dexRouterAddress,liquidityAllocationAndRates, teamTokenVestingDetails, raisedFundVestingDetails,founderInfo, _dexLockerFactory, _useTokenOrRaisedFundsVesting
+            // );
+                       
+            // _campaigns.set(_counter.current(), address( cmpgn));
+            // ownersCampaign[msg.sender].push( _counter.current());        
+            // _tokenCampaigns[_tokenAddress]= payable(address( cmpgn));
+            // emit CampaignCreated(msg.sender, _counter.current(),address( cmpgn));
         }
     }
 
@@ -82,7 +94,7 @@ contract CampaignList is Context,Ownable /*, ReentrancyGuard */ {
     function hasExistingCampaign(address _tokenAddress) external view returns (bool){
         return _tokenCampaigns[_tokenAddress] != address(0);
     }
-    function allOwnersCampaigns() public view returns (uint256[] memory) {
+    function allOwnersCampaigns(uint256 limit, uint256 offset) public view returns (uint256[] memory) {
         return ownersCampaign[msg.sender];
     }
 

@@ -1,18 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.8;
 
-
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {IDexRouter} from "../IDexRouter.sol";
 import "./VestSchedule.sol";
 import "./TokenLocker.sol";
-import "./CoinLocker.sol";
+
+import "./CoinVestingVault.sol";
 import "./LiquidityLocker.sol";
+import "@openzeppelin/contracts/proxy/Clones.sol";
 // import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 
 
 // locks liquidity for LP tokens and handles team vseting
-contract DexLocker{
+contract DexLocker is Initializable{
 
      // timestamp when token release is enabled
     uint256 private _lpReleaseTime;
@@ -34,19 +36,33 @@ contract DexLocker{
     IDexRouter private _dexRouter;
 
     TokenLocker private _tokenLocker;
-    CoinLocker private _coinLocker;
+    CoinVestingVault private _coinVault;
     LiquidityLocker private _liquidityLocker;
 
-    constructor(address dexRouterAddress, address token,address deployer,address owner )  {
+    /**
+    Maps to 
+    
+        uint256 _percentOfRaisedFundsToLock,
+        uint256 _vestingDurationInDays,
+        uint256 _vestingCliffInDays
+     */
+    uint256[3] _raisedFundVestingDetails;
+    bool _useRaisedFundsVesting;
+
+    address  _coinVestingVaultImplementationAddress;
+
+    function initialize(address dexRouterAddress, address token,address deployer,address owner, address coinVestingVaultImplementationAddress ) public initializer  {
         _dexRouter = IDexRouter(dexRouterAddress);
         _deployer = deployer; //msg.sender;
         
         _owner = owner;
-        _token = token;        
+        _token = token; 
+        _coinVestingVaultImplementationAddress=coinVestingVaultImplementationAddress;       
     }
 
     
-    function setupLock(uint liquidityPercentOfRaisedFunds,uint maxRaisedFunds, uint256 lpReleaseTime,  uint256 dexListPrice, bool useTeamTokenVesting, VestSchedule[8] memory teamTokenVestingDetails, bool useRaisedFundsVesting, VestSchedule[8] memory raisedFundVestingDetails) public {
+    function setupLock(uint liquidityPercentOfRaisedFunds,uint maxRaisedFunds, uint256 lpReleaseTime,  uint256 dexListPrice, bool useTeamTokenVesting, VestSchedule[8] memory teamTokenVestingDetails, bool useRaisedFundsVesting, uint256[3] memory raisedFundVestingDetails 
+    ) public {
         require(msg.sender == _deployer, "DexLocker: Only Deployer is allowed ");
 
         require(lpReleaseTime > block.timestamp, "DexLocker: release time is before current time");
@@ -71,19 +87,44 @@ contract DexLocker{
        
         
         
+
         for (uint8 i=0; i < 8 /*100%*/; i++) {
             totalTokensExpectedToBeLocked += teamTokenVestingDetails[i].releaseAmount; 
         }
 
-        if(useRaisedFundsVesting){
+        _useRaisedFundsVesting=useRaisedFundsVesting;
+        if(_useRaisedFundsVesting){
+            for (uint8 i=0; i < 3 ; i++) {
+                _raisedFundVestingDetails[i] = raisedFundVestingDetails[i]; 
+            }
+        }
+        
+    }
+
+    function startRaisedFundsLock(
+        uint256 _raisedAmount
+        
+    ) public {
+        require(msg.sender == _deployer, "DexLocker: Only Deployer is allowed ");
+
+        if(_useRaisedFundsVesting){
+            address newCoinVaultCloneAddress = Clones.clone(_coinVestingVaultImplementationAddress);
+            _coinVault = CoinVestingVault(payable(newCoinVaultCloneAddress) );
+            // _coinVault.initialize(_owner, _startTime,_amount, _vestingDurationInDays,_vestingCliffInDays);
+
+             _coinVault.initialize(_owner,block.timestamp, raisedFundVestingDetails[0] * _raisedAmount /1000, raisedFundVestingDetails[1],raisedFundVestingDetails[2]);
+
             
-            _coinLocker = new CoinLocker(_owner,raisedFundVestingDetails );
         }
         
     }
 
     receive() external payable {
-        payable(_coinLocker).transfer(msg.value);
+        // payable(_coinLocker).transfer(msg.value);
+    }
+
+    function receiveCoinVaultCoins() public payable {
+        payable(_coinVault).transfer(msg.value);
     }
 
     /**
@@ -129,12 +170,12 @@ contract DexLocker{
     /**
      * @notice Transfers ETH back to the owner
      */
-    function releaseETH() public {
-        _coinLocker.release();
+    function releaseCoinVaultETH() public {
+        _coinVault.claimVestedCoins();
     }
 
-    function coinLockerAddress() public view returns (address) {
-        return address(_coinLocker);
+    function coinVaultAddress() public view returns (address) {
+        return address(_coinVault);
     }
 
     function tokenLockerAddress() public view returns (address) {

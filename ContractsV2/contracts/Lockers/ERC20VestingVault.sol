@@ -3,132 +3,96 @@
 pragma solidity ^0.8.8;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-// import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+// import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+// import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-contract VestingVault is Ownable {
-    // using SafeMath for uint256;
-    // using SafeMath for uint16;
+
+contract ERC20VestingVault is Ownable {
     using SafeERC20 for IERC20;
+
+    
+    modifier onlyValidAddress(address _recipient) {
+        require(_recipient != address(0) && _recipient != address(this) && _recipient != address(token), "not valid _recipient");
+        _;
+    }
+
+    uint256 constant internal SECONDS_PER_DAY = 86400;
 
     struct Grant {
         uint256 startTime;
         uint256 amount;
         uint16 vestingDuration;
+        uint16 vestingCliff;
         uint16 daysClaimed;
         uint256 totalClaimed;
         address recipient;
     }
 
-    event GrantAdded(address indexed recipient);
+    event GrantAdded(address indexed recipient, uint256 vestingId);
     event GrantTokensClaimed(address indexed recipient, uint256 amountClaimed);
-    event GrantRevoked(address recipient, uint256 amountVested, uint256 amountNotVested);
+    event GrantRemoved(address recipient, uint256 amountVested, uint256 amountNotVested);
+    
 
     IERC20 public token;
     
-    mapping (address => Grant) private tokenGrants;
-
+    mapping (uint256 => Grant) public tokenGrants;
+    mapping (address => uint[]) private activeGrants;
+    
     uint256 public totalVestingCount;
 
     constructor(IERC20 _token) public {
         require(address(_token) != address(0));
+        
         token = _token;
     }
     
     function addTokenGrant(
         address _recipient,
+        uint256 _startTime,
         uint256 _amount,
-        uint16 _vestingDurationInDays,// total vesting duration
-        uint16 _vestingCliffInDays     //release freq -> 1 month cliff means some coins r rleased every 30 days
+        uint16 _vestingDurationInDays,
+        uint16 _vestingCliffInDays    
     ) 
         external
         onlyOwner
     {
-        require(tokenGrants[_recipient].amount == 0, "Grant already exists, must revoke first.");
-        require(_vestingCliffInDays <= 10*365, "Cliff greater than 10 years");
-        require(_vestingDurationInDays <= 25*365, "Duration greater than 25 years");
+        require(_vestingCliffInDays <= 10*365, "more than 10 years");
+        require(_vestingDurationInDays <= 25*365, "more than 25 years");
+        require(_vestingDurationInDays >= _vestingCliffInDays, "Duration < Cliff");
         
         uint256 amountVestedPerDay = _amount/_vestingDurationInDays;
         require(amountVestedPerDay > 0, "amountVestedPerDay > 0");
 
         // Transfer the grant tokens under the control of the vesting contract
-        // require(token.transferFrom(owner(), address(this), _amount));
+        // require(token.transferFrom(owner(), address(this), _amount), "transfer failed");
 
         Grant memory grant = Grant({
-            startTime: currentTime() + _vestingCliffInDays * 1 days,
+            startTime: _startTime == 0 ? currentTime() : _startTime,
             amount: _amount,
             vestingDuration: _vestingDurationInDays,
+            vestingCliff: _vestingCliffInDays,
             daysClaimed: 0,
             totalClaimed: 0,
             recipient: _recipient
         });
-        tokenGrants[_recipient] = grant;
-        emit GrantAdded(_recipient);
+        tokenGrants[totalVestingCount] = grant;
+        activeGrants[_recipient].push(totalVestingCount);
+        emit GrantAdded(_recipient, totalVestingCount);
+        totalVestingCount++;
     }
 
-    /// @notice Allows a grant recipient to claim their vested tokens. Errors if no tokens have vested
-    function claimVestedTokens() external {
-        uint16 daysVested;
-        uint256 amountVested;
-        (daysVested, amountVested) = calculateGrantClaim(msg.sender);
-        require(amountVested > 0, "Vested is 0");
-
-        Grant storage tokenGrant = tokenGrants[msg.sender];
-        tokenGrant.daysClaimed = uint16(tokenGrant.daysClaimed + daysVested);
-        tokenGrant.totalClaimed = uint256(tokenGrant.totalClaimed+amountVested);
-        
-        token.safeTransfer(tokenGrant.recipient, amountVested);
-        // require(token.safeTransfer(tokenGrant.recipient, amountVested), "no tokens");
-        emit GrantTokensClaimed(tokenGrant.recipient, amountVested);
-    }
-
-    /// @notice Terminate token grant transferring all vested tokens to the `_recipient`
-    /// and returning all non-vested tokens to the contract owner
-    /// Secured to the contract owner only
-    /// @param _recipient address of the token grant recipient
-    function revokeTokenGrant(address _recipient) 
-        external 
-        onlyOwner
-    {
-        Grant storage tokenGrant = tokenGrants[_recipient];
-        uint16 daysVested;
-        uint256 amountVested;
-        (daysVested, amountVested) = calculateGrantClaim(_recipient);
-
-        uint256 amountNotVested = (tokenGrant.amount-tokenGrant.totalClaimed) - amountVested;
-
-        
-        token.safeTransfer(owner(), amountNotVested);
-        token.safeTransfer(_recipient, amountVested);
-
-        tokenGrant.startTime = 0;
-        tokenGrant.amount = 0;
-        tokenGrant.vestingDuration = 0;
-        tokenGrant.daysClaimed = 0;
-        tokenGrant.totalClaimed = 0;
-        tokenGrant.recipient = address(0);
-
-        emit GrantRevoked(_recipient, amountVested, amountNotVested);
-    }
-
-    function getGrantStartTime(address _recipient) public view returns(uint256) {
-        Grant storage tokenGrant = tokenGrants[_recipient];
-        return tokenGrant.startTime;
-    }
-
-    function getGrantAmount(address _recipient) public view returns(uint256) {
-        Grant storage tokenGrant = tokenGrants[_recipient];
-        return tokenGrant.amount;
+    function getActiveGrants(address _recipient) public view returns(uint256[] memory){
+        return activeGrants[_recipient];
     }
 
     /// @notice Calculate the vested and unclaimed months and tokens available for `_grantId` to claim
     /// Due to rounding errors once grant duration is reached, returns the entire left grant amount
     /// Returns (0, 0) if cliff has not been reached
-    function calculateGrantClaim(address _recipient) private view returns (uint16, uint256) {
-        Grant storage tokenGrant = tokenGrants[_recipient];
-
-        require(tokenGrant.totalClaimed < tokenGrant.amount, "Grant fully claimed");
+    function calculateGrantClaim(uint256 _grantId) public view returns (uint16, uint256) {
+        Grant storage tokenGrant = tokenGrants[_grantId];
 
         // For grants created with a future start date, that hasn't been reached, return 0, 0
         if (currentTime() < tokenGrant.startTime) {
@@ -136,21 +100,80 @@ contract VestingVault is Ownable {
         }
 
         // Check cliff was reached
-        uint elapsedDays = (currentTime()-(tokenGrant.startTime - 1 days))/ 1 days;
+        uint elapsedTime = currentTime()-tokenGrant.startTime;
+        uint elapsedDays = elapsedTime/SECONDS_PER_DAY;
+        
+        if (elapsedDays < tokenGrant.vestingCliff) {
+            return (uint16(elapsedDays), 0);
+        }
 
         // If over vesting duration, all tokens vested
         if (elapsedDays >= tokenGrant.vestingDuration) {
-            uint256 remainingGrant = tokenGrant.amount- tokenGrant.totalClaimed;
+            uint256 remainingGrant = tokenGrant.amount-tokenGrant.totalClaimed;
             return (tokenGrant.vestingDuration, remainingGrant);
         } else {
-            uint16 daysVested = uint16(elapsedDays- tokenGrant.daysClaimed);
-            uint256 amountVestedPerDay = tokenGrant.amount/uint256(tokenGrant.vestingDuration);
-            uint256 amountVested = uint256(daysVested/amountVestedPerDay);
+            uint16 daysVested = uint16(elapsedDays-tokenGrant.daysClaimed);
+            uint256 amountVestedPerDay = tokenGrant.amount/ uint256(tokenGrant.vestingDuration);
+            uint256 amountVested = uint256(daysVested*amountVestedPerDay);
             return (daysVested, amountVested);
         }
     }
 
+    /// @notice Allows a grant recipient to claim their vested tokens. Errors if no tokens have vested
+    /// It is advised recipients check they are entitled to claim via `calculateGrantClaim` before calling this
+    function claimVestedTokens(uint256 _grantId) external {
+        uint16 daysVested;
+        uint256 amountVested;
+        (daysVested, amountVested) = calculateGrantClaim(_grantId);
+        require(amountVested > 0, "amountVested is 0");
+
+        Grant storage tokenGrant = tokenGrants[_grantId];
+        tokenGrant.daysClaimed = uint16(tokenGrant.daysClaimed+ daysVested);
+        tokenGrant.totalClaimed = uint256(tokenGrant.totalClaimed + amountVested);
+        
+        require(token.transfer(tokenGrant.recipient, amountVested), "no tokens");
+        emit GrantTokensClaimed(tokenGrant.recipient, amountVested);
+    }
+
+    // /// @notice Terminate token grant transferring all vested tokens to the `_grantId`
+    // /// and returning all non-vested tokens to the V12 MultiSig
+    // /// Secured to the V12 MultiSig only
+    // /// @param _grantId grantId of the token grant recipient
+    // function removeTokenGrant(uint256 _grantId) 
+    //     external 
+    //     onlyOwner
+    // {
+    //     Grant storage tokenGrant = tokenGrants[_grantId];
+    //     address recipient = tokenGrant.recipient;
+    //     uint16 daysVested;
+    //     uint256 amountVested;
+    //     (daysVested, amountVested) = calculateGrantClaim(_grantId);
+
+    //     uint256 amountNotVested = (tokenGrant.amount.sub(tokenGrant.totalClaimed)).sub(amountVested);
+
+    //     require(token.transfer(recipient, amountVested));
+    //     require(token.transfer(v12MultiSig, amountNotVested));
+
+    //     tokenGrant.startTime = 0;
+    //     tokenGrant.amount = 0;
+    //     tokenGrant.vestingDuration = 0;
+    //     tokenGrant.vestingCliff = 0;
+    //     tokenGrant.daysClaimed = 0;
+    //     tokenGrant.totalClaimed = 0;
+    //     tokenGrant.recipient = address(0);
+
+    //     emit GrantRemoved(recipient, amountVested, amountNotVested);
+    // }
+
     function currentTime() private view returns(uint256) {
         return block.timestamp;
     }
+
+    function tokensVestedPerDay(uint256 _grantId) public view returns(uint256) {
+        Grant storage tokenGrant = tokenGrants[_grantId];
+        return tokenGrant.amount/uint256(tokenGrant.vestingDuration);
+    }
+
+    
+
 }
