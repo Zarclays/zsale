@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
+
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 // import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -23,7 +25,7 @@ import "hardhat/console.sol";
 //   function createNewCampaign(address _tokenAddress, address _campaignAddress) external payable ;
 // }
 
-contract Campaign is Context,Ownable, ReentrancyGuard {
+contract Campaign is Context,Ownable, ReentrancyGuard, Initializable {
   using SafeERC20 for IERC20;
 
   event AdminOwnershipTransferred(address indexed previousAdmin, address indexed newAdmin);
@@ -75,7 +77,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   CampaignSaleInfo public  saleInfo;
   CampaignOtherInfo public otherInfo;
   
-  address public immutable  dexRouterAddress;
+  address public dexRouterAddress;
   uint256 public totalCoinReceived; // total  received
   uint256 public totalCoinInTierOne; // total coin for tier one
   uint256 public totalCoinInTierTwo; // total coin for tier Tier
@@ -102,7 +104,7 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   uint public totalUserInTierTwo;
   
   bool public useTokenVesting;
-  bool public raisedFundsVesting;
+  bool public useRaisedFundsVesting;
 
     //Tier 1 - holders of our coin
     //Tier 2 - Whitelisted or public
@@ -132,10 +134,8 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
   DexLockerFactory private _dexLockerFactory;
   address payable private _dexLockerAddress;
   
-  
-  constructor(
-    
-    // address campaignOwner,
+
+  function initialize(// address campaignOwner,
     // address campaignFactory,
     // address  _tokenAddress,
     address[3] memory addresses,
@@ -149,12 +149,10 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
     // uint _dexListRate,
     uint[4] memory liquidityAllocationAndRates,
     VestSchedule[8] memory teamTokenVestingDetails, 
-    VestSchedule[8] memory raisedFundVestingDetails,
+    uint256[4] memory raisedFundVestingDetails,
     string[6] memory founderInfo,
     DexLockerFactory dexLockerFactory,
-    bool[2] memory _useTokenOrRaisedFundVesting
-    
-  ) payable  {
+    bool[2] memory _useTokenOrRaisedFundVesting ) public payable initializer {
       campaignKey=capAndDate[8];
       _campaignFactory= addresses[1];
       _dexLockerFactory=dexLockerFactory;
@@ -197,22 +195,89 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
 
       updateLockDetails(liquidityAllocationAndRates[1], _useTokenOrRaisedFundVesting[0], teamTokenVestingDetails,_useTokenOrRaisedFundVesting[1], raisedFundVestingDetails );
   }
+  
+  // constructor(
+    
+  //   // address campaignOwner,
+  //   // address campaignFactory,
+  //   // address  _tokenAddress,
+  //   address[3] memory addresses,
+  //   uint256[10] memory capAndDate,  // uint256 _softCap,uint256 _hardCap,uint256 _saleStartTime,uint256 _saleEndTime, uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo ,uint _campaignKey,
+    
+  //   RefundType _refundType, 
+  //   address _dexRouterAddress,
+  //   // uint _liquidityPercent, 
+  //   // uint liquidityReleaseTime,
+  //   // uint _listRate, 
+  //   // uint _dexListRate,
+  //   uint[4] memory liquidityAllocationAndRates,
+  //   VestSchedule[8] memory teamTokenVestingDetails, 
+  //   VestSchedule[8] memory raisedFundVestingDetails,
+  //   string[6] memory founderInfo,
+  //   DexLockerFactory dexLockerFactory,
+  //   bool[2] memory _useTokenOrRaisedFundVesting
+    
+  // ) payable  {
+  //     campaignKey=capAndDate[8];
+  //     _campaignFactory= addresses[1];
+  //     _dexLockerFactory=dexLockerFactory;
+      
+  //     // require(releaseTime > block.timestamp, "CAMPAIGN: release time above current time");
+  //     require(capAndDate[3] > capAndDate[2], "CAMPAIGN: Sale End time above start time");
+  //     require(liquidityAllocationAndRates[0] >= 5100, "CAMPAIGN: Liquidity allowed is > 51 %");
+        
+        
+  //     // //block scopin to avoid stack too deep 
+  //     {
+        
+  //       // saleInfo= CampaignSaleInfo();
+  //       saleInfo.tokenAddress=addresses[2];
+  //       saleInfo.softCap=capAndDate[0];
+  //       saleInfo.hardCap=capAndDate[1];
+  //       if(capAndDate[2] <= block.timestamp){
+  //         saleInfo.saleStartTime=block.timestamp;
+  //       }else{
+  //         saleInfo.saleStartTime=capAndDate[2];
+  //       }
+        
+  //       saleInfo.saleEndTime=capAndDate[3];
+  //       saleInfo.liquidityPercent=liquidityAllocationAndRates[0];
+  //       saleInfo.listRate=liquidityAllocationAndRates[2];
+  //       saleInfo.dexListRate=liquidityAllocationAndRates[3];
+  //     }        
+
+  //     {    
+  //       dexRouterAddress=_dexRouterAddress; 
+         
+  //     }
+        
+  //     otherInfo= CampaignOtherInfo(false, false,false,'', _refundType,founderInfo[0],founderInfo[1],founderInfo[2],founderInfo[3],founderInfo[4], founderInfo[5]);
+      
+      
+  //     _updateTierDetails (capAndDate[4], capAndDate[5], capAndDate[6],capAndDate[7], capAndDate[8]);
+
+  //     transferOwnership(addresses[0]);
+
+  //     updateLockDetails(liquidityAllocationAndRates[1], _useTokenOrRaisedFundVesting[0], teamTokenVestingDetails,_useTokenOrRaisedFundVesting[1], raisedFundVestingDetails );
+  // }
 
   // function to update other details not initialized in constructor - this is bcos solidity limits how many variables u can pass in at once
   function updateLockDetails(uint liquidityReleaseTimeDays, //Time to add to startTime in days
     bool _useTokenVesting,
     VestSchedule[8] memory teamTokenVestingDetails,
-    bool _raisedFundsVesting, 
-    VestSchedule[8] memory raisedFundVestingDetails
+    bool _useRaisedFundsVesting, 
+    // VestSchedule[8] memory raisedFundVestingDetails
+      uint256[3] memory raisedFundVestingDetails
+      
   ) private /*public onlyOwner*/ {
     liquidityReleaseTime  = saleInfo.saleEndTime + (liquidityReleaseTimeDays * 1 days);
     useTokenVesting=_useTokenVesting;
-    raisedFundsVesting=_raisedFundsVesting;
+    useRaisedFundsVesting=_useRaisedFundsVesting;
     //Set dexLock
-    DexLocker dexLocker =_dexLockerFactory.createDexLocker(dexRouterAddress,saleInfo.tokenAddress,address(this), msg.sender);
+    DexLocker dexLocker = DexLocker(payable(_dexLockerFactory.createDexLocker(dexRouterAddress,saleInfo.tokenAddress,address(this), msg.sender) ) );
     
 
-    dexLocker.setupLock(saleInfo.liquidityPercent,saleInfo.hardCap, liquidityReleaseTime,  saleInfo.dexListRate,useTokenVesting, teamTokenVestingDetails, raisedFundsVesting,  raisedFundVestingDetails);
+    dexLocker.setupLock(saleInfo.liquidityPercent,saleInfo.hardCap, liquidityReleaseTime,  saleInfo.dexListRate,useTokenVesting, teamTokenVestingDetails, _useRaisedFundsVesting,  raisedFundVestingDetails);
 
     _dexLockerAddress= payable(dexLocker);
 
@@ -566,9 +631,12 @@ contract Campaign is Context,Ownable, ReentrancyGuard {
       //liquidity pair
       payable(_dexLockerAddress).transfer(liquidityAmount);
       _token.safeTransfer(_dexLockerAddress, liquidityAmount * saleInfo.dexListRate );
-          
-      
-      DexLocker(_dexLockerAddress).addLiquidity();
+
+      DexLocker locker = DexLocker(_dexLockerAddress);    
+      if(){
+        locker.startRaisedFundsLock( totalCoinReceived );
+      }
+      locker.addLiquidity();
       
       status=CampaignStatus.LIQUIDITY_SETUP;
   }

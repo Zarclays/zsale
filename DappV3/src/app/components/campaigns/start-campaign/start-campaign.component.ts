@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, ViewChild, Injectable } from '@angular/core';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators,  ValidatorFn, ValidationErrors } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { WizardComponent } from 'angular-archwizard';
@@ -10,6 +10,7 @@ import { NgxSpinnerService } from "ngx-spinner";
 import { ValidateEndDateLaterThanStartDate , ValidateDateIsNotInPast, ValidateVestingPercentUpto100, ValidateHardCap} from '../../../validators/create-launchpad-validators';
 import { ToasterComponent, ToasterPlacement } from '@coreui/angular';
 import { AppToastComponent } from 'src/app/views/notifications/toasters/toast-simple/toast.component';
+import { Subscription } from 'rxjs';
 // import { AppToastComponent } from '../../toast/toast.component';
 const CampaignListAbi = require('../../../../assets/CampaignList.json');
 const CampaignAbi = require('../../../../assets/Campaign.json');
@@ -25,6 +26,8 @@ export class StartCampaignComponent implements OnInit {
   campaignId: number|undefined;
   @ViewChild('wizard') wizard!: WizardComponent;
   mainFormGroup!: FormGroup;
+
+  formSubscriptions: Subscription[]=[];
 
   testFG!: FormGroup;
 
@@ -95,7 +98,7 @@ export class StartCampaignComponent implements OnInit {
      },
      'maxBuy' : {
        'required'  :   'Max Buy is Required.',
-       'min': 'Max Buy must be at least 1 ',
+       'min': 'Max Buy must be at least 0 ',
        'max': 'Max Buy must be at most 1,000,000 '
      },
      'softCap' : {
@@ -118,6 +121,30 @@ export class StartCampaignComponent implements OnInit {
        //'less': 'End date cannot be less than Start date'
        // 'pattern'   :   'Contact No. should only contain Numbers '
      },
+
+     'raisedFundsUseVesting' : {
+       'required'  :   'This is Required.'
+     },
+
+     'raisedFundsPercentToLock' : {
+       'required'  :   'Percentage is Required.',
+       'min': 'Percentage of Raised Funds must be at least 0 ',
+       'max': 'Percentage of Raised Funds must be at most 100 '
+     },
+
+     'raisedFundsLockDuration' : {
+       'required'  :   'Duration is Required.',
+       'min': 'Duration must be at least 0 ',
+       'max': 'Duration must be at most 3650 (10 years) '
+     },
+
+      'raisedFundsLockCliff' : {
+       'required'  :   'Cliff is Required.',
+       'min': 'Cliff must be at least 0 ',
+       'max': 'Cliff must be at most 365 (1 year) '
+     },
+
+
      
      'refundType': {
        'required': 'Refund Type is required'
@@ -159,13 +186,18 @@ export class StartCampaignComponent implements OnInit {
  
    };
 
+
+
+
   
   constructor(private titleService: Title, 
     public web3Service: Web3Service,
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private spinner: NgxSpinnerService,
-    private router: Router) { }
+    private router: Router) { 
+
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params: ParamMap) => {
@@ -194,17 +226,7 @@ export class StartCampaignComponent implements OnInit {
     }, 2500);
     this.titleService.setTitle('Launch Campaign | ZSale');
 
-    // this.testFG = this.fb.group({
-    //   name: ['', , Validators.required],
-    //   age: ['', , Validators.required]
-    // })
-
-    this.testFG = this.fb.group({
-      name: ['Sammy', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      message: ['', [Validators.required, Validators.minLength(15)]],
-    });
-
+   
     this.mainFormGroup = this.fb.group({
       // existing formControls
       tokenInfoFG: this.fb.group({
@@ -226,6 +248,12 @@ export class StartCampaignComponent implements OnInit {
         router: ['', [Validators.required ] ],
         startDate: ['', [Validators.required, ValidateDateIsNotInPast ] ],
         endDate: ['', [Validators.required , ValidateDateIsNotInPast] ],
+
+        raisedFundsUseVesting : [false, [Validators.required ]],
+        raisedFundsLockCliff: ['30', [Validators.required, Validators.min(30), Validators.max(365)]],
+        raisedFundsLockDuration: ['', [Validators.required,Validators.min(0),Validators.max(3650)]],
+        raisedFundsPercentToLock: ['50', [Validators.required, Validators.min(0), Validators.max(100)]],
+
         // refundType: ['', [Validators.required ] ],
         liquidityLockupDays: ['90', [Validators.required, Validators.min(30), Validators.max(730)]],
         useTokenVesting : [false, [Validators.required ]],
@@ -253,15 +281,6 @@ export class StartCampaignComponent implements OnInit {
 
     this.onFormChanges();
 
-    // this.mainFormGroup.markAsPristine();
-    // this.mainFormGroup.markAsUntouched();
-    // this.mainFormGroup.reset()
-    // this.spinner.show();
-
-    // setTimeout(() => {
-    //   /** spinner ends after 5 seconds */
-    //   this.spinner.hide();
-    // }, 55000);
   }
 
   onSubmit(form: FormGroup) {
@@ -271,49 +290,18 @@ export class StartCampaignComponent implements OnInit {
     console.log('Message', form.value.message);
   }
 
-  ngAfterViewInit(): void {
+  ngOnDestroy(): void {
     
-    setTimeout(() => {
-      
-      this.mainFormGroup.reset()
-      this.mainFormGroup.get('teamInfoFG')?.markAsPristine()
-      this.mainFormGroup.get('teamInfoFG')?.markAsPristine()
-
-
-      this.mainFormGroup.get('teamInfoFG')?.markAsUntouched()
-    }, 7000);
-    
+        this.formSubscriptions.forEach( sub=>{
+          sub.unsubscribe();
+        } )
   }
 
-  t(): void {
-    this.mainFormGroup.get('teamInfoFG')?.reset();
-    console.log('afterviw rt')
-      this.mainFormGroup.get('teamInfoFG')?.markAsPristine()
-      this.mainFormGroup.get('teamInfoFG')?.setErrors(null);
-
-      this.mainFormGroup.get('teamInfoFG')?.markAsUntouched();
-
-      const grp = this.mainFormGroup.get('teamInfoFG');
-
-      if (grp instanceof FormGroup) {
-        
-        Object.keys(grp.controls).forEach((name) => {
-        let control = grp.controls[name];
-        // control.setErrors(null);
-        control.markAsUntouched()
-        control.markAsPristine()
-      });
-          
-        
-      }
-    
-  }
-
-  
+   
 
 
   onFormChanges(): void {
-    this.mainFormGroup.get('tokenInfoFG.tokenAddress')!.valueChanges.subscribe(async val => {
+    this.formSubscriptions.push( this.mainFormGroup.get('tokenInfoFG.tokenAddress')!.valueChanges.subscribe(async val => {
       //this.formattedMessage = `My name is ${val}.`;
       const currentChainId = await this.web3Service.getCurrentChainId();
     
@@ -337,9 +325,9 @@ export class StartCampaignComponent implements OnInit {
       }
       
       
-    });
+    }) );
 
-    this.mainFormGroup.get('tokenInfoFG.tokenToUse')!.valueChanges.subscribe(val => {
+    this.formSubscriptions.push(  this.mainFormGroup.get('tokenInfoFG.tokenToUse')!.valueChanges.subscribe(val => {
       //this.formattedMessage = `My name is ${val}.`;
       if(val=='useMyToken'){
         // this.mainFormGroup.get('tokenInfoFG.tokenType')!.disable()
@@ -350,10 +338,13 @@ export class StartCampaignComponent implements OnInit {
         this.mainFormGroup.get('tokenInfoFG.tokenAddress')!.disable()
       }
       
-    });
+    }) );
 
     //todo unsunbscribe
   }
+
+  
+
 
   get tokenInfoFG(): any {
     return this.mainFormGroup.get('tokenInfoFG');
@@ -436,6 +427,12 @@ export class StartCampaignComponent implements OnInit {
       [(100 * +this.campaignInfoFG.get('liquidity')?.value).toFixed(0) , this.campaignInfoFG.get('liquidityLockupDays')?.value,this.campaignInfoFG.get('presaleRate')?.value, this.campaignInfoFG.get('dexRate').value ],
       
       [this.teamInfoFG.get('logo')?.value,this.teamInfoFG.get('desc')?.value,this.teamInfoFG.get('website')?.value, this.teamInfoFG.get('twitter')?.value, this.teamInfoFG.get('telegram')?.value, this.teamInfoFG.get('discord')?.value ],
+
+      [
+        this.mainFormGroup.get('campaignInfoFG.useTokenVesting')?.value === true,
+        this.mainFormGroup.get('campaignInfoFG.useRaisedFundsVesting')?.value === true
+      ],
+
       this.tokenVestings.controls.map((v,ix)=>{ 
         let n = new Date(now.getTime()) ;
         
@@ -446,20 +443,14 @@ export class StartCampaignComponent implements OnInit {
           hasBeenClaimed: false
         }
         }),
+
       [
-        {releaseDate: nowTimeStamp,releaseAmount: 0,hasBeenClaimed: false},
-        {releaseDate: nowTimeStamp,releaseAmount: 0,hasBeenClaimed: false},
-        {releaseDate: nowTimeStamp,releaseAmount: 0,hasBeenClaimed: false},
-        {releaseDate: nowTimeStamp,releaseAmount: 0,hasBeenClaimed: false},
-        {releaseDate: nowTimeStamp,releaseAmount: 0,hasBeenClaimed: false},
-        {releaseDate: nowTimeStamp,releaseAmount: 0,hasBeenClaimed: false},
-        {releaseDate: nowTimeStamp,releaseAmount: 0,hasBeenClaimed: false},
-        {releaseDate: nowTimeStamp,releaseAmount: 0,hasBeenClaimed: false}
+        
+        (100 * this.campaignInfoFG.get('raisedFundsPercentToLock')?.value).toFixed(0) ,
+        this.campaignInfoFG.get('raisedFundsLockDuration')?.value.toString(),
+        this.campaignInfoFG.get('raisedFundsLockCliff')?.value.toString()
       ],
-      [
-        this.mainFormGroup.get('campaignInfoFG.useTokenVesting')?.value === true,
-        this.mainFormGroup.get('campaignInfoFG.useRaisedFundsVesting')?.value === true
-      ],
+      
 
       {
         value: utils.parseEther(currentChain.creationFee.toString())
