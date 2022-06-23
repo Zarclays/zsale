@@ -327,20 +327,63 @@ export class StartCampaignComponent implements OnInit {
       
     }) );
 
-    this.formSubscriptions.push(  this.mainFormGroup.get('tokenInfoFG.tokenToUse')!.valueChanges.subscribe(val => {
-      //this.formattedMessage = `My name is ${val}.`;
-      if(val=='useMyToken'){
-        // this.mainFormGroup.get('tokenInfoFG.tokenType')!.disable()
-        this.mainFormGroup.get('tokenInfoFG.tokenAddress')!.enable()
+    this.formSubscriptions.push(  
+      this.mainFormGroup.get('tokenInfoFG.tokenToUse')!.valueChanges.subscribe(val => {
+        //this.formattedMessage = `My name is ${val}.`;
+        if(val=='useMyToken'){
+          // this.mainFormGroup.get('tokenInfoFG.tokenType')!.disable()
+          this.mainFormGroup.get('tokenInfoFG.tokenAddress')!.enable()
+          
+        }else{
+          // this.mainFormGroup.get('tokenInfoFG.tokenType')!.enable()
+          this.mainFormGroup.get('tokenInfoFG.tokenAddress')!.disable()
+        }
         
-      }else{
-        // this.mainFormGroup.get('tokenInfoFG.tokenType')!.enable()
-        this.mainFormGroup.get('tokenInfoFG.tokenAddress')!.disable()
-      }
-      
-    }) );
+      }) 
+    );
 
-    //todo unsunbscribe
+    this.formSubscriptions.push(  
+      
+      this.mainFormGroup.get('campaignInfoFG.useTokenVesting')!.valueChanges.subscribe(val => {
+        
+        if(val==true){
+          
+          this.mainFormGroup.get('campaignInfoFG.tokenVestings')!.enable()
+          
+        }else{
+          // this.mainFormGroup.get('tokenInfoFG.tokenType')!.enable()
+          this.mainFormGroup.get('campaignInfoFG.tokenVestings')!.disable()
+        }
+        
+      }) 
+    );
+
+    this.formSubscriptions.push(  
+      
+      this.mainFormGroup.get('campaignInfoFG.raisedFundsUseVesting')!.valueChanges.subscribe(val => {
+        
+        if(val==true){
+          
+          this.mainFormGroup.get('campaignInfoFG.raisedFundsLockCliff')!.enable();
+          this.mainFormGroup.get('campaignInfoFG.raisedFundsLockDuration')!.enable();
+          this.mainFormGroup.get('campaignInfoFG.raisedFundsPercentToLock')!.enable();
+          
+        }else{
+          this.mainFormGroup.get('campaignInfoFG.raisedFundsLockCliff')!.disable();
+          this.mainFormGroup.get('campaignInfoFG.raisedFundsLockDuration')!.disable();
+          this.mainFormGroup.get('campaignInfoFG.raisedFundsPercentToLock')!.disable();
+        }
+        
+      }) 
+    );
+
+
+    //defaults
+    this.mainFormGroup.get('campaignInfoFG.tokenVestings')!.disable();
+    this.mainFormGroup.get('campaignInfoFG.raisedFundsLockCliff')!.disable();
+    this.mainFormGroup.get('campaignInfoFG.raisedFundsLockDuration')!.disable();
+    this.mainFormGroup.get('campaignInfoFG.raisedFundsPercentToLock')!.disable();
+
   }
 
   
@@ -399,6 +442,61 @@ export class StartCampaignComponent implements OnInit {
   }
 
 
+  getMappedRaisedFunds(){
+    let arr = []
+    
+    if(this.mainFormGroup.get('campaignInfoFG.useRaisedFundsVesting')?.value === true){
+      
+      arr = [
+        (100 * this.campaignInfoFG.get('raisedFundsPercentToLock')?.value).toFixed(0) ,
+        this.campaignInfoFG.get('raisedFundsLockDuration')?.value.toString(),
+        this.campaignInfoFG.get('raisedFundsLockCliff')?.value.toString()
+      ];
+    }else{
+      arr = [
+        0,0,0
+      ]
+    }
+
+    return arr;
+  }
+
+
+  getMappedTokenVestings(){
+    let vests = []
+    const now = new Date();
+    
+
+    if(this.mainFormGroup.get('campaignInfoFG.useTokenVesting')?.value === true){
+      let arr = this.tokenVestings.controls.map((v,ix)=>{ 
+        let n = new Date(now.getTime()) ;
+        console.log('' , this.tokenVestings.controls[ix].get('amount')?.value.toString() )
+        
+        return {
+          releaseDate:  Math.floor( n.setDate(n.getDate() + +this.tokenVestings.controls[ix].get('releaseDate')?.value) / 1000), 
+          releaseAmount: utils.parseEther(this.tokenVestings.controls[ix].get('amount')?.value.toString()), 
+          hasBeenClaimed: false
+        }
+      });
+      vests = [...arr];
+    }
+
+
+
+    for(let i = vests.length ; i <8; i++){
+      vests.push(
+        {
+          releaseDate:  0, 
+          releaseAmount: 0, 
+          hasBeenClaimed: false
+        }
+      )
+    }    
+
+    return vests;
+  }
+
+
   async finishFunction(){
     const currentChain = await this.web3Service.getCurrentChain();
     const currentChainId = currentChain.chainId;
@@ -411,50 +509,52 @@ export class StartCampaignComponent implements OnInit {
     
 
     try{
-      const tx = await campaignListContract.createNewCampaign(this.tokenInfoFG.get('tokenAddress')?.value, 
-      [
-        utils.formatUnits( utils.parseEther(this.campaignInfoFG.get('softCap')?.value), 'wei'),
-        utils.formatUnits( utils.parseEther(this.campaignInfoFG.get('hardCap')?.value), 'wei'), 
-        Math.floor(Date.parse(this.campaignInfoFG.get('startDate')?.value) / 1000) , 
-        Math.floor(Date.parse(this.campaignInfoFG.get('endDate')?.value) / 1000), 
-        utils.formatUnits( utils.parseEther((+this.campaignInfoFG.get('hardCap')?.value/ 2).toString()), 'wei'),
-        utils.formatUnits( utils.parseEther((+this.campaignInfoFG.get('hardCap')?.value/ 2).toString()), 'wei'),
-        utils.formatUnits( utils.parseEther(this.campaignInfoFG.get('minBuy')?.value.toString()), 'wei'),
-        utils.formatUnits( utils.parseEther(this.campaignInfoFG.get('maxBuy')?.value.toString()), 'wei'),
-        utils.formatUnits( utils.parseEther(this.campaignInfoFG.get('maxBuy')?.value.toString()), 'wei'),
-        0
-      ], 0, this.campaignInfoFG.get('router')?.value, 
-      [(100 * +this.campaignInfoFG.get('liquidity')?.value).toFixed(0) , this.campaignInfoFG.get('liquidityLockupDays')?.value,this.campaignInfoFG.get('presaleRate')?.value, this.campaignInfoFG.get('dexRate').value ],
-      
-      [this.teamInfoFG.get('logo')?.value,this.teamInfoFG.get('desc')?.value,this.teamInfoFG.get('website')?.value, this.teamInfoFG.get('twitter')?.value, this.teamInfoFG.get('telegram')?.value, this.teamInfoFG.get('discord')?.value ],
 
-      [
-        this.mainFormGroup.get('campaignInfoFG.useTokenVesting')?.value === true,
-        this.mainFormGroup.get('campaignInfoFG.useRaisedFundsVesting')?.value === true
-      ],
+      const gasFeeData = await this.web3Service.getFeeData();
+      const tx = await campaignListContract.createNewCampaign(
+        this.tokenInfoFG.get('tokenAddress')?.value, 
+        [
+          utils.formatUnits( utils.parseEther(this.campaignInfoFG.get('softCap')?.value.toString()), 'wei'),
+          utils.formatUnits( utils.parseEther(this.campaignInfoFG.get('hardCap')?.value.toString()), 'wei'), 
+          Math.floor(Date.parse(this.campaignInfoFG.get('startDate')?.value) / 1000) , 
+          Math.floor(Date.parse(this.campaignInfoFG.get('endDate')?.value) / 1000), 
+          utils.formatUnits( utils.parseEther((+this.campaignInfoFG.get('hardCap')?.value/ 2).toString()), 'wei'),
+          utils.formatUnits( utils.parseEther((+this.campaignInfoFG.get('hardCap')?.value/ 2).toString()), 'wei'),
+          utils.formatUnits( utils.parseEther(this.campaignInfoFG.get('minBuy')?.value.toString()), 'wei'),
+          utils.formatUnits( utils.parseEther(this.campaignInfoFG.get('maxBuy')?.value.toString()), 'wei'),
+          utils.formatUnits( utils.parseEther(this.campaignInfoFG.get('maxBuy')?.value.toString()), 'wei'),
+          0
+        ], 0, this.campaignInfoFG.get('router')?.value, 
+        [
+          (100 * +this.campaignInfoFG.get('liquidity')?.value).toFixed(0) , 
+          this.campaignInfoFG.get('liquidityLockupDays')?.value,
+          this.campaignInfoFG.get('presaleRate')?.value, 
+          this.campaignInfoFG.get('dexRate').value 
+        ],
+        
+        [
+          this.teamInfoFG.get('tokenLogo')?.value,
+          this.teamInfoFG.get('desc')?.value,
+          this.teamInfoFG.get('website')?.value, 
+          this.teamInfoFG.get('twitter')?.value, 
+          this.teamInfoFG.get('telegram')?.value, 
+          this.teamInfoFG.get('discord')?.value 
+        ],
 
-      this.tokenVestings.controls.map((v,ix)=>{ 
-        let n = new Date(now.getTime()) ;
-        
-        
-        return {
-          releaseDate:  Math.floor( n.setDate(n.getDate() + +this.tokenVestings.controls[ix].get('releaseDate')?.value) / 1000), 
-          releaseAmount: utils.parseEther(this.tokenVestings.controls[ix].get('amount')?.value), 
-          hasBeenClaimed: false
+        [
+          this.mainFormGroup.get('campaignInfoFG.useTokenVesting')?.value === true,
+          this.mainFormGroup.get('campaignInfoFG.useRaisedFundsVesting')?.value === true
+        ],
+
+        this.getMappedTokenVestings(),
+
+        this.getMappedRaisedFunds(),        
+
+        {
+          value: utils.parseEther(currentChain.creationFee.toString()),
+          maxFeePerGas: gasFeeData.maxFeePerGas,// should use geasprice for bsc, since it doesnt support eip 1559 yet
+          maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas
         }
-        }),
-
-      [
-        
-        (100 * this.campaignInfoFG.get('raisedFundsPercentToLock')?.value).toFixed(0) ,
-        this.campaignInfoFG.get('raisedFundsLockDuration')?.value.toString(),
-        this.campaignInfoFG.get('raisedFundsLockCliff')?.value.toString()
-      ],
-      
-
-      {
-        value: utils.parseEther(currentChain.creationFee.toString())
-      }
       );
 
       

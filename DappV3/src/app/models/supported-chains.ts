@@ -61,6 +61,26 @@ function getSupportedChains(){
             
         }
         supportedChains.push({
+            name: 'Hardhat Testnet',
+            chainId: 31337,
+            shortName: "hrdt",
+            chain: "HRDT",
+            network: "Hardhat",
+            networkId: 31337,
+            nativeCurrency: {
+                name: "ETH",
+                symbol: "ETH",
+                decimals: 18,
+            },
+            rpc: ["https://rpctest.meter.io"],
+            faucets: [],
+            infoURL: "",
+            isTestNet: true,
+            creationFee: 0.001
+    
+        });
+
+        supportedChains.push({
             name: 'Meter Testnet',
             chainId: 83,
             shortName: "mtrt",

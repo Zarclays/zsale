@@ -12,6 +12,7 @@ import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "./Campaign.sol";
+import "./Confirmations/ConfirmAddress.sol";
 import './Lockers/DexLockerFactory.sol';
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
@@ -30,6 +31,8 @@ contract CampaignList is Context,Ownable  {
 
     DexLockerFactory private _dexLockerFactory;
 
+    ConfirmAddress addressConfirmer;
+
     mapping(address => uint256[]) private ownersCampaign; //owneraddress -> campaignIndex
     
 
@@ -44,6 +47,8 @@ contract CampaignList is Context,Ownable  {
     constructor(DexLockerFactory dexLockerFactory, address campaignImplementationAddress)  {      
        _dexLockerFactory=dexLockerFactory;
        _campaignImplementationAddress = campaignImplementationAddress;
+       addressConfirmer=new ConfirmAddress();
+
     }
 
     function setCampaignCreationPrice(uint256 newPrice) public onlyOwner{
@@ -60,6 +65,8 @@ contract CampaignList is Context,Ownable  {
     ) public payable  {
 
         require(msg.value >= campaignCreationPrice, 'CampaignFactory: Requires CampaignCreation Price' );
+
+        require(addressConfirmer.isContract(_tokenAddress), 'CampaignFactory: Requires TokenAddress to be contract ');
         
         if(_tokenCampaigns[_tokenAddress] != address(0)){
             Campaign ct = Campaign(_tokenCampaigns[_tokenAddress]);

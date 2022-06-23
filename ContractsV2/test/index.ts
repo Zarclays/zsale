@@ -30,6 +30,8 @@ describe("CampaignList", function () {
       TokenArtifact = await ethers.getContractFactory("Token");
       CampaignArtifact = await ethers.getContractFactory("Campaign");
       DexLockerFactoryArtifact = await ethers.getContractFactory("DexLockerFactory");
+      const DexLockerArtifact = await ethers.getContractFactory("DexLocker");
+      const CoinVestingVaultArtifact = await ethers.getContractFactory("CoinVestingVault");
 
 
       token = await TokenArtifact.deploy();
@@ -39,10 +41,23 @@ describe("CampaignList", function () {
       await token2.deployed();
       console.log('Token2 Deployed at  ', token2.address );
 
-      const dexLockerFactory = await DexLockerFactoryArtifact.deploy();
+
+      let campaignImplementation = await CampaignArtifact.deploy();
+      await campaignImplementation.deployed();
+      console.log('Campaign Implemntation Deployed at  ', campaignImplementation.address );
+
+      let dexLockerImplementation = await DexLockerArtifact.deploy();
+      await dexLockerImplementation.deployed();
+      console.log('dexLocker Implemntation Deployed at  ', dexLockerImplementation.address );
+
+      let coinVault = await CoinVestingVaultArtifact.deploy();
+      await coinVault.deployed();
+      console.log('coinVesting Implemntation Deployed at  ', coinVault.address );
+
+      const dexLockerFactory = await DexLockerFactoryArtifact.deploy(dexLockerImplementation.address, coinVault.address);
       await dexLockerFactory.deployed();
       
-      campaignFactory = await CampaignFactoryArtifact.deploy(dexLockerFactory.address);
+      campaignFactory = await CampaignFactoryArtifact.deploy(dexLockerFactory.address , campaignImplementation.address);
       await campaignFactory.deployed();
       console.log('Using Campaign List Deployed at  ', campaignFactory.address );
       
@@ -68,6 +83,7 @@ describe("CampaignList", function () {
         //founderinfo
         //[formData.logo,'',formData.website, formData.twitter, formData.telegram, formData.discord ]
         ['https://place-hold.it/110','dsec', 'https://testtoken.org','https://twitter.com/test','https://testtoken.org', 'http://discord.me'],
+        [true,false],
           //teamtokenvesting
           [
           {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.05"), hasBeenClaimed: false},
@@ -79,17 +95,9 @@ describe("CampaignList", function () {
           {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
           {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false}
         ],
-        [
-          {releaseDate: fourHoursLater, releaseAmount:  ethers.utils.parseEther("0.02"), hasBeenClaimed: false}, //25% of 0.08 being raisedfunds - raisedfundsUsedForLiquidity
-          {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.02"), hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.02"), hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.02"), hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
-          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false}
-        ], 
-        [true,true],
+        
+        [0,0,0],
+        
           
           {  
             value: ethers.utils.parseEther("0.0001") 
@@ -311,4 +319,58 @@ describe("CampaignList", function () {
 
 
 });
+
+
+
+describe("ConfirmAddress", async function () {
+  
+  
+
+ 
+  let ConfirmAddressArtifact ;
+  
+
+  const router = '0xeD37AEDD777B44d34621Fe5cb1CF594dc39C8192';
+  let userAccount :any ;
+  let confirmAddContract :any;
+  
+
+  before('Initialize and Deploy SmartContracts', async () => {
+      
+    ConfirmAddressArtifact = await ethers.getContractFactory("ConfirmAddress");
+    userAccount = (await ethers.getSigners())[0];
+
+    
+    confirmAddContract = await ConfirmAddressArtifact.deploy();
+    await confirmAddContract.deployed();
+    console.log('Confirm Address Deployed at  ', confirmAddContract.address );
+      
+  });
+
+
+  it("Should return true when a contract address is sent to it", async function () {
+    const TokenArtifact = await ethers.getContractFactory("Token");
+    const token = await TokenArtifact.deploy();
+    await token.deployed();
+    
+    let addToCheck = token.address;
+    let isContractCheck = await confirmAddContract.isContract(addToCheck);
+    expect(isContractCheck).to.equal(true);
+  });
+
+  
+  
+
+  it('Should return false when a non-contract address is sent to it', async() => {
+    let addToCheck = userAccount.address;
+    let isContractCheck = await confirmAddContract.isContract(addToCheck);
+    expect(isContractCheck).to.equal(false);
+    
+
+  });
+
+
+
+});
+
 

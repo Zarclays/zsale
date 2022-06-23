@@ -1,66 +1,22 @@
-{
-  "contractName": "Campaign",
-  "abi": [
+[
     {
+      "anonymous": false,
       "inputs": [
         {
+          "indexed": true,
           "internalType": "address",
-          "name": "_tokenAddress",
+          "name": "previousAdmin",
           "type": "address"
         },
         {
-          "internalType": "uint256",
-          "name": "_softCap",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_hardCap",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_saleStartTime",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_saleEndTime",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bool",
-          "name": "_useWhiteList",
-          "type": "bool"
-        },
-        {
-          "internalType": "enum Campaign.RefundType",
-          "name": "_refundType",
-          "type": "uint8"
-        },
-        {
+          "indexed": true,
           "internalType": "address",
-          "name": "_dexRouterAddress",
+          "name": "newAdmin",
           "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_liquidityPercent",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_listRate",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_dexListRate",
-          "type": "uint256"
         }
       ],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
+      "name": "AdminOwnershipTransferred",
+      "type": "event"
     },
     {
       "anonymous": false,
@@ -97,8 +53,78 @@
           "type": "uint256"
         }
       ],
+      "name": "Refunded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [],
+      "name": "SoldOut",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
       "name": "ValueReceived",
       "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Withdrawn",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "_campaignFactory",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "addWhitelistTwo",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
       "inputs": [
@@ -108,7 +134,7 @@
           "type": "address"
         }
       ],
-      "name": "buyInOneTier",
+      "name": "buyInAllTiers",
       "outputs": [
         {
           "internalType": "uint256",
@@ -127,7 +153,7 @@
           "type": "address"
         }
       ],
-      "name": "buyInThreeTier",
+      "name": "buyInOneTier",
       "outputs": [
         {
           "internalType": "uint256",
@@ -159,6 +185,52 @@
     },
     {
       "inputs": [],
+      "name": "campaignKey",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "cancelCampaign",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newAdmin",
+          "type": "address"
+        }
+      ],
+      "name": "changeAdmin",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "dexLockerAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "dexRouterAddress",
       "outputs": [
         {
@@ -172,12 +244,368 @@
     },
     {
       "inputs": [],
-      "name": "isCancelled",
+      "name": "end",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "finalizeAndSetupLiquidity",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getCampaignInfo",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "softcap",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "hardcap",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "saleStartTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "saleEndTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "listRate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dexListRate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "liquidity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_liquidityReleaseTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalCoins",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalParticipant",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "useWhiteList",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "hasKyc",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "isAuditd",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getCampaignPeriod",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "saleStartTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "saleEndTime",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getCampaignSalePriceInfo",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getCampaignStatus",
+      "outputs": [
+        {
+          "internalType": "enum Campaign.CampaignStatus",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "hasFailed",
       "outputs": [
         {
           "internalType": "bool",
           "name": "",
           "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "hasKYC",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[3]",
+          "name": "addresses",
+          "type": "address[3]"
+        },
+        {
+          "internalType": "uint256[10]",
+          "name": "capAndDate",
+          "type": "uint256[10]"
+        },
+        {
+          "internalType": "enum Campaign.RefundType",
+          "name": "_refundType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "_dexRouterAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256[4]",
+          "name": "liquidityAllocationAndRates",
+          "type": "uint256[4]"
+        },
+        {
+          "internalType": "bool[2]",
+          "name": "_useTokenOrRaisedFundVesting",
+          "type": "bool[2]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "releaseDate",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "releaseAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "hasBeenClaimed",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct VestSchedule[8]",
+          "name": "teamTokenVestingDetails",
+          "type": "tuple[8]"
+        },
+        {
+          "internalType": "uint256[3]",
+          "name": "raisedFundVestingDetails",
+          "type": "uint256[3]"
+        },
+        {
+          "internalType": "string[6]",
+          "name": "founderInfo",
+          "type": "string[6]"
+        },
+        {
+          "internalType": "contract DexLockerFactory",
+          "name": "dexLockerFactory",
+          "type": "address"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "isAllowedInTier1",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isAudited",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "isInTier1WhiteList",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "isInTier2WhiteList",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isSoldOut",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "liquidityReleaseTime",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -198,7 +626,7 @@
     },
     {
       "inputs": [],
-      "name": "maxAllocationPerUserTierThree",
+      "name": "maxAllocationPerUserTierTwo",
       "outputs": [
         {
           "internalType": "uint256",
@@ -211,7 +639,7 @@
     },
     {
       "inputs": [],
-      "name": "maxAllocationPerUserTierTwo",
+      "name": "minAllocationPerUser",
       "outputs": [
         {
           "internalType": "uint256",
@@ -242,6 +670,11 @@
           "type": "bool"
         },
         {
+          "internalType": "string",
+          "name": "auditUrl",
+          "type": "string"
+        },
+        {
           "internalType": "enum Campaign.RefundType",
           "name": "refundType",
           "type": "uint8"
@@ -270,6 +703,11 @@
           "internalType": "string",
           "name": "telegram",
           "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "discord",
+          "type": "string"
         }
       ],
       "stateMutability": "view",
@@ -286,6 +724,24 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "newDate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "newEndDate",
+          "type": "uint256"
+        }
+      ],
+      "name": "postponeSale",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -344,13 +800,85 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "tierOnehardCap",
-      "outputs": [
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "audit",
+          "type": "bool"
+        }
+      ],
+      "name": "setAudited",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "kyc",
+          "type": "bool"
+        }
+      ],
+      "name": "setKYC",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
         {
           "internalType": "uint256",
-          "name": "",
+          "name": "newValue",
           "type": "uint256"
+        }
+      ],
+      "name": "setTier1TimeLineInHours",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "allowed",
+          "type": "bool"
+        }
+      ],
+      "name": "setWhiteListMode",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_tokenAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setZSalesTokenAddress",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "startReceivingBids",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "status",
+      "outputs": [
+        {
+          "internalType": "enum Campaign.CampaignStatus",
+          "name": "",
+          "type": "uint8"
         }
       ],
       "stateMutability": "view",
@@ -358,7 +886,7 @@
     },
     {
       "inputs": [],
-      "name": "tierThreehardCap",
+      "name": "tierOnehardCap",
       "outputs": [
         {
           "internalType": "uint256",
@@ -384,12 +912,12 @@
     },
     {
       "inputs": [],
-      "name": "totalCoinInTierOne",
+      "name": "tokenAddress",
       "outputs": [
         {
-          "internalType": "uint256",
+          "internalType": "address",
           "name": "",
-          "type": "uint256"
+          "type": "address"
         }
       ],
       "stateMutability": "view",
@@ -397,7 +925,7 @@
     },
     {
       "inputs": [],
-      "name": "totalCoinInTierThree",
+      "name": "totalCoinInTierOne",
       "outputs": [
         {
           "internalType": "uint256",
@@ -449,7 +977,7 @@
     },
     {
       "inputs": [],
-      "name": "totalUserInTierOne",
+      "name": "totalTokensExpectedToBeLocked",
       "outputs": [
         {
           "internalType": "uint256",
@@ -462,7 +990,7 @@
     },
     {
       "inputs": [],
-      "name": "totalUserInTierThree",
+      "name": "totalUserInTierOne",
       "outputs": [
         {
           "internalType": "uint256",
@@ -500,8 +1028,37 @@
       "type": "function"
     },
     {
-      "stateMutability": "payable",
-      "type": "receive"
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "logoUrl",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "desc",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "website",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "twitter",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "telegram",
+          "type": "string"
+        }
+      ],
+      "name": "updateCampaignDetails",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
       "inputs": [
@@ -517,7 +1074,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "_tierThreeHardCap",
+          "name": "_minAllocationPerUser",
           "type": "uint256"
         },
         {
@@ -529,11 +1086,6 @@
           "internalType": "uint256",
           "name": "_maxAllocationPerUserTierTwo",
           "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_maxAllocationPerUserTierThree",
-          "type": "uint256"
         }
       ],
       "name": "updateTierDetails",
@@ -543,123 +1095,7 @@
     },
     {
       "inputs": [],
-      "name": "cancelCampaign",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_address",
-          "type": "address"
-        }
-      ],
-      "name": "addWhitelistOne",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_address",
-          "type": "address"
-        }
-      ],
-      "name": "addWhitelistTwo",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_address",
-          "type": "address"
-        }
-      ],
-      "name": "addWhitelistThree",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_address",
-          "type": "address"
-        }
-      ],
-      "name": "getWhitelistOne",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_address",
-          "type": "address"
-        }
-      ],
-      "name": "getWhitelistTwo",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_address",
-          "type": "address"
-        }
-      ],
-      "name": "getWhitelistThree",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bool",
-          "name": "kyc",
-          "type": "bool"
-        }
-      ],
-      "name": "setKYC",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "hasKYC",
+      "name": "useRaisedFundsVesting",
       "outputs": [
         {
           "internalType": "bool",
@@ -672,7 +1108,7 @@
     },
     {
       "inputs": [],
-      "name": "isAudited",
+      "name": "useTokenVesting",
       "outputs": [
         {
           "internalType": "bool",
@@ -684,106 +1120,34 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "bool",
-          "name": "audit",
-          "type": "bool"
-        }
-      ],
-      "name": "setAudited",
+      "inputs": [],
+      "name": "withdrawFunds",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
       "inputs": [],
-      "name": "submitBid",
+      "name": "withdrawOwnerTokens",
       "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "zsalesTokenAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "finalizeAndwithdraw",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "withdrawRefund",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getCampaignInfo",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "_tokenAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "softcap",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "hardcap",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "saleStartTim",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "saleEndTime",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "listRate",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "dexListRate",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "totalCoins",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "totalParticipant",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bool",
-          "name": "useWhiteList",
-          "type": "bool"
-        },
-        {
-          "internalType": "bool",
-          "name": "hasKYC",
-          "type": "bool"
-        },
-        {
-          "internalType": "bool",
-          "name": "isAuduited",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
+      "type": "receive"
     }
   ]
-}
