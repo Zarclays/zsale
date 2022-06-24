@@ -10,8 +10,8 @@ import { FormModule, ProgressModule, ToastModule } from '@coreui/angular';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ButtonGroupModule } from '@coreui/angular';
 import {DpDatePickerModule} from 'ng2-date-picker';
-import { CardModule } from '@coreui/angular';
-import { GridModule } from '@coreui/angular';
+// import { CardModule } from '@coreui/angular';
+// import { GridModule } from '@coreui/angular';
 
 @NgModule({
   declarations: [
@@ -29,8 +29,8 @@ import { GridModule } from '@coreui/angular';
     DpDatePickerModule ,
     ProgressModule,
     ToastModule,
-    CardModule,
-    GridModule
+    // CardModule,
+    // GridModule
   ]
 })
 export class CampaignsModule { }

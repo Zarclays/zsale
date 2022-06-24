@@ -112,7 +112,7 @@ contract DexLocker is Initializable{
             _coinVault = CoinVestingVault(payable(newCoinVaultCloneAddress) );
             // _coinVault.initialize(_owner, _startTime,_amount, _vestingDurationInDays,_vestingCliffInDays);
 
-             _coinVault.initialize(_owner,block.timestamp, raisedFundVestingDetails[0] * _raisedAmount /1000, raisedFundVestingDetails[1],raisedFundVestingDetails[2]);
+             _coinVault.initialize(_owner,block.timestamp, _raisedFundVestingDetails[0] * _raisedAmount /1000, _raisedFundVestingDetails[1],_raisedFundVestingDetails[2]);
 
             
         }

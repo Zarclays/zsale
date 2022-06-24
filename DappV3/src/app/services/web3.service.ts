@@ -264,6 +264,10 @@ export class Web3Service {
 
   };
 
+  public async getFeeData(){
+    return await this.ethersProvider?.getFeeData();
+  }
+
 
   public getERC20Contract (address: string) {
     
