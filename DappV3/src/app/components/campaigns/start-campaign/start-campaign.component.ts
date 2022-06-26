@@ -25,6 +25,7 @@ const CampaignAbi = require('../../../../assets/Campaign.json');
 export class StartCampaignComponent implements OnInit {
   campaignId: number|undefined;
   @ViewChild('wizard') wizard!: WizardComponent;
+
   mainFormGroup!: FormGroup;
 
   formSubscriptions: Subscription[]=[];
@@ -38,6 +39,8 @@ export class StartCampaignComponent implements OnInit {
   tokenAddress: string;
   tokenDetails: any;
   nativeCoin= '';
+
+  isGettingTokenDetails = false;
 
   datePickerConfig: any={
     format: 'YYYY/MM/DD HH:mm'
@@ -83,7 +86,7 @@ export class StartCampaignComponent implements OnInit {
      },
      'liquidity' : {
        'required'  :   'Liquidity is required.',
-		    'min':  'Liquidity must be at least 50.',
+		    'min':  'Liquidity must be at least 51.',
         'max':  'Liquidity must be at most 100.'
      },
      'liquidityLockupDays':{
@@ -187,7 +190,8 @@ export class StartCampaignComponent implements OnInit {
    };
 
 
-
+  campaignAddress: string;
+  campaignIndex: string;
 
   
   constructor(private titleService: Title, 
@@ -243,7 +247,7 @@ export class StartCampaignComponent implements OnInit {
         hardCap: ['', [Validators.required,Validators.min(0),Validators.max(1000000), ValidateHardCap()]],
         minBuy: ['', [Validators.required, Validators.min(0)]],
         maxBuy: ['', [Validators.required,Validators.min(0),Validators.max(100000000)]],
-        liquidity: ['50', [Validators.required, Validators.min(50), Validators.max(100)]],
+        liquidity: ['51', [Validators.required, Validators.min(50), Validators.max(100)]],
         dexRate : ['', [Validators.required,Validators.min(0)]],
         router: ['', [Validators.required ] ],
         startDate: ['', [Validators.required, ValidateDateIsNotInPast ] ],
@@ -298,10 +302,11 @@ export class StartCampaignComponent implements OnInit {
   }
 
    
-
+  
 
   onFormChanges(): void {
     this.formSubscriptions.push( this.mainFormGroup.get('tokenInfoFG.tokenAddress')!.valueChanges.subscribe(async val => {
+      this.isGettingTokenDetails=true;
       //this.formattedMessage = `My name is ${val}.`;
       const currentChainId = await this.web3Service.getCurrentChainId();
     
@@ -317,11 +322,15 @@ export class StartCampaignComponent implements OnInit {
         }
 
         try{
-          this.isTokenApproved= (await this.web3Service.getERC20ApprovalAllowance(this.tokenAddress, contractList[currentChainId].campaignList)).gte(constants.Zero);
+          const allowance = await this.web3Service.getERC20ApprovalAllowance(this.tokenAddress, contractList[currentChainId].campaignList);
+          // console.log('Current Allowance:', utils.formatUnits( allowance,  'ether'))
+          this.isTokenApproved= allowance.gt(constants.Zero);
           
         }catch(err){
           console.error('eror gting erc20 details:', err, new Date())
         }
+
+        this.isGettingTokenDetails=false;
       }
       
       
@@ -506,6 +515,7 @@ export class StartCampaignComponent implements OnInit {
     const now = new Date();
     const nowTimeStamp = Math.floor(now.getTime() / 1000)
 
+    let campaignAddress,campaignIndex;
     
 
     try{
@@ -566,25 +576,58 @@ export class StartCampaignComponent implements OnInit {
       this.showToast('Success!','Campaign Created succesfully');
 
 
-      const campaignAddress = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['createdCampaignAddress'];
-      const campaignIndex = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['index'];
+      this.campaignAddress = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['createdCampaignAddress'];
+      this.campaignIndex = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['index'];
       
-      console.log('camp: ', campaignAddress)
-
-      const campaignContract = new Contract(campaignAddress, CampaignAbi, this.web3Service.signer);
-      const transferTokenTx = await campaignListContract.transferTokens(campaignAddress);        
-      let transfrTxResult =   await transferTokenTx.wait();
-
-      this.spinner.hide();
-
-	  this.router.navigate(['/campaigns', currentChain.shortName,'p',  campaignIndex]);
-      // navigate(`/campaigns/${campaignIndex}`);
+      
+      this.wizard.goToNextStep();
 
     }catch(err){
       console.error('error creating campaign: ', err)
       this.showToast('Oops!','Campaign Created Failed', 'danger');
-      this.spinner.hide();
+      
     }
+
+    
+
+    this.spinner.hide();
+
+    
+  }
+
+
+  async transferTokens(){
+    const currentChain = await this.web3Service.getCurrentChain();
+    const currentChainId = currentChain.chainId;
+  
+    this.spinner.show();
+    const campaignListContract = new Contract(contractList[currentChainId].campaignList, CampaignListAbi, this.web3Service.signer);
+    
+    if(this.campaignAddress && this.campaignIndex){
+      try{
+        this.showToast('Working!','Transferring Tokens to Campaign');
+        console.log('camp: ', this.campaignAddress)
+
+        
+        const transferTokenTx = await campaignListContract.transferTokens(this.campaignAddress);        
+        let transfrTxResult =   await transferTokenTx.wait();
+
+        this.spinner.hide();
+
+        this.showToast('Success!','Tokens Transferred Successfully. You will be redirected.');
+
+        this.router.navigate(['/campaigns', currentChain.shortName,'p',  this.campaignIndex]);
+      }catch(err){
+        console.error('error transferring Tokens to campaign: ', err)
+        this.showToast('Oops!','Transferring Tokens to Campaign Created Failed', 'danger');
+      }
+      
+    }
+    
+
+    this.spinner.hide();
+
+    
   }
 
   /*Colors 

@@ -99,9 +99,9 @@ describe("CampaignList", function () {
         [0,0,0],
         
           
-          {  
-            value: ethers.utils.parseEther("0.0001") 
-          });
+        {  
+          value: ethers.utils.parseEther("0.0001") 
+        });
     let txResult =   await createCampaignTx.wait();
     // campaignAddress = txResult.events[2].args['createdCampaignAddress'];
     campaignAddress = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['createdCampaignAddress'];

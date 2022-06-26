@@ -2,6 +2,7 @@
 pragma solidity ^0.8.8;
 
 import "@openzeppelin/contracts/utils/Context.sol";
+// import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -25,7 +26,7 @@ import "hardhat/console.sol";
 //   function createNewCampaign(address _tokenAddress, address _campaignAddress) external payable ;
 // }
 
-contract Campaign is Context,Ownable, ReentrancyGuard, Initializable {
+contract Campaign is Initializable,Ownable, ReentrancyGuard {
   using SafeERC20 for IERC20;
 
   event AdminOwnershipTransferred(address indexed previousAdmin, address indexed newAdmin);
@@ -198,83 +199,17 @@ contract Campaign is Context,Ownable, ReentrancyGuard, Initializable {
       
       _updateTierDetails (capAndDate[4], capAndDate[5], capAndDate[6],capAndDate[7], capAndDate[8]);
 
-      transferOwnership(addresses[0]);
+      _transferOwnership(addresses[0]);
 
-      updateLockDetails(liquidityAllocationAndRates[1], _useTokenOrRaisedFundVesting[0], teamTokenVestingDetails,_useTokenOrRaisedFundVesting[1], raisedFundVestingDetails );
+      _updateLockDetails(liquidityAllocationAndRates[1], _useTokenOrRaisedFundVesting[0], teamTokenVestingDetails,_useTokenOrRaisedFundVesting[1], raisedFundVestingDetails );
   }
   
-  // constructor(
-    
-  //   // address campaignOwner,
-  //   // address campaignFactory,
-  //   // address  _tokenAddress,
-  //   address[3] memory addresses,
-  //   uint256[10] memory capAndDate,  // uint256 _softCap,uint256 _hardCap,uint256 _saleStartTime,uint256 _saleEndTime, uint256 _tierOneHardCap, uint256 _tierTwoHardCap, uint256 _maxAllocationPerUserTierOne, uint256 _maxAllocationPerUserTierTwo ,uint _campaignKey,
-    
-  //   RefundType _refundType, 
-  //   address _dexRouterAddress,
-  //   // uint _liquidityPercent, 
-  //   // uint liquidityReleaseTime,
-  //   // uint _listRate, 
-  //   // uint _dexListRate,
-  //   uint[4] memory liquidityAllocationAndRates,
-  //   VestSchedule[8] memory teamTokenVestingDetails, 
-  //   VestSchedule[8] memory raisedFundVestingDetails,
-  //   string[6] memory founderInfo,
-  //   DexLockerFactory dexLockerFactory,
-  //   bool[2] memory _useTokenOrRaisedFundVesting
-    
-  // ) payable  {
-  //     campaignKey=capAndDate[8];
-  //     _campaignFactory= addresses[1];
-  //     _dexLockerFactory=dexLockerFactory;
-      
-  //     // require(releaseTime > block.timestamp, "CAMPAIGN: release time above current time");
-  //     require(capAndDate[3] > capAndDate[2], "CAMPAIGN: Sale End time above start time");
-  //     require(liquidityAllocationAndRates[0] >= 5100, "CAMPAIGN: Liquidity allowed is > 51 %");
-        
-        
-  //     // //block scopin to avoid stack too deep 
-  //     {
-        
-  //       // saleInfo= CampaignSaleInfo();
-  //       saleInfo.tokenAddress=addresses[2];
-  //       saleInfo.softCap=capAndDate[0];
-  //       saleInfo.hardCap=capAndDate[1];
-  //       if(capAndDate[2] <= block.timestamp){
-  //         saleInfo.saleStartTime=block.timestamp;
-  //       }else{
-  //         saleInfo.saleStartTime=capAndDate[2];
-  //       }
-        
-  //       saleInfo.saleEndTime=capAndDate[3];
-  //       saleInfo.liquidityPercent=liquidityAllocationAndRates[0];
-  //       saleInfo.listRate=liquidityAllocationAndRates[2];
-  //       saleInfo.dexListRate=liquidityAllocationAndRates[3];
-  //     }        
-
-  //     {    
-  //       dexRouterAddress=_dexRouterAddress; 
-         
-  //     }
-        
-  //     otherInfo= CampaignOtherInfo(false, false,false,'', _refundType,founderInfo[0],founderInfo[1],founderInfo[2],founderInfo[3],founderInfo[4], founderInfo[5]);
-      
-      
-  //     _updateTierDetails (capAndDate[4], capAndDate[5], capAndDate[6],capAndDate[7], capAndDate[8]);
-
-  //     transferOwnership(addresses[0]);
-
-  //     updateLockDetails(liquidityAllocationAndRates[1], _useTokenOrRaisedFundVesting[0], teamTokenVestingDetails,_useTokenOrRaisedFundVesting[1], raisedFundVestingDetails );
-  // }
-
   // function to update other details not initialized in constructor - this is bcos solidity limits how many variables u can pass in at once
-  function updateLockDetails(uint liquidityReleaseTimeDays, //Time to add to startTime in days
+  function _updateLockDetails(uint liquidityReleaseTimeDays, //Time to add to startTime in days
     bool _useTokenVesting,
     VestSchedule[8] memory teamTokenVestingDetails,
     bool _useRaisedFundsVesting, 
-    // VestSchedule[8] memory raisedFundVestingDetails
-      uint256[3] memory raisedFundVestingDetails
+    uint256[3] memory raisedFundVestingDetails
       
   ) private /*public onlyOwner*/ {
     liquidityReleaseTime  = saleInfo.saleEndTime + (liquidityReleaseTimeDays * 1 days);
@@ -690,14 +625,10 @@ contract Campaign is Context,Ownable, ReentrancyGuard, Initializable {
       return saleInfo.tokenAddress;
   }
 
-  // //To get refund when the requirement not ment
-  // function getRefund() public {
-  //     require(block.number > saleEndTime, 'salenedtime ......');
-  //     require(block.number >= saleStartTime);
-  //     require(contributions[msg.sender] > 0);
-
-  //     msg.sender.transfer(contributions[msg.sender]);
-  //     contributions[msg.sender] = 0;
-  // }
+  // Refund any mistakenly sent in ERC20
+  function refundERC20(IERC20 _token, address recipient, uint256 amount) public onlyAdmin {
+      
+    _token.safeTransfer(recipient, amount);
+  }
 
 }

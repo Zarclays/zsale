@@ -15,7 +15,7 @@
 
         
 
-        <form [formGroup]="mainFormGroup" class="main-form needs-validation" (ngSubmit)="finishFunction()" novalidate [validated]="false"  cForm>
+        <form [formGroup]="mainFormGroup" class="main-form needs-validation"  novalidate [validated]="false"  cForm>
             <aw-wizard  #wizard [navBarLayout]="'large-filled'" [navBarLocation]="'left'">
                 <aw-wizard-step stepTitle="Token information" [navigationSymbol]="{ symbol: '1' }" [canExit]>
                     <div formGroupName="tokenInfoFG">
@@ -106,10 +106,10 @@
                         <div class="row mt-4">
                             <div class="col d-flex align-items-center justify-content-end">
                                 
-                                <button type="button" *ngIf="!isTokenApproved" (click)="approveToken()" class="me-1 btn btn-primary" [disabled]="tokenInfoFG.invalid || mainFormGroup.get('tokenInfoFG.tokenToUse').value !== 'useMyToken' " >
+                                <button type="button" *ngIf="!isTokenApproved" (click)="approveToken()" class="me-1 btn btn-primary" [disabled]="isGettingTokenDetails || tokenInfoFG.invalid || mainFormGroup.get('tokenInfoFG.tokenToUse').value !== 'useMyToken' " >
                                     Approve Token
                                 </button>
-                                <button type="button" *ngIf="isTokenApproved" class="me-1 btn btn-primary" [disabled]="tokenInfoFG.invalid" awNextStep>
+                                <button type="button" *ngIf="isTokenApproved" class="me-1 btn btn-primary" [disabled]="isGettingTokenDetails || tokenInfoFG.invalid" awNextStep>
                                     Next
                                 </button>
                             </div>
@@ -343,8 +343,7 @@
                                         <option *ngFor='let rtr of routers' [value]="rtr.address">
                                             {{rtr.name}}
                                         </option>
-                                        <!-- <option value="1">Pancakeswap</option>
-                                        <option value="2">Bakery Swap</option> -->
+                                        
                                       </select>
                                   </label>
                                   
@@ -589,8 +588,7 @@
                         <div class="row">
                             <div class="col">
                                 <div [cFormFloating]="true" class="my-3" >
-                                    <!-- <input cFormControl id="floatingInput" placeholder="" formControlName="desc" type="text" sizing="sm" /> -->
-
+                                    
                                     <textarea cFormControl style="height: 100px;" rows="4" id="desc" placeholder="" formControlName="desc" type="text" sizing="lg" [ngClass]="{ 'is-invalid': teamInfoFG.get('desc').touched && teamInfoFG.get('desc').invalid, 'is-valid': teamInfoFG.get('desc').touched && teamInfoFG.get('desc').valid }"></textarea>
                                     <label cLabel for="desc">Token Description</label>
                                     
@@ -727,7 +725,7 @@
                     </div>
                 </aw-wizard-step>
         
-                <aw-wizard-step stepTitle="Preview">
+                <aw-wizard-step stepTitle="Preview" [navigationSymbol]="{ symbol: '4' }">
                     									
                     <div >
 
@@ -916,17 +914,20 @@
                                 <strong>Token Vesting </strong>
                             </div>
                             <div class="card-body">
-                                <c-form-check [switch]="true">
-                                    <input readonly cFormCheckInput checked type="checkbox" *ngIf="campaignInfoFG.get('useTokenVesting')?.value" />
-							         <input readonly cFormCheckInput  type="checkbox" *ngIf="!campaignInfoFG.get('useTokenVesting')?.value" />		
-                                    <label cFormCheckLabel>Use Token Vesting</label>
-                                </c-form-check>
+                                <div>
+                                    <dl>
+                                        <dt>Use Token Vesting?</dt>
+                                        <dd>{{campaignInfoFG.get('useTokenVesting')?.value==true ? 'Yes':'No'}}</dd>
+                                    </dl>
+                                    <label cFormCheckLabel>Lock a percentage of your Tokens</label>
+                                </div>
+
                                 <div class="row mt-3" *ngIf="mainFormGroup.get('campaignInfoFG.useTokenVesting').value === true">
                                     <div class="col">
-                                        <!--<ng-container >-->
+                                        
                                             
                                             <div *ngFor="let _ of tokenVestings.controls; index as i">
-                                                <!--<ng-container >-->
+                                                
                                                   
 
                                                   <div class="row {{i%2==0?'striped-vest':''}}">
@@ -948,10 +949,10 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <!--</ng-container>-->
+                                                
                                             </div>
 
-                                        <!--</ng-container>-->
+                                        
                                     </div>
 
                                 </div>
@@ -1085,14 +1086,7 @@
                         </div>
                     
                         <div class="row">
-                            <!-- <div class="col-6">
-                                <div [cFormFloating]="true" class="my-3" >
-                                    <input readonly cFormControl id="reddit" placeholder="" value="{{teamInfoFG.get('reddit')?.value}}" type="url" sizing="sm" />
-                                    <label cLabel for="reddit">Reddit</label>
-                                    
-                                    
-                                </div>
-                            </div> -->
+                            
                     
                             <div class="col">
                                 <div [cFormFloating]="true" class="my-3" >
@@ -1126,7 +1120,50 @@
                 
                         </div>
                     </div>
-                </aw-wizard-step>
+                </aw-wizard-step> 
+
+                <aw-wizard-completion-step stepTitle="Transfer Tokens" [navigationSymbol]="{ symbol: '5' }">
+                                                        
+                    <div >
+
+                       <h4>Transfer your Tokens to the Sale Contract</h4>
+
+                       
+                        
+                        <div class="card text-white bg-success  mt-3">
+                            <div class="card-header">
+                                <strong>One Final Step </strong>
+                                
+                            </div>
+                            <div class="card-body">
+                                <h4 class="card-title">Transfer your Tokens to the Sale Contract</h4>
+                                <p class="card-text" *ngIf="tokenDetails">Your {{tokenDetails.name}} needs to be transferred to the Sale Contract to Complete the listing.</p>
+                                
+
+                            </div>
+                        </div>
+                       
+                                              
+                    
+                        
+
+                        
+                    </div>
+                   
+
+                    <div class="row mt-4">
+                        <div class="col d-flex align-items-center justify-content-end">
+                            
+                            
+                
+                
+                            <button type="submit"  class="me-1 btn btn-success" (click)="transferTokens()"  >
+                                Transfer Tokens
+                            </button>
+                
+                        </div>
+                    </div>
+                </aw-wizard-completion-step>
             </aw-wizard>
         
         

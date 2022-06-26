@@ -275,6 +275,12 @@ export class Web3Service {
     return cContract;
   }
 
+  public getERC20ContractWithSigner (address: string) {
+    
+    const cContract = new ethers.Contract(address, ERC20AbiJSON.abi, this.ethersSigner);
+    return cContract;
+  }
+
   public async getERC20Details(address: string){
     
     let tokenInfo = await this.getERC20Contract(address);
@@ -302,7 +308,7 @@ export class Web3Service {
 
   public async approveERC20Contract(addressOrContract: string|ethers.Contract, addressToApprove: string, amount: any){
     if(typeof addressOrContract === 'string'){
-      addressOrContract = await this.getERC20Contract(addressOrContract)
+      addressOrContract = await this.getERC20ContractWithSigner(addressOrContract)
     }
 
     const currAllowance = await this.getERC20ApprovalAllowance(addressOrContract,addressToApprove);
