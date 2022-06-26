@@ -44,7 +44,11 @@ export const navItems: INavData[] = [
   {
     name: 'Token Locker',
     url: '/tokens/token-lock',
-    iconComponent: { name: 'cil-drop'}
+    iconComponent: { name: 'cil-drop'},
+    badge: {
+      color: 'secondary',
+      text: 'COMING SOON'
+    }
   },
   {
     title: true,
@@ -53,6 +57,11 @@ export const navItems: INavData[] = [
   {
     name: 'Docs',
     // url: ''
-    iconComponent: { name: 'cil-drop'}
+    iconComponent: { name: 'cil-drop'},
+    badge: {
+      color: 'secondary',
+      text: 'COMING SOON'
+    }
+    
   }
 ];
