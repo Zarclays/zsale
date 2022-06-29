@@ -77,6 +77,12 @@ const routes: Routes = [
         loadChildren: () =>
           import('./components/campaigns/campaigns.module').then((m) => m.CampaignsModule)
       },
+
+      {
+        path: 'tokens',
+        loadChildren: () =>
+          import('./components/tokens/tokens.module').then((m) => m.TokensModule)
+      }
     ]
   },
   {

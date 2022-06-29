@@ -54,6 +54,7 @@ import { ArchwizardModule } from 'angular-archwizard';
 import { NgxSpinnerModule } from "ngx-spinner";
 import { ToastModule } from '@coreui/angular';
 
+
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
 };

@@ -1,0 +1,50 @@
+<div class="container-fluid text-center mt-5">
+    <h1>BurnMintable ERC-20 Token Form</h1>
+    <p>Fill in the Form to create your BurnMintable ERC-20 token</p>
+</div>
+
+<form [formGroup]="burnERC" (ngSubmit)="onSubmit(burnERC)">
+    <div class="container text-center">
+        <div class="row p-5">
+        
+            <!-- First colum -->
+            <div class="col">
+                <label>
+                    Token Name:
+                    <pre></pre>
+                    <input type="text" formControlName="name" placeholder="Szaliun">
+                    <div class="text-danger" *ngIf="burnERC.get('name').invalid && (burnERC.get('name').dirty || burnERC.get('name').touched)">Please provide a Token Name</div>
+                </label>
+                <pre></pre>
+                <label>
+                    Token Symbol:
+                    <pre></pre>
+                    <input type="text" formControlName="symbol" placeholder="ZSL">
+                    <div class="text-danger" *ngIf="burnERC.get('symbol').invalid && (burnERC.get('symbol').dirty || burnERC.get('symbol').touched)">Please provide a Token Symbol</div>
+                </label>
+                </div>
+                <!-- Second Col -->
+                <div class="col">
+                    <label>
+                        Decimal:
+                        <pre></pre>
+                        <input type="number" formControlName="decimal" maxlength="2" minlength="2"  placeholder="18">
+                        <div class="text-danger" *ngIf="burnERC.get('decimal').invalid && (burnERC.get('decimal').dirty || burnERC.get('decimal').touched)">Please provide a Token Decimal</div>
+                    </label>
+                    <pre></pre>
+                    <label>
+                        TotalSupply:
+                        <pre></pre>
+                        <input type="number" formControlName="totalsupply" placeholder="100000000000000..........">
+                        <div class="text-danger" *ngIf="burnERC.get('totalsupply').invalid && (burnERC.get('totalsupply').dirty || burnERC.get('totalsupply').touched)">Please provide a Token TotalSupply</div>
+                    </label>
+                </div>
+                <!-- End of Cols -->
+
+                <!-- Button -->
+                <div class="container mt-5">
+                    <button class="btn btn-primary" [disabled]="burnERC.invalid">Create Token</button>
+                </div>
+        </div>
+    </div>
+</form>
