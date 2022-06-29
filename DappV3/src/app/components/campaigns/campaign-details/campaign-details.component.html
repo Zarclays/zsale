@@ -1,1 +1,9 @@
 <p>campaign-details works!</p>
+
+<div *ngIf="!campaign">
+    Loading ..
+</div>
+
+<div *ngIf="campaign">
+    {{campaign.name}}
+</div>

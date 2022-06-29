@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Web3Service } from '../../../services/web3.service';
 import { ActivatedRoute, ParamMap } from '@angular/router'
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-list-campaign',
@@ -9,6 +10,8 @@ import { ActivatedRoute, ParamMap } from '@angular/router'
   styleUrls: ['./list-campaign.component.scss']
 })
 export class ListCampaignComponent implements OnInit {
+  web3ServiceConnect$: Subscription|undefined;
+  userChain: string|null = 'mtrt';
   
   constructor(private titleService: Title, 
     public web3Service: Web3Service,
@@ -16,24 +19,27 @@ export class ListCampaignComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params: ParamMap) => {
-      const userChain = params.get('chain');
-      if(userChain){
-        
-        setTimeout(()=>{
-          this.web3Service.switchNetworkByChainShortName(userChain).then(()=>{
+      this.userChain = params.get('chain');
+      this.web3ServiceConnect$ = this.web3Service.onConnect.subscribe(async ()=>{
+      
+        if(this.userChain ){
+          await this.web3Service.switchNetworkByChainShortName(this.userChain); 
+        }
             
-            this.web3Service.connect().then(async ()=>{
-              const selectedNetwork = await this.web3Service.getCurrentChainId();
-              console.log('loaded chain: ', selectedNetwork)
-            });
-          });
-        },1700)
-        
-      }
+      })
       
     })
+
+    
+
     this.titleService.setTitle('Campaigns | ZSale');
 
+  }
+
+
+  
+  ngOnDestroy(){
+    this.web3ServiceConnect$!.unsubscribe();
   }
 
 

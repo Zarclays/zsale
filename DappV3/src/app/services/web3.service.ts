@@ -25,10 +25,11 @@ export class Web3Service {
   // accounts: string[] | undefined;
   // balance: string | undefined;
 
-  web3Modal: any| undefined;
+  web3Modal: Web3Modal ;
 
   @Output() onConnect: EventEmitter<any> = new EventEmitter();
   @Output() onDisConnect: EventEmitter<void> = new EventEmitter();
+  @Output() onNetworkChanged: EventEmitter<any> = new EventEmitter();
 
   
 
@@ -49,7 +50,16 @@ export class Web3Service {
               'imtoken',
               'pillar'
             ]
-          }
+          },
+          // rpc: {
+          //   56: 'https://bsc-dataseed.binance.org',
+          // },
+          // network: 'binance'
+
+          // rpc: { 
+          //   1337: 'http://localhost:8545', 
+          // }, 
+          // chainId: 1337
         }
       },
       fortmatic: {
@@ -87,16 +97,15 @@ export class Web3Service {
     });
 
 
-    // const cachedProvider =   window.localStorage.getItem('WEB3_CONNECT_CACHED_PROVIDER');
-    // if (cachedProvider) {
-    //   this.web3modalService.setCachedProvider(cachedProvider);
-      
-    //   setTimeout(()=>{
-    //     this.connect().then(()=>{
+    const cachedProvider =   window.localStorage.getItem('WEB3_CONNECT_CACHED_PROVIDER');
+    if (cachedProvider) {
+      // console.log('Using Cached web3modal')      
+      setTimeout(()=>{
+        this.connect().then(()=>{
         
-    //     })
-    //   }, 3000)
-    // }
+        })
+      }, 200)
+    }
   }
 
   get accounts(){
@@ -144,8 +153,10 @@ export class Web3Service {
 
     // Subscribe to chainId change
     provider.on('chainChanged', (chainId: number) => {
-        location.reload();
+      // location.reload();
+      location.href = '/campaigns';
       //this.onConnect.emit(provider);
+      this.onNetworkChanged.emit(chainId);
     });
 
     // Subscribe to provider connection
@@ -212,6 +223,7 @@ export class Web3Service {
 
   async switchNetworkByChainShortName(newChain:  string) {
     const c = getSupportedChainByChain(newChain.toUpperCase());
+    
     let networkInfo = {
       chainId: c?.chainId??97,
       chainName: c?.name??'',
@@ -231,12 +243,16 @@ export class Web3Service {
     
     if(this.ethersProvider){
       try {
+        
         //@ts-ignore
         await this.ethersProvider?.provider?.request({
           method: "wallet_switchEthereumChain",
           params: [{ chainId: utils.hexlify(networkInfo.chainId) }],
         });
+
+        
       } catch (switchError: any) {
+        console.error('web3provider not added to metamask::', switchError);
         // This error code indicates that the chain has not been added to MetaMask.
         if (switchError.code === 4902) {
           try {
@@ -259,7 +275,7 @@ export class Web3Service {
         }
       }
     }else{
-      console.warn('web3provider not instantiated::');
+      console.info('Web3provider not instantiated::');
     }
 
   };

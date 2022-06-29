@@ -472,7 +472,7 @@ export class StartCampaignComponent implements OnInit {
 
 
   getMappedTokenVestings(){
-    let vests = []
+    let vests: any[] = []
     const now = new Date();
     
 
@@ -508,7 +508,7 @@ export class StartCampaignComponent implements OnInit {
 
   async finishFunction(){
     const currentChain = await this.web3Service.getCurrentChain();
-    const currentChainId = currentChain.chainId;
+    const currentChainId = currentChain!.chainId;
 	
     this.spinner.show();
     const campaignListContract = new Contract(contractList[currentChainId].campaignList, CampaignListAbi, this.web3Service.signer);
@@ -520,7 +520,7 @@ export class StartCampaignComponent implements OnInit {
 
     try{
 
-      const gasFeeData = await this.web3Service.getFeeData();
+      const gasFeeData = (await this.web3Service.getFeeData())!;
       const tx = await campaignListContract.createNewCampaign(
         this.tokenInfoFG.get('tokenAddress')?.value, 
         [
@@ -561,7 +561,7 @@ export class StartCampaignComponent implements OnInit {
         this.getMappedRaisedFunds(),        
 
         {
-          value: utils.parseEther(currentChain.creationFee.toString()),
+          value: utils.parseEther(currentChain!.creationFee.toString()),
           maxFeePerGas: gasFeeData.maxFeePerGas,// should use geasprice for bsc, since it doesnt support eip 1559 yet
           maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas
         }
@@ -597,7 +597,7 @@ export class StartCampaignComponent implements OnInit {
 
 
   async transferTokens(){
-    const currentChain = await this.web3Service.getCurrentChain();
+    const currentChain = (await this.web3Service.getCurrentChain())!;
     const currentChainId = currentChain.chainId;
   
     this.spinner.show();
@@ -606,7 +606,7 @@ export class StartCampaignComponent implements OnInit {
     if(this.campaignAddress && this.campaignIndex){
       try{
         this.showToast('Working!','Transferring Tokens to Campaign');
-        console.log('camp: ', this.campaignAddress)
+        // console.log('camp: ', this.campaignAddress)
 
         
         const transferTokenTx = await campaignListContract.transferTokens(this.campaignAddress);        
