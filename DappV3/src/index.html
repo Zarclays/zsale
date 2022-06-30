@@ -22,11 +22,20 @@
   <title>ZSale</title>
 </head>
 <body>
-<noscript>You need to enable JavaScript to run this app.</noscript>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
 
-<div class="fade show" style="text-align: center; padding-top: calc(100vh / 2); height: 100vh">
-  <i class="spinner-grow spinner-grow-sm"></i>
-  <span class="m-1">Loading...</span>
-</div>
+  <div class="fade show" style="text-align: center; padding-top: calc(100vh / 2); height: 100vh">
+    <i class="spinner-grow spinner-grow-sm"></i>
+    <span class="m-1">Loading...</span>
+  </div>
+
+
+  <script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
+  </script>
 </body>
 </html>

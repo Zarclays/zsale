@@ -44,3 +44,7 @@ $enable-rtl: true;
 @import "node_modules/angular-archwizard/styles/archwizard.scss";
 
 @import '~@angular/cdk/overlay-prebuilt.css';
+
+.error-message{
+    color: red;
+}

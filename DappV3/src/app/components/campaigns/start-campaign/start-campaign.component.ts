@@ -287,12 +287,7 @@ export class StartCampaignComponent implements OnInit {
 
   }
 
-  onSubmit(form: FormGroup) {
-    console.log('Valid?', form.valid); // true or false
-    console.log('Name', form.value.name);
-    console.log('Email', form.value.email);
-    console.log('Message', form.value.message);
-  }
+  
 
   ngOnDestroy(): void {
     

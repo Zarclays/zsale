@@ -13,10 +13,10 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'list'
+        redirectTo: 'd/list'
       },
       {
-        path: 'list',
+        path: 'd/list',
         component: ListCampaignComponent,
         data: {
           title: 'All Campaigns'
