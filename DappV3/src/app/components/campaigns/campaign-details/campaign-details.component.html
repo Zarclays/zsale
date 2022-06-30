@@ -1,3 +1,5 @@
+<c-toaster class="p-3" position="fixed" [placement]="placement"></c-toaster>
+
 
 <div *ngIf="!campaign">
     Loading ..
@@ -7,8 +9,8 @@
     <div class="col-8">
         <h3>{{campaign.name}}</h3>
         <div>
-            <span *ngIf="true || campaign.hasKYC===true" class="badge bg-primary rounded-pill  mx-2">KYC</span>
-            <a *ngIf="true || campaign.isAudited===true" href="/audit" class="p-3 mx-2">
+            <span *ngIf="campaign.hasKYC===true" class="badge bg-primary rounded-pill  mx-2">KYC</span>
+            <a *ngIf="campaign.isAudited===true" href="/audit" class="p-3 mx-2">
                 <span  class="badge bg-success rounded-pill">Audited</span>
             </a>
         </div>
@@ -32,14 +34,14 @@
                   <div class="fw-bold">Dates</div>
                   
                 </div>
-                <div >{{ formatEtherDateToJs( campaign.saleStartTime)}} to {{formatEtherDateToJs( campaign.saleEndTime)}} </div>
+                <div >{{ formatDateToJsString( campaign.saleStartTime)}} to {{formatDateToJsString( campaign.saleEndTime)}} </div>
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-start py-4">
                 <div class="ms-2 me-auto">
                 <div class="fw-bold">Soft Cap/Hard Cap</div>
                 
                 </div>
-                <div >{{formatUnits(  campaign.softCap,nativeCoin.decimals)}} {{nativeCoin.symbol}} to {{formatUnits(  campaign.hardCap,nativeCoin.decimals)}} {{nativeCoin.symbol}}</div>
+                <div >{{campaign.softCap}} {{nativeCoin.symbol}} to {{  campaign.hardCap}} {{nativeCoin.symbol}}</div>
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-start py-4">
             <div class="ms-2 me-auto">
@@ -57,11 +59,11 @@
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-start">
               <div class="ms-2 me-auto">
-                <div class="fw-bold">% of Raised funds allocated for Liquidity</div>
+                <div class="fw-bold">Raised funds allocated for Liquidity</div>
                 
               </div>
               <span class="">
-                  {{ formatPercent(  campaign.liquidity) }} % of {{formatUnits(  campaign.hardCap,nativeCoin.decimals)}} {{nativeCoin.symbol}} 
+                  {{ formatPercent(  campaign.liquidity) }} % of {{ campaign.hardCap}} {{nativeCoin.symbol}} 
                   locked till {{formatEtherDateToJs( campaign.liquidityReleaseTime)}}
                </span>
             </li>
@@ -70,111 +72,164 @@
     <div class="col-4">
 
         <div class="card ">
-            <div class="card-body">
+            <div class="card-body" style="font-size: 0.78rem">
 
-                <ul class="list-group mt-4">
+                <ul class="list-group mt-4" >
+                    
+
+                    
+                    
+                    <li *ngIf="isOpenForPayment===true" class="list-group-item ">
+                        <!-- <div class="ms-2">
+                            <div class="fw-bold">00:00:12</div>
+                        
+                        </div> -->
+
+                        <div>
+                            <strong>Sale End Timer</strong>
+                        </div>
+
+                        <div
+                          class="countdown d-flex justify-content-center"
+                          simpleCountdown
+                          [dateTo]="campaign.saleEndTime.getTime()/1000"
+                          [language]="'en'"
+                          [endMessage]="'Sale Ended'"
+                          [styles]="'
+                            font-size: 20px;
+                            color: red;
+                            background-color: white;
+                            padding: 10px 4px;
+                            font-weight: bold;
+                          '"
+                          (finish)="onCountdownfinish()"
+                        ></div>
+                        
+                    </li>
+
+                    <li *ngIf="campaign.saleStartTime.getTime() > now" class="list-group-item">
+                        
+                        <div >
+
+                            <strong>Sale Start Timer</strong>
+                        </div>
+
+                         <div
+                          class="countdown d-flex justify-content-center"
+                          simpleCountdown
+                          [dateTo]="campaign.saleStartTime.getTime()/1000"
+                          [language]="'en'"
+                          [endMessage]="'Sale Started'"
+                          [styles]="'
+                            font-size: 20px;
+                            color: red;
+                            background-color: white;
+                            padding: 10px 4px;
+                            font-weight: bold;
+                          '"
+                          (finish)="onCountdownfinish()"
+                        ></div>
+                        
+                    </li>
+
+                    <li class="list-group-item">
+                        <div>
+                            <small>{{this.campaign.totalCoinReceived}} {{nativeCoin?.symbol??'Coin'}} /
+
+                            {{ (this.campaign.totalCoinReceived >= this.campaign.softCap) ? (this.campaign.hardCap + ' ' + nativeCoin?.symbol  + ' Soft Cap Hit') : (this.campaign.softCap + ' '+ nativeCoin?.symbol ) }}
+                            </small> 
+                        </div>
+                        
+                        <c-progress class="mb-3" [height]="20">
+                          <c-progress-bar [value]="saleProgress"> 
+                            {{this.campaign.totalCoinReceived}} {{nativeCoin?.symbol??'Coin'}}                            
+                          </c-progress-bar>
+                        </c-progress>
+                    </li>
+
+                    <li class="list-group-item">
+                        <form *ngIf="isOpenForPayment===true" [formGroup]="mainFormGroup" class="main-form needs-validation"  novalidate [validated]="false"  cForm>
+                            <div class="row">
+                                <div class="col-12 ">
+                                    <b>Participate in Sale  </b> <br/>
+                                    <!-- <small class="text-em">
+                                        If you already have a token, use "Use My Token."" If you’d like to create one now with our Token Minter, use the "Mint New Token" option.
+                                    </small> -->
+                                </div>
+                                <div class="col-12 ">
+                                    <div class="row">
+                                        <div [cFormFloating]="true" class="my-3" >
+                                            <input cFormControl id="amt" placeholder="Amount" formControlName="amount" type="number" sizing="sm" 
+                                                [ngClass]="{ 'is-invalid': mainFormGroup.get('amount').touched && mainFormGroup.get('amount').invalid, 'is-valid': mainFormGroup.get('amount').touched && mainFormGroup.get('amount').valid }"
+                                            />
+                                            <label cLabel for="amt">Amount to buy ({{nativeCoin?.symbol??'Coin'}})</label>
+                                            
+                                            <div cFormText class="mt-2">
+                                                If the Soft Cap is not met, Funds will be returned to Participants
+                                            </div>
+                
+                                            <div class="error-message" *ngIf="mainFormGroup.get('amount').invalid && mainFormGroup.get('amount').touched">
+                                                <div *ngFor="let error of  objectKeys(mainFormGroup.get('amount')?.errors)">                                        
+                                                {{validationMessages.amount[error]}}
+                                                </div>
+                                            </div>
+                
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                </div>
+                
+                                <div class="col d-flex align-items-center justify-content-end">
+
+                                    
+                        
+                                    <button type="submit"  class="me-1 btn btn-success" [disabled]="mainFormGroup.invalid || submittingBid"  (click)="submitBid()"  >
+                                        
+                                        <!-- <svg *ngIf="submittingBid==true" [cIcon]="icons.cilList" size="xl" title="List Icon"></svg> -->
+                                        <img *ngIf="submittingBid==true" src="/assets/images/loader.gif" style="width:40px;height: 40px;"/>
+                                        Submit
+                                    </button>
+                        
+                                </div>
+                            </div>
+                        </form>
+                    </li>
+
                     <li class="list-group-item d-flex justify-content-between align-items-start py-4">
                         <div class="ms-2 me-auto">
                           <div class="fw-bold">Sale Dates</div>
                           
                         </div>
-                        <div >{{ formatEtherDateToJs( campaign.saleStartTime)}} to {{formatEtherDateToJs( campaign.saleEndTime)}} </div>
+                        <div>
+                            <div >{{ formatDateToJsString(campaign.saleStartTime)}} </div> to <div> {{ formatDateToJsString(campaign.saleEndTime)}} </div>
+                        </div>
                     </li>
+                    
 
                     <li class="list-group-item d-flex justify-content-between align-items-start py-4">
                       <div class="ms-2 me-auto">
-                        <div class="fw-bold">Buy Limits (Tier 1 - Must have ZSX to participate) 
-                            <button type="button" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top">
-                                Tooltip on top
-                            </button>
-                        </div>
+                        <div class="fw-bold">Buy Limits (Tier 1)  </div>
                         
                       </div>
-                      <div >{{campaign.saleAddress}} </div>
+                      <div >{{campaign.maxAllocationPerUserTierOne}} {{nativeCoin.symbol}} 
+                        <button cButton cTooltip="To participate in Tier 1 you must have ZSX to participate." cTooltipPlacement="top"
+        class="me-1" color="secondary">i
+                            </button>
+                      </div>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-start py-4">
                         <div class="ms-2 me-auto">
                           <div class="fw-bold">Buy Limits (Public Tier)</div>
                           
                         </div>
-                        <div >{{campaign.tokenAddress}}</div>
+                        <div >{{campaign.maxAllocationPerUserTierTwo}} {{nativeCoin.symbol}} </div>
                     </li>
-                    
-                    <li class="list-group-item d-flex justify-content-between align-items-start py-4">
-                        <div class="ms-2 me-auto">
-                        <div class="fw-bold">Soft Cap/Hard Cap</div>
-                        
-                        </div>
-                        <div >{{formatUnits(  campaign.softCap,nativeCoin.decimals)}} {{nativeCoin.symbol}} to {{formatUnits(  campaign.hardCap,nativeCoin.decimals)}} {{nativeCoin.symbol}}</div>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-start py-4">
-                    <div class="ms-2 me-auto">
-                        <div class="fw-bold">Sale Rate</div>
-                        
-                    </div>
-                    <div >1 {{nativeCoin.symbol}} gets {{campaign.listRate}}</div>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-start py-4">
-                        <div class="ms-2 me-auto">
-                        <div class="fw-bold">DEX Listing Rate</div>
-                        
-                        </div>
-                        <div >1 {{nativeCoin.symbol}} gets {{campaign.dexListRate}}</div>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                      <div class="ms-2 me-auto">
-                        <div class="fw-bold">% of Raised funds allocated for Liquidity</div>
-                        
-                      </div>
-                      <span class="">
-                          {{ formatPercent(  campaign.liquidity) }} % of {{formatUnits(  campaign.hardCap,nativeCoin.decimals)}} {{nativeCoin.symbol}} 
-                          locked till {{formatEtherDateToJs( campaign.liquidityReleaseTime)}}
-                       </span>
-                    </li>
+
                 </ul>
 
 
-                <form *ngIf="isOpenForPayment===true" [formGroup]="mainFormGroup" class="main-form needs-validation"  novalidate [validated]="false"  cForm>
-                    <div class="row">
-                        <div class="col-12 ">
-                            <b>Input your Token </b> <br/>
-                            <small class="text-em">
-                                If you already have a token, use "Use My Token."" If you’d like to create one now with our Token Minter, use the "Mint New Token" option.
-                            </small>
-                        </div>
-                        <div class="col-12 ">
-                            <div class="row">
-                                <div [cFormFloating]="true" class="my-3" >
-                                    <input cFormControl id="amt" placeholder="Amount" formControlName="amount" type="number" sizing="sm" 
-                                        [ngClass]="{ 'is-invalid': mainFormGroup.get('amount').touched && mainFormGroup.get('amount').invalid, 'is-valid': mainFormGroup.get('amount').touched && mainFormGroup.get('amount').valid }"
-                                    />
-                                    <label cLabel for="amt">Amount ({{nativeCoin?.symbol??'Coin'}})</label>
-                                    
-                                    <div cFormText class="mt-2">
-                                        If the Soft Cap is not met, Funds will be returned to Participants
-                                    </div>
-        
-                                    <div class="error-message" *ngIf="mainFormGroup.get('amount').invalid && mainFormGroup.get('amount').touched">
-                                        <div *ngFor="let error of  objectKeys(mainFormGroup.get('amount')?.errors)">                                        
-                                        {{validationMessages.amount[error]}}
-                                        </div>
-                                    </div>
-        
-                                </div>
-                            </div>
-                            
-                            
-                        </div>
-        
-                        <div class="col d-flex align-items-center justify-content-end">
                 
-                            <button type="submit"  class="me-1 btn btn-success" [disabled]="mainFormGroup.invalid"  (click)="submitBid()"  >
-                                Submit
-                            </button>
-                
-                        </div>
-                    </div>
-                </form>
             </div>
         </div>
 

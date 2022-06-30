@@ -10,7 +10,7 @@ export function formatEtherDateToJs(bn){
 
   // Create a new JavaScript Date object based on the timestamp
   // multiplied by 1000 so that the argument is in milliseconds, not seconds.
-  var date = new Date(s * 1000);
+  let date = new Date(s * 1000);
   // Hours part from the timestamp
   const hours = date.getHours();
   // Minutes part from the timestamp
@@ -22,6 +22,23 @@ export function formatEtherDateToJs(bn){
 
   return formattedTime;
 }
+
+
+export function formatDateToJsString(date: Date){
+  
+  // Hours part from the timestamp
+  const hours = date.getHours();
+  // Minutes part from the timestamp
+  const minutes = "0" + date.getMinutes();
+  // Seconds part from the timestamp
+  const seconds = "0" + date.getSeconds();
+
+  const formattedTime = `${monthNames[date.getMonth()].substr(0,3)} ${date.getDate()}, ${date.getFullYear()} ` + hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+
+  return formattedTime;
+}
+
+
 
 export function getDateFromEther(bn){
   const val = utils.formatUnits(  bn.toString(),0);

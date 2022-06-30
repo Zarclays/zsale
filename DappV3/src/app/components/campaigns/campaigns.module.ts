@@ -10,6 +10,9 @@ import { FormModule, ProgressModule, ToastModule } from '@coreui/angular';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ButtonGroupModule } from '@coreui/angular';
 import {DpDatePickerModule} from 'ng2-date-picker';
+import { TooltipModule } from '@coreui/angular';
+import { NgxSimpleCountdownModule } from 'ngx-simple-countdown';
+
 // import { CardModule } from '@coreui/angular';
 // import { GridModule } from '@coreui/angular';
 
@@ -29,6 +32,8 @@ import {DpDatePickerModule} from 'ng2-date-picker';
     DpDatePickerModule ,
     ProgressModule,
     ToastModule,
+    TooltipModule,
+    NgxSimpleCountdownModule
     // CardModule,
     // GridModule
   ]

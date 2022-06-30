@@ -4,6 +4,8 @@ import { Web3Service } from '../../../app/services/web3.service';
 import { Campaign } from '../../../app/models/campaign';
 import { CampaignListService } from './campaign-list.service';
 const CampaignAbi = require('../../../assets/Campaign.json');
+import {utils} from 'ethers';
+import {getDateFromEther, formatEtherDateToJs} from '../../../app/utils/date';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +29,7 @@ export class CampaignService {
     return cContract;
   }
 
-  public async getCampaignDetails (campaignListaddress: string, campaignId: string): Promise<Campaign> {
+  public async getCampaignDetails (campaignListaddress: string, campaignId: string, decimals: number = 18): Promise<Campaign> { //decimals is nativecoin decimals
     const listContract = this.campaignListService.getCampaignListContract(campaignListaddress); 
     const [success,cmpAddress] = await listContract.tryGetCampaignByKey(campaignId);
 
@@ -56,12 +58,13 @@ export class CampaignService {
     const owner = await campaignContract.owner();
     
     
+    
 
     return {
-        softCap: cmp.softcap,
-        hardCap: cmp.hardcap,
-        saleStartTime: cmp.saleStartTime,
-        saleEndTime: cmp.saleEndTime,
+        softCap: utils.formatUnits( cmp.softcap,decimals),
+        hardCap: utils.formatUnits( cmp.hardcap,decimals),
+        saleStartTime: getDateFromEther(cmp.saleStartTime),
+        saleEndTime: getDateFromEther(cmp.saleEndTime),
         listRate: cmp.listRate,
         dexListRate: cmp.dexListRate,
         liquidity: cmp.liquidity,
@@ -75,14 +78,14 @@ export class CampaignService {
         totalSupply,            
         tokenAddress,  
         
-        minAllocationPerUser,
-        maxAllocationPerUserTierOne ,
-        maxAllocationPerUserTierTwo,
+        minAllocationPerUser: utils.formatUnits(minAllocationPerUser,decimals),
+        maxAllocationPerUserTierOne: utils.formatUnits(maxAllocationPerUserTierOne,decimals) ,
+        maxAllocationPerUserTierTwo: utils.formatUnits(maxAllocationPerUserTierTwo,decimals),
         campaignAddress: cmpAddress,
         logoUrl,
         hasKYC,
         isAudited,
-        totalCoinReceived : totalCoinReceived??0,
+        totalCoinReceived : utils.formatUnits( totalCoinReceived??'0' ,decimals) ,
         owner
     };
 

@@ -47,6 +47,7 @@
     "ng2-date-picker": "^13.1.1",
     "ngx-bootstrap": "^8.0.0",
     "ngx-perfect-scrollbar": "^10.1.1",
+    "ngx-simple-countdown": "^13.0.1",
     "ngx-spinner": "^13.1.1",
     "os": "^0.1.2",
     "rxjs": "~7.5.0",

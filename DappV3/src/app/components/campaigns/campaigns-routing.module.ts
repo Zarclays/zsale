@@ -7,54 +7,39 @@ import { CampaignDetailsComponent } from './campaign-details/campaign-details.co
 const routes: Routes = [
   {
     path: '',
+    redirectTo: 'd/list'
+  },
+  {
+    path: 'd/list',
+    component: ListCampaignComponent,
     data: {
-      title: 'Campaigns'
-    },
-    children: [
-      {
-        path: '',
-        redirectTo: 'd/list'
-      },
-      {
-        path: 'd/list',
-        component: ListCampaignComponent,
-        data: {
-          title: 'All Campaigns'
-        }
-      },
-      {
-        path: 'start',
-        component: StartCampaignComponent,
-        data: {
-          title: 'Start Campaign'
-        }
-      },
-      {
-        path: ':chain/list',
-        component: ListCampaignComponent,
-        data: {
-          title: 'All Campaigns'
-        }
-      },
-      {
-        path: ':chain/p/:campaignId',
-        component: CampaignDetailsComponent,
-        data: {
-          title: 'Participate'
-        }
-      }
-    ]
+      title: 'All Campaigns'
+    }
+  },
+  {
+    path: 'start',
+    component: StartCampaignComponent,
+    data: {
+      title: 'Start Campaign'
+    }
+  },
+  {
+    path: ':chain/list',
+    component: ListCampaignComponent,
+    data: {
+      title: 'All Campaigns'
+    }
+  },
+  {
+    path: ':chain/p/:campaignId',
+    component: CampaignDetailsComponent,
+    data: {
+      title: 'Participate'
+    }
   }
 
-  // { path: '', component: ListCampaignComponent , canActivate: [] , data: {
-  //     title: 'Campaigns'
-  //   }
-  // },
-  // { path: ':chain/list', component: ListCampaignComponent , canActivate: [], data: {
-  //     title: 'Campaigns'
-  //   }
-  // },
 ];
+
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
