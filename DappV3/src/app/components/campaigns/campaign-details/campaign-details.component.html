@@ -7,67 +7,72 @@
 
 <div class="row" *ngIf="campaign">
     <div class="col-8">
-        <h3>{{campaign.name}}</h3>
-        <div>
-            <span *ngIf="campaign.hasKYC===true" class="badge bg-primary rounded-pill  mx-2">KYC</span>
-            <a *ngIf="campaign.isAudited===true" href="/audit" class="p-3 mx-2">
-                <span  class="badge bg-success rounded-pill">Audited</span>
-            </a>
-        </div>
-        <ul class="list-group mt-4">
-            <li class="list-group-item d-flex justify-content-between align-items-start py-4">
-              <div class="ms-2 me-auto">
-                <div class="fw-bold">Presale Address</div>
-                
+        <div class="card ">
+            <div class="card-body" >
+                <h3>{{campaign.name}}</h3>
+                <div>
+                    <span *ngIf="campaign.hasKYC===true" class="badge bg-primary rounded-pill  mx-2">KYC</span>
+                    <a *ngIf="campaign.isAudited===true" href="/audit" class="p-3 mx-2">
+                        <span  class="badge bg-success rounded-pill">Audited</span>
+                    </a>
+                </div>
+                <ul class="list-group mt-4">
+                    <li class="list-group-item d-flex justify-content-between align-items-start py-4">
+                      <div class="ms-2 me-auto">
+                        <div class="fw-bold">Presale Address</div>
+                        
+                      </div>
+                      <div >{{campaign.saleAddress}} </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start py-4">
+                        <div class="ms-2 me-auto">
+                          <div class="fw-bold">Token Address</div>
+                          
+                        </div>
+                        <div >{{campaign.tokenAddress}}</div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start py-4">
+                        <div class="ms-2 me-auto">
+                          <div class="fw-bold">Dates</div>
+                          
+                        </div>
+                        <div >{{ formatDateToJsString( campaign.saleStartTime)}} to {{formatDateToJsString( campaign.saleEndTime)}} </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start py-4">
+                        <div class="ms-2 me-auto">
+                        <div class="fw-bold">Soft Cap/Hard Cap</div>
+                        
+                        </div>
+                        <div >{{campaign.softCap}} {{nativeCoin.symbol}} to {{  campaign.hardCap}} {{nativeCoin.symbol}}</div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start py-4">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">Sale Rate</div>
+                        
+                    </div>
+                    <div >1 {{nativeCoin.symbol}} gets {{campaign.listRate}} {{campaign.symbol}}</div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start py-4">
+                        <div class="ms-2 me-auto">
+                        <div class="fw-bold">DEX Listing Rate</div>
+                        
+                        </div>
+                        <div >1 {{nativeCoin.symbol}} gets {{campaign.dexListRate}} {{campaign.symbol}}</div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Raised funds allocated for Liquidity</div>
+                            
+                        </div>
+                        <div class="">
+                          <div>{{ formatPercent(  campaign.liquidity) }} % of {{ campaign.hardCap}} {{nativeCoin.symbol}} </div>
+                          <div><em>locked till {{formatEtherDateToJs( campaign.liquidityReleaseTime)}}</em></div>
+                        </div>
+                    </li>
+                  </ul>
+
               </div>
-              <div >{{campaign.saleAddress}} </div>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-start py-4">
-                <div class="ms-2 me-auto">
-                  <div class="fw-bold">Token Address</div>
-                  
-                </div>
-                <div >{{campaign.tokenAddress}}</div>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-start py-4">
-                <div class="ms-2 me-auto">
-                  <div class="fw-bold">Dates</div>
-                  
-                </div>
-                <div >{{ formatDateToJsString( campaign.saleStartTime)}} to {{formatDateToJsString( campaign.saleEndTime)}} </div>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-start py-4">
-                <div class="ms-2 me-auto">
-                <div class="fw-bold">Soft Cap/Hard Cap</div>
-                
-                </div>
-                <div >{{campaign.softCap}} {{nativeCoin.symbol}} to {{  campaign.hardCap}} {{nativeCoin.symbol}}</div>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-start py-4">
-            <div class="ms-2 me-auto">
-                <div class="fw-bold">Sale Rate</div>
-                
-            </div>
-            <div >1 {{nativeCoin.symbol}} gets {{campaign.listRate}}</div>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-start py-4">
-                <div class="ms-2 me-auto">
-                <div class="fw-bold">DEX Listing Rate</div>
-                
-                </div>
-                <div >1 {{nativeCoin.symbol}} gets {{campaign.dexListRate}}</div>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-start">
-              <div class="ms-2 me-auto">
-                <div class="fw-bold">Raised funds allocated for Liquidity</div>
-                
-              </div>
-              <span class="">
-                  {{ formatPercent(  campaign.liquidity) }} % of {{ campaign.hardCap}} {{nativeCoin.symbol}} 
-                  locked till {{formatEtherDateToJs( campaign.liquidityReleaseTime)}}
-               </span>
-            </li>
-          </ul>
+          </div>
     </div>
     <div class="col-4">
 
@@ -75,10 +80,19 @@
             <div class="card-body" style="font-size: 0.78rem">
 
                 <ul class="list-group mt-4" >
-                    
+                    <li *ngIf="this.campaign.totalCoinReceived >= this.campaign.hardCap" class="list-group-item d-flex justify-content-center ">
+                        
+                        <div style="font-size: 20px;
+                            color: red;
+                            background-color: white;
+                            padding: 10px 4px;
+                            font-weight: bold;">
+                            Sold out
+                        </div>
 
-                    
-                    
+                        
+                    </li>
+
                     <li *ngIf="isOpenForPayment===true" class="list-group-item ">
                         <!-- <div class="ms-2">
                             <div class="fw-bold">00:00:12</div>
@@ -134,21 +148,21 @@
 
                     <li class="list-group-item">
                         <div>
-                            <small>{{this.campaign.totalCoinReceived}} {{nativeCoin?.symbol??'Coin'}} /
+                            <small>{{campaign.totalCoinReceived}} {{nativeCoin?.symbol??'Coin'}} /
 
-                            {{ (this.campaign.totalCoinReceived >= this.campaign.softCap) ? (this.campaign.hardCap + ' ' + nativeCoin?.symbol  + ' Soft Cap Hit') : (this.campaign.softCap + ' '+ nativeCoin?.symbol ) }}
+                            {{ (campaign.totalCoinReceived >= campaign.softCap) ? (campaign.hardCap + ' ' + nativeCoin?.symbol  + ' Soft Cap Hit') : (campaign.softCap + ' '+ nativeCoin?.symbol ) }}
                             </small> 
                         </div>
                         
                         <c-progress class="mb-3" [height]="20">
                           <c-progress-bar [value]="saleProgress"> 
-                            {{this.campaign.totalCoinReceived}} {{nativeCoin?.symbol??'Coin'}}                            
+                            {{campaign.totalCoinReceived}} {{nativeCoin?.symbol??'Coin'}}                            
                           </c-progress-bar>
                         </c-progress>
                     </li>
 
-                    <li class="list-group-item">
-                        <form *ngIf="isOpenForPayment===true" [formGroup]="mainFormGroup" class="main-form needs-validation"  novalidate [validated]="false"  cForm>
+                    <li *ngIf="isOpenForPayment===true" class="list-group-item" style="background-color: #9effbb;">
+                        <form  [formGroup]="mainFormGroup" class="main-form needs-validation"  novalidate [validated]="false"  cForm>
                             <div class="row">
                                 <div class="col-12 ">
                                     <b>Participate in Sale  </b> <br/>
@@ -162,7 +176,7 @@
                                             <input cFormControl id="amt" placeholder="Amount" formControlName="amount" type="number" sizing="sm" 
                                                 [ngClass]="{ 'is-invalid': mainFormGroup.get('amount').touched && mainFormGroup.get('amount').invalid, 'is-valid': mainFormGroup.get('amount').touched && mainFormGroup.get('amount').valid }"
                                             />
-                                            <label cLabel for="amt">Amount to buy ({{nativeCoin?.symbol??'Coin'}})</label>
+                                            <label cLabel for="amt"> &nbsp; Amount to buy ({{nativeCoin?.symbol??'Coin'}})</label>
                                             
                                             <div cFormText class="mt-2">
                                                 If the Soft Cap is not met, Funds will be returned to Participants
@@ -184,7 +198,7 @@
 
                                     
                         
-                                    <button type="submit"  class="me-1 btn btn-success" [disabled]="mainFormGroup.invalid || submittingBid"  (click)="submitBid()"  >
+                                    <button type="submit"  class="me-1 btn btn-success" style="color:white" [disabled]="mainFormGroup.invalid || submittingBid"  (click)="submitBid()"  >
                                         
                                         <!-- <svg *ngIf="submittingBid==true" [cIcon]="icons.cilList" size="xl" title="List Icon"></svg> -->
                                         <img *ngIf="submittingBid==true" src="/assets/images/loader.gif" style="width:40px;height: 40px;"/>
@@ -226,6 +240,29 @@
                         <div >{{campaign.maxAllocationPerUserTierTwo}} {{nativeCoin.symbol}} </div>
                     </li>
 
+                    <li *ngIf="isOwner" class="list-group-item  py-4 px-4">
+
+                        <div class="btn-group-vertical  " role="group" >
+                            <button *ngIf="isOwner && campaign.saleStartTime.getTime() > now" class="mx-2 my-2 btn btn-warning btn-sm"  (click)="postponeSale()"  >Postpone Sale</button>
+
+                            <button *ngIf="isOwner && campaign.saleStartTime.getTime() > now" class="mx-2 my-2 btn btn-danger btn-sm"  (click)="cancelSale()"  >Cancel Sale</button>
+
+
+
+                            <button *ngIf="isOwner && campaign.saleEndTime.getTime() > now" class="mx-2 my-2 btn btn-success btn-sm"  (click)="finalizeSale()"  >Finalize Sale</button>
+
+                            <button *ngIf="isOwner && campaign.saleEndTime.getTime() > now" class="mx-2 my-2 btn btn-success btn-sm"  (click)="withdrawOwnerTokens()"  >Withdraw Owner Tokens</button>
+
+                            <!-- <button *ngIf="isOwner && campaign.saleEndTime.getTime() > now" class="mx-2 btn btn-success"  (click)="withdrawOwnerTokens()" >Withdraw Your Funds</button> -->
+                        </div>
+                        
+                    </li>
+
+                    <li *ngIf="!isOwner" class="list-group-item d-flex justify-content-between align-items-start py-4">
+                        
+                        <button *ngIf="!isOwner && campaign.saleEndTime.getTime() > now" class="mx-2 my-2 btn btn-success btn-sm" (click)="withdrawInvestorTokens()"  >Withdraw Your Tokens</button>
+                    </li>
+
                 </ul>
 
 
@@ -235,3 +272,62 @@
 
     </div>
 </div>
+
+
+
+<c-modal id="postponeSaleModal" [visible]="postponeSaleModalVisible" >
+  <c-modal-header>
+    <h5 cModalTitle>Postpone this Sale?</h5>
+    <button (click)="closePostponeModal()" cButtonClose>x</button>
+  </c-modal-header>
+
+  <c-modal-body>
+    <form *ngIf="postponeSaleFormGroup"  [formGroup]="postponeSaleFormGroup" class="pospone-form needs-validation"  novalidate [validated]="false"  cForm>
+        <div class="row">
+            <div class="col-12">
+                <div [cFormFloating]="true" class="my-3" >
+                    <input cFormControl id="postponesaleStartTime"  placeholder="" formControlName="startDate" type="datetime"  sizing="sm"  [ngClass]="{ 'is-invalid': postponeSaleFormGroup.get('startDate').touched && postponeSaleFormGroup.get('startDate').invalid, 'is-valid': postponeSaleFormGroup.get('startDate').touched && postponeSaleFormGroup.get('startDate').valid }"/>
+                    <label cLabel for="postponesaleStartTime">New Start Date</label>
+                    
+                    <div cFormText class="mt-2">
+                        
+                    </div>
+
+                    <div class="error-message" *ngIf="postponeSaleFormGroup.get('startDate').invalid && postponeSaleFormGroup.get('startDate').touched">
+                        <div *ngFor="let error of  objectKeys(postponeSaleFormGroup.get('startDate')?.errors)">                                        
+                        {{validationMessages.startDate[error]}}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-12">
+                <div [cFormFloating]="true" class="my-3" >
+                    <input cFormControl id="postponesaleEndTime" type="datetime"  placeholder="" formControlName="endDate"  sizing="sm"  [ngClass]="{ 'is-invalid': postponeSaleFormGroup.get('endDate').touched && postponeSaleFormGroup.get('endDate').invalid, 'is-valid': postponeSaleFormGroup.get('endDate').touched && postponeSaleFormGroup.get('endDate').valid }"/>
+                    <label cLabel for="postponesaleEndTime">New End Date</label>
+                    
+                    <div cFormText class="mt-2">
+                        
+                    </div>
+
+                    <div class="error-message" *ngIf="postponeSaleFormGroup.get('endDate').invalid && postponeSaleFormGroup.get('endDate').touched">
+                        <div *ngFor="let error of  objectKeys(postponeSaleFormGroup.get('endDate')?.errors)">                                        
+                        {{validationMessages.endDate[error]}}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            
+
+        </div>
+    </form>
+  </c-modal-body>
+
+  <c-modal-footer>
+    <button (click)="closePostponeModal()" cButton color="secondary">
+      Close
+    </button>
+    <button cButton color="primary" *ngIf="postponeSaleFormGroup" [disabled]="postponeSaleFormGroup.invalid " (click)="submitPostpone()">Postpone</button>
+  </c-modal-footer>
+</c-modal>

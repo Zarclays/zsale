@@ -36,8 +36,12 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   
   ngOnInit(): void {
     
-    this.web3ServiceConnect$ = this.web3Service.onConnect.subscribe(async ()=>{
-      this.selectedNetwork = await this.web3Service.getCurrentChainId();      
+    this.web3ServiceConnect$ = this.web3Service.onConnectChange.subscribe(async (connected)=>{
+      if(connected){
+        this.selectedNetwork = await this.web3Service.getCurrentChainId();    
+      }else{
+        // this.selectedNetwork = undefined;
+      } 
     })
     // this.selectedNetwork = 83;
     // this.web3Service.switchNetworkByChainId(this.selectedNetwork);
@@ -48,7 +52,7 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   }
 
   ngOnDestroy(){
-    this.web3ServiceConnect$!.unsubscribe();
+    //this.web3ServiceConnect$!.unsubscribe();
   }
 
   onSwitchNetwork(newNetwork: any){

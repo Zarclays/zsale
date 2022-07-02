@@ -340,7 +340,7 @@
                                   <label cLabel for="router">DEX Router
                                     <select id="router" placeholder="Select router" aria-label="Router" formControlName="router" cSelect  sizing="lg" [ngClass]="{ 'is-invalid': campaignInfoFG.get('router').touched && campaignInfoFG.get('router').invalid, 'is-valid': campaignInfoFG.get('router').touched && campaignInfoFG.get('router').valid }">
                                         <option value="">Select DEX Router</option>
-                                        <option *ngFor='let rtr of routers' [value]="rtr.address">
+                                        <option *ngFor="let rtr of routers" [value]="rtr.address">
                                             {{rtr.name}}
                                         </option>
                                         

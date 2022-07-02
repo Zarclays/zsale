@@ -56,8 +56,10 @@ export class CampaignService {
     const isAudited = otherInfo.isAudited;
     const totalCoinReceived = await campaignContract.totalCoinReceived();
     const owner = await campaignContract.owner();
-    
-    
+    const description = otherInfo.desc;
+    const status = await campaignContract.status();
+
+
     
 
     return {
@@ -86,7 +88,9 @@ export class CampaignService {
         hasKYC,
         isAudited,
         totalCoinReceived : utils.formatUnits( totalCoinReceived??'0' ,decimals) ,
-        owner
+        owner,
+        description,
+        status
     };
 
   }

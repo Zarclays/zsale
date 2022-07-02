@@ -12,7 +12,9 @@ import { ButtonGroupModule } from '@coreui/angular';
 import {DpDatePickerModule} from 'ng2-date-picker';
 import { TooltipModule } from '@coreui/angular';
 import { NgxSimpleCountdownModule } from 'ngx-simple-countdown';
-
+import { ModalModule } from '@coreui/angular';
+import { CampaignListItemComponent } from './campaign-list-item/campaign-list-item.component';
+import { AvatarModule } from '@coreui/angular';
 // import { CardModule } from '@coreui/angular';
 // import { GridModule } from '@coreui/angular';
 
@@ -20,7 +22,8 @@ import { NgxSimpleCountdownModule } from 'ngx-simple-countdown';
   declarations: [
     ListCampaignComponent,
     StartCampaignComponent,
-    CampaignDetailsComponent 
+    CampaignDetailsComponent,
+    CampaignListItemComponent 
   ],
   imports: [
     CommonModule,
@@ -33,7 +36,9 @@ import { NgxSimpleCountdownModule } from 'ngx-simple-countdown';
     ProgressModule,
     ToastModule,
     TooltipModule,
-    NgxSimpleCountdownModule
+    NgxSimpleCountdownModule,
+    ModalModule,
+    AvatarModule
     // CardModule,
     // GridModule
   ]

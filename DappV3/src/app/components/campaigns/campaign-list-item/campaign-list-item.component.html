@@ -1,0 +1,99 @@
+
+<div *ngIf="!campaign" class="card">
+	<div class="card-body d-flex justify-content-center align-items-center">
+		<img src="/assets/images/loader.gif" style="width:40px;height: 40px;"/>
+	</div>
+</div>
+
+<div *ngIf="campaign" class="card" [routerLink]="['/campaigns', chainName, 'p', campaignId]">
+	<div class="card-body">
+		<div class="d-flex justify-content-left align-items-center">
+			<c-avatar color="secondary" [status]="(campaign.status==2||campaign.status==3) ? 'danger':'success'" size="md">{{campaign.symbol}}</c-avatar>
+			<div class="ms-2">
+				{{campaign.name}} {{campaign.symbol}} 
+			</div>
+
+			<div *ngIf="campaign.saleStartTime.getTime() > now" class="ms-2">
+                <div
+                  class="countdown d-flex justify-content-center"
+                  simpleCountdown
+                  [dateTo]="campaign.saleStartTime.getTime()/1000"
+                  [language]="'en'"
+                  [endMessage]="'Ongoing Sale'"
+                  [styles]="'
+                    font-size: 16px;
+                    color: red;
+                    background-color: white;
+                    padding: 8px 4px;
+                    font-weight: bold;
+                  '"
+                  
+                ></div>
+                
+            </div>
+            <div *ngIf="campaign.saleEndTime.getTime() < now" class="ms-2">
+                <div style="
+                    font-size: 16px;
+                    color: red;
+                    background-color: white;
+                    padding: 8px 4px;
+                    font-weight: bold;
+                  ">
+                  	Sale Ended
+              	</div>
+                
+            </div>
+		</div>
+		<div >
+			<img [src]="campaign.logoUrl" [alt]="campaign.name+ ' Logo'" class="img-fluid" style="width:100px;"/>
+		</div>
+
+		<ul class="list-group mt-4 mx-0 ">
+            <li class="list-group-item ">
+                <div class="">
+                	<div class="fw-bold">Soft Cap/Hard Cap</div>
+                
+                </div>
+                <div >{{campaign.softCap}} {{nativeCoin.symbol}} to {{  campaign.hardCap}} {{nativeCoin.symbol}}</div>
+            </li>
+            <li class="list-group-item ">
+	            <div class="">
+	                <div class="fw-bold">Sale Rate</div>	                
+	            </div>
+	            <div >1 {{nativeCoin.symbol}} gets {{campaign.listRate}} {{campaign.symbol}}</div>
+            </li>
+            <li class="list-group-item">
+                <div class="">
+                <div class="fw-bold">DEX Listing Rate</div>
+                
+                </div>
+                <div >1 {{nativeCoin.symbol}} gets {{campaign.dexListRate}} {{campaign.symbol}}</div>
+            </li>
+
+            <li class="list-group-item px-2 ">
+                
+                <p class="mb-2">{{campaign.description}}</p>
+
+                <div>
+                    <small>{{campaign.totalCoinReceived}} {{nativeCoin?.symbol??'Coin'}} /
+
+                    {{ (campaign.totalCoinReceived >= campaign.softCap) ? (campaign.hardCap + ' ' + nativeCoin?.symbol  + ' Soft Cap Hit') : (campaign.softCap + ' '+ nativeCoin?.symbol ) }}
+                    </small> 
+                </div>
+                
+                <c-progress class="mb-3" [height]="20">
+                  <c-progress-bar [value]="saleProgress"> 
+                    {{campaign.totalCoinReceived}} {{nativeCoin?.symbol??'Coin'}}                            
+                  </c-progress-bar>
+                </c-progress>
+            </li>
+
+
+            
+          </ul>
+	</div>
+
+	<div class="card-footer">
+		<button type="button" class="btn btn-outline-primary">Share</button>
+	</div>
+</div>

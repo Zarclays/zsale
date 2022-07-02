@@ -7,9 +7,11 @@ import Web3Modal from "web3modal";
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Fortmatic from 'fortmatic';
 import { BigNumber , constants, ethers, utils } from 'ethers';
+import {BehaviorEventEmitter} from '../utils/BehaviorEventEmitter';
 import { getSupportedChainById, getSupportedChainByChain } from '../models/supported-chains';
 const ERC20AbiJSON = require('../../assets/ERC20.json');
 const CampaignListAbi = require('../../assets/CampaignList.json');
+
 
 
 @Injectable({
@@ -27,8 +29,8 @@ export class Web3Service {
 
   web3Modal: Web3Modal ;
 
-  @Output() onConnect: EventEmitter<any> = new EventEmitter();
-  @Output() onDisConnect: EventEmitter<void> = new EventEmitter();
+  @Output() onConnectChange: BehaviorEventEmitter<any> = new BehaviorEventEmitter(false);
+  // @Output() onDisConnect: EventEmitter<void> = new EventEmitter();
   @Output() onNetworkChanged: EventEmitter<any> = new EventEmitter();
 
   
@@ -122,9 +124,11 @@ export class Web3Service {
     if (this.provider) {
       this.ethersProvider = new Web3Provider(this.provider);
       this.ethersSigner = this.ethersProvider.getSigner();  
-      this.onConnect.emit(this.provider);
+      
       this.createProviderHooks(this.provider);
+
       this._accountsObservable.next(await this.ethersProvider.listAccounts());
+      this.onConnectChange.emit(true);
     } // create web3 instance
     
   }
@@ -148,21 +152,21 @@ export class Web3Service {
   createProviderHooks(provider: any) {
     // Subscribe to accounts change
     provider.on('accountsChanged', (accounts: string[]) => {
-      this.onConnect.emit(provider);    
+      this.onConnectChange.emit(true);    
     });
 
     // Subscribe to chainId change
     provider.on('chainChanged', (chainId: number) => {
       // location.reload();
       location.href = '/campaigns';
-      //this.onConnect.emit(provider);
+      //this.onConnectChange.emit(provider);
       this.onNetworkChanged.emit(chainId);
     });
 
     // Subscribe to provider connection
     provider.on('connect', (info: { chainId: number }) => {
       console.log(info);
-      this.onConnect.emit(provider);
+      this.onConnectChange.emit(true);
       // location.reload();
     });
 
@@ -170,7 +174,7 @@ export class Web3Service {
     provider.on('disconnect', (error: { code: number; message: string }) => {
       console.log(error);
       console.log('disconnect')
-      this.onDisConnect.emit(provider);
+      this.onConnectChange.emit(false);
     });
   }
 
@@ -197,7 +201,7 @@ export class Web3Service {
     }
 
     this._accountsObservable.next([]);
-    this.onDisConnect.emit();
+    this.onConnectChange.emit(false);
   }
 
   async switchNetwork(networkInfo: {

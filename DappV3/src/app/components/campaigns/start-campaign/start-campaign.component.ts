@@ -1,10 +1,11 @@
 import { Component, OnInit, ViewChild, Injectable } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators,  ValidatorFn, ValidationErrors } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, Params } from '@angular/router';
 import { WizardComponent } from 'angular-archwizard';
 import { Web3Service } from 'src/app/services/web3.service';
-import contractList from '../../../models/contract-list'
+import contractList from '../../../models/contract-list';
+import {Location} from '@angular/common';
 import { BigNumber , constants, Contract, ethers, utils } from 'ethers';
 import { NgxSpinnerService } from "ngx-spinner";
 import { ValidateEndDateLaterThanStartDate , ValidateDateIsNotInPast, ValidateVestingPercentUpto100, ValidateHardCap} from '../../../validators/create-launchpad-validators';
@@ -23,7 +24,7 @@ const CampaignAbi = require('../../../../assets/Campaign.json');
   styleUrls: ['./start-campaign.component.scss']
 })
 export class StartCampaignComponent implements OnInit {
-  campaignId: number|undefined;
+  
   @ViewChild('wizard') wizard!: WizardComponent;
 
   mainFormGroup!: FormGroup;
@@ -193,41 +194,47 @@ export class StartCampaignComponent implements OnInit {
   campaignAddress: string;
   campaignIndex: string;
 
+  web3ServiceConnect$: Subscription|undefined;
+  userChain: string|null = 'mtrt';
+  currentChainId: any;
+
   
   constructor(private titleService: Title, 
     public web3Service: Web3Service,
     private route: ActivatedRoute,
     private fb: FormBuilder,
+    private location: Location,
     private spinner: NgxSpinnerService,
     private router: Router) { 
 
   }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params: ParamMap) => {
-      const userChain = params.get('chain');
-      this.campaignId = +params.get('campaignId')!;
-      if(userChain){
+    this.route.params.subscribe((params: Params) => {
+      this.userChain = params['chain'];
+
+      this.web3ServiceConnect$ = this.web3Service.onConnectChange.subscribe(async (connected: boolean)=>{
         
-        setTimeout(()=>{
-          this.web3Service.switchNetworkByChainShortName(userChain).then(()=>{
-            
-            this.web3Service.connect().then(async ()=>{
-              const selectedNetwork = await this.web3Service.getCurrentChainId();
-              console.log('loaded chain: ', selectedNetwork)
-            });
-          });
-        },1700)
-        
-      }
-      
+        if(connected){
+           if(this.userChain && this.userChain!='d' ){
+            await this.web3Service.switchNetworkByChainShortName(this.userChain); 
+          }else{
+            this.userChain = (await this.web3Service.getCurrentChain())?.chain??'';
+            this.updateURLWithNewParamsWithoutReloading()
+          }
+
+          this.currentChainId = await this.web3Service.getCurrentChainId();
+          // this.nativeCoin = (await this.web3Service.getCurrentChain())?.nativeCurrency;
+          this.nativeCoin = (await this.web3Service.getCurrentChain())?.nativeCurrency.symbol??'Coin';
+
+          this.routers= contractList[this.currentChainId].routers;
+
+        }
+
+      });      
     })
 
-    setTimeout(async () => {
-      const currentChainId = await this.web3Service.getCurrentChainId();
-      this.nativeCoin = (await this.web3Service.getCurrentChain())?.nativeCurrency.symbol??'Coin';
-      this.routers= contractList[currentChainId].routers;
-    }, 2500);
+   
     this.titleService.setTitle('Launch Campaign | ZSale');
 
    
@@ -287,13 +294,31 @@ export class StartCampaignComponent implements OnInit {
 
   }
 
+  updateURLWithNewParamsWithoutReloading() {
+    // const params = new HttpParams().appendAll({
+        
+    //     chain: this.userChain!
+    // });
+
+    // this.location.replaceState(
+    //     location.pathname,
+    //     params.toString()
+    // );
+
+    const url = this.router.createUrlTree(['campaigns', this.userChain, 'start']).toString()
+
+    this.location.go(url);
+  }
+
   
 
   ngOnDestroy(): void {
     
-        this.formSubscriptions.forEach( sub=>{
-          sub.unsubscribe();
-        } )
+    this.formSubscriptions.forEach( sub=>{
+      sub.unsubscribe();
+    } )
+
+    this.web3ServiceConnect$!.unsubscribe();
   }
 
    

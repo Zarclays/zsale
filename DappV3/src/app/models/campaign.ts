@@ -23,4 +23,6 @@ export interface Campaign{
     isAudited: boolean; 
     totalCoinReceived: any; 
     owner: string; 
+    description: string;
+    status: any;
 }

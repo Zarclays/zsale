@@ -7,7 +7,11 @@ import { CampaignDetailsComponent } from './campaign-details/campaign-details.co
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'd/list'
+    redirectTo: 'd/list',
+
+    data: {
+      title: 'All Campaigns'
+    }
   },
   {
     path: 'd/list',
@@ -18,6 +22,17 @@ const routes: Routes = [
   },
   {
     path: 'start',
+    redirectTo: 'd/start',
+  },
+  {
+    path: 'd/start',
+    component: StartCampaignComponent,
+    data: {
+      title: 'Start Campaign'
+    }
+  },
+  {
+    path: ':chain/start',
     component: StartCampaignComponent,
     data: {
       title: 'Start Campaign'

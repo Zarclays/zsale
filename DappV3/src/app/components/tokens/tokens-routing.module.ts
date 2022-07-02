@@ -11,31 +11,52 @@ import { TokenMinterComponent } from './token-minter/token-minter.component';
 const routes: Routes = [
   {
     path: '',
-    component: ListTokenComponent
+    component: ListTokenComponent,
+    data: {
+      title: 'List'
+    }
   },
   {
     path: 'token-minter',
-    component: TokenMinterComponent
+    component: TokenMinterComponent,
+    data: {
+      title: 'Mint Token'
+    }
   },
   {
     path: 'plans-token',
-    component: PlansTokenComponent
+    component: PlansTokenComponent,
+    data: {
+      title: 'Token Plans'
+    }
   },
   {
     path: 'simpleerc20',
-    component: Simpleerc20Component
+    component: Simpleerc20Component,
+    data: {
+      title: 'Simple ERC20'
+    }
   },
   {
     path: 'standarderc20',
-    component: Standarderc20Component
+    component: Standarderc20Component,
+    data: {
+      title: 'Standard ERC20'
+    }
   },
   {
     path: 'burnmintableerc20',
-    component: Burnmintableerc20Component
+    component: Burnmintableerc20Component,
+    data: {
+      title: 'Burn Mintable ERC20'
+    }
   },
   {
     path: 'token-lock',
-    component: TokenLockComponent
+    component: TokenLockComponent,
+    data: {
+      title: 'Token Lock'
+    }
   }
 ];
 

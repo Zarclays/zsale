@@ -1,1 +1,10 @@
-<p>list-campaign works!</p>
+<div class="container">
+	<div class="row">
+		<div class="col-12"></div>
+
+		<div class="col-12 col-sm-6 col-md-3" *ngFor="let campaign of campaigns">
+			<campaign-list-item [campaignId]="campaign.key" [campaignAddress]="campaign.address" [nativeCoin]="nativeCoin" [currentChainId]="currentChainId" [chainName]="userChain"></campaign-list-item>
+		</div>
+	</div>
+
+</div>
