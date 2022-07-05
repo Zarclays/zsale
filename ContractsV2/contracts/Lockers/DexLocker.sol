@@ -133,6 +133,7 @@ contract DexLocker is Initializable{
     *
      */
     function addLiquidity() public {
+        _liquidityLocker.setCampaignSucceded(true);
         _liquidityLocker.addLiquidity();
     }
 

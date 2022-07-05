@@ -53,6 +53,7 @@ import Fortmatic from 'fortmatic';
 import { ArchwizardModule } from 'angular-archwizard';
 import { NgxSpinnerModule } from "ngx-spinner";
 import { ToastModule } from '@coreui/angular';
+import { HomeComponent } from './components/home/home.component';
 
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
@@ -66,7 +67,7 @@ const APP_CONTAINERS = [
 ];
 
 @NgModule({
-  declarations: [AppComponent, ...APP_CONTAINERS],
+  declarations: [AppComponent, ...APP_CONTAINERS, HomeComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

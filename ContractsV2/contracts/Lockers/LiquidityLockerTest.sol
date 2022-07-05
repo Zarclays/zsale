@@ -3,14 +3,14 @@ pragma solidity ^0.8.0;
 
 
 import {IDexRouter, IDexFactory} from "../IDexRouter.sol";
-
+import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 
 
 
 // locks liquidity for LP tokens based on % of raised funds
-contract LiquidityLocker{
+contract LiquidityLockerTest{
 
     using SafeERC20 for IERC20;
     // using SafeMath for uint256;
@@ -39,8 +39,10 @@ contract LiquidityLocker{
     IDexRouter private _dexRouter;
     IDexFactory private _dexFactory;
 
-    bool private _campaignSucceded;
 
+    
+
+    
 
     constructor(address dexRouterAddress, address token, address owner, uint256 price,uint256 releaseTime, uint liquidityPercentOfRaisedFunds,uint maxRaisedFunds) {
         require(releaseTime > block.timestamp, "LiquidityLocker: release time is before current time");
@@ -52,8 +54,14 @@ contract LiquidityLocker{
         _price = price;
         _owner = owner;
         _token = token;
+        console.log("liquidityPercentOfRaisedFunds:", liquidityPercentOfRaisedFunds);
+        console.log("maxRaisedFunds:", maxRaisedFunds);
+        console.log("_price:", _price);
         totalEthExpected = (liquidityPercentOfRaisedFunds* maxRaisedFunds)  / 100;
         totalTokensExpected = _price * totalEthExpected;
+
+        console.log("totalEthExpected:", totalEthExpected);
+        console.log("totalTokensExpected:", totalTokensExpected);
     }
 
     receive() external payable {
@@ -65,35 +73,36 @@ contract LiquidityLocker{
     *  Approve token for router, require contract to have the necessary tokens
     *
      */
-    function addLiquidity() public {       
+    function addLiquidity() public {
         
-      require(msg.sender == address(_deployer), "LiquidityLocker: Only deployer can call this function");
-      require(_token != address(0), "LiquidityLocker: Token can not be zero");
-      uint256 etherBalance = address(this).balance;
-      
-      uint256 tokensAmount = _price * etherBalance;
-      uint256 tokensAmountMin = tokensAmount - (_price * etherBalance);
-      require(etherBalance >= totalEthExpected, "LiquidityLocker: no ether to add liquidity"); 
-            
-      require( IERC20(_token).balanceOf(address(this)) >= totalTokensExpected, "LiquidityLocker: no token balance to add liquidity");        
-      
-      lpTokenPairAddress = _dexFactory.getPair(_token, _dexRouter.WETH() );
-      if(lpTokenPairAddress==address(0)){
-        lpTokenPairAddress = _dexFactory.createPair(_token, _dexRouter.WETH());          
-      }        
-      
-      IERC20(_token).approve(address(_dexRouter), MAX_INT);
-      IERC20(_token).approve(lpTokenPairAddress, MAX_INT);
-      
-      _dexRouter.addLiquidityETH{value: totalEthExpected}(_token, tokensAmount , tokensAmount, totalEthExpected, address(this), block.timestamp + 100);
+        
+        require(msg.sender == address(_deployer), "LiquidityLocker: Only deployer can call this function");
+        require(_token != address(0), "LiquidityLocker: Token can not be zero");
+        uint256 etherBalance = address(this).balance;
+        
+        uint256 tokensAmount = _price * etherBalance;
+        uint256 tokensAmountMin = tokensAmount - (_price * etherBalance);
+        require(etherBalance >= totalEthExpected, "LiquidityLocker: no ether to add liquidity"); 
+
+              
+        require( IERC20(_token).balanceOf(address(this)) >= totalTokensExpected, "LiquidityLocker: no token balance to add liquidity");
+        
+        
+        lpTokenPairAddress = _dexFactory.getPair(_token, _dexRouter.WETH() );
+        if(lpTokenPairAddress==address(0)){
+          lpTokenPairAddress = _dexFactory.createPair(_token, _dexRouter.WETH());          
+        }        
+        
+        // _factory.createPair(address(this), _router.WETH());
+        IERC20(_token).approve(address(_dexRouter), MAX_INT);
+        IERC20(_token).approve(lpTokenPairAddress, MAX_INT);
+        console.log("lpTokenPairAddress:", lpTokenPairAddress);
+        _dexRouter.addLiquidityETH{value: totalEthExpected}(_token, tokensAmount , tokensAmount, totalEthExpected, address(this), block.timestamp + 100);
 
         
     }
 
-    function setCampaignSucceded(bool status) public  {
-      require(msg.sender == address(_deployer), "LiquidityLocker: Only deployer can call this function");
-      _campaignSucceded=status;
-    }
+  
 
    /**
      * @return the time when the tokens are released.
@@ -116,7 +125,7 @@ contract LiquidityLocker{
     function releaseLPTokens() public {
         // solhint-disable-next-line not-rely-on-time
         require(block.timestamp >= _releaseTime, "LiquidityLocker: current time is before release time");
-        require(lpTokenPairAddress!=address(0), "LiquidityLocker: Add Liquidity not yet called");
+
         IERC20 lptoken=IERC20(lpTokenPairAddress);
         uint256 amount = lptoken.balanceOf(address(this));
         require(amount > 0, "LiquidityLocker: no LP tokens to release");
@@ -131,9 +140,6 @@ contract LiquidityLocker{
     function release() public {
         // solhint-disable-next-line not-rely-on-time
         require(block.timestamp >= _releaseTime, "LiquidityLocker: current time is before release time");
-        if(_campaignSucceded){
-          require(lpTokenPairAddress!=address(0), "LiquidityLocker: Add Liquidity not yet called");
-        }
 
         uint256 amount = IERC20(_token).balanceOf(address(this));
         require(amount > 0, "LiquidityLocker: no tokens to release");
@@ -149,9 +155,6 @@ contract LiquidityLocker{
         // solhint-disable-next-line not-rely-on-time
         require(block.timestamp >= _releaseTime, "LiquidityLocker: current time is before release time");
         require(address(this).balance > 0, "LiquidityLocker: no Eth to release");
-        if(_campaignSucceded){
-          require(lpTokenPairAddress!=address(0), "LiquidityLocker: Add Liquidity not yet called");
-        }
 
         payable(getOwner()).transfer(address(this).balance);
     }

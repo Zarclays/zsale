@@ -44,17 +44,7 @@ contract TokenLocker{
             schedule[i].hasBeenClaimed=false;
             // tokenVestSchedule.push(schedule[i]);
             tokenVestSchedule[i]=schedule[i];
-
         }
- 
-        
-
-
-    }
-
-    
-    receive() external payable {
-
     }
 
     /**
@@ -94,5 +84,17 @@ contract TokenLocker{
         require(address(this).balance > 0, "TokenLocker: no Eth to release");
 
         payable(getOwner()).transfer(address(this).balance);
+    }
+
+    /**
+     * @notice Transfers any unrecognised token back to the owner, 
+       @dev Function used to transfer Tokens mistakenly sent here
+     */
+    function releaseToken(address tokenToSend) public {
+        require(_token!=tokenToSend, "TokenLocker: cannot transfre token meant for lock");
+        require(IERC20(tokenToSend).balanceOf(address(this)) > 0, "TokenLocker: no Token to release");
+
+        IERC20(tokenToSend).safeTransfer(getOwner(), IERC20(tokenToSend).balanceOf(address(this))); 
+        
     }
 }

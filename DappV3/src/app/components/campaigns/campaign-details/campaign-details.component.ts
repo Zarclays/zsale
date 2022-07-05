@@ -330,7 +330,7 @@ export class CampaignDetailsComponent implements OnInit {
   };
 
   async withdrawOwnerTokens() {
-    if(window.confirm('Are you sure you want to Withdraw from this Campaign?')){
+    if(window.confirm('Are you sure you want to Withdraw Tokens from this Campaign?')){
       this.spinner.show();
       
       

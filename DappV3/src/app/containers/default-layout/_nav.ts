@@ -3,9 +3,19 @@ import { IconComponent } from '@coreui/icons-angular';
 import { url } from 'inspector';
 
 export const navItems: INavData[] = [
+  // {
+  //   name: 'Dashboard',
+  //   url: '/dashboard',
+  //   iconComponent: { name: 'cil-speedometer' },
+  //   badge: {
+  //     color: 'info',
+  //     text: 'NEW'
+  //   }
+  // },
+
   {
-    name: 'Dashboard',
-    url: '/dashboard',
+    name: 'Home',
+    url: '/home',
     iconComponent: { name: 'cil-speedometer' },
     badge: {
       color: 'info',

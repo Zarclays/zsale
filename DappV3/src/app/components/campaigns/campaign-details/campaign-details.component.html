@@ -249,9 +249,9 @@
 
 
 
-                            <button *ngIf="isOwner && campaign.saleEndTime.getTime() > now" class="mx-2 my-2 btn btn-success btn-sm"  (click)="finalizeSale()"  >Finalize Sale</button>
+                            <button *ngIf="isOwner && campaign.saleEndTime.getTime() <  now" class="mx-2 my-2 btn btn-success btn-sm"  (click)="finalizeSale()"  >Finalize Sale</button>
 
-                            <button *ngIf="isOwner && campaign.saleEndTime.getTime() > now" class="mx-2 my-2 btn btn-success btn-sm"  (click)="withdrawOwnerTokens()"  >Withdraw Owner Tokens</button>
+                            <button *ngIf="isOwner && campaign.saleEndTime.getTime() < now && (campaign.status==2 || campaign.status==3)" class="mx-2 my-2 btn btn-success btn-sm"  (click)="withdrawOwnerTokens()"  >Withdraw Owner Tokens</button>
 
                             <!-- <button *ngIf="isOwner && campaign.saleEndTime.getTime() > now" class="mx-2 btn btn-success"  (click)="withdrawOwnerTokens()" >Withdraw Your Funds</button> -->
                         </div>
@@ -260,7 +260,7 @@
 
                     <li *ngIf="!isOwner" class="list-group-item d-flex justify-content-between align-items-start py-4">
                         
-                        <button *ngIf="!isOwner && campaign.saleEndTime.getTime() > now" class="mx-2 my-2 btn btn-success btn-sm" (click)="withdrawInvestorTokens()"  >Withdraw Your Tokens</button>
+                        <button *ngIf="!isOwner && (campaign.saleEndTime.getTime() < now || campaign.status==4) " class="mx-2 my-2 btn btn-success btn-sm" (click)="withdrawInvestorTokens()"  >Withdraw Your Tokens</button>
                     </li>
 
                 </ul>

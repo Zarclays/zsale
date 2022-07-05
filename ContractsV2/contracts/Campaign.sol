@@ -219,7 +219,7 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
     DexLocker dexLocker = DexLocker(payable(_dexLockerFactory.createDexLocker(dexRouterAddress,saleInfo.tokenAddress,address(this), msg.sender) ) );
     
 
-    dexLocker.setupLock(saleInfo.liquidityPercent,saleInfo.hardCap, liquidityReleaseTime,  saleInfo.dexListRate,useTokenVesting, teamTokenVestingDetails, _useRaisedFundsVesting,  raisedFundVestingDetails);
+    dexLocker.setupLock(saleInfo.liquidityPercent / 100,saleInfo.hardCap, liquidityReleaseTime,  saleInfo.dexListRate,useTokenVesting, teamTokenVestingDetails, _useRaisedFundsVesting,  raisedFundVestingDetails);
 
     _dexLockerAddress= payable(dexLocker);
 
@@ -492,30 +492,36 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
   */
   function withdrawFunds () public   {
     
-    require(msg.sender!= owner(), 'CAMPAIGN: Owners cannot withdraw' );
+    address usr = _msgSender();
+
+    require(usr!= owner(), 'CAMPAIGN: Owners cannot withdraw' );
     // require(status.isCancelled, 'Campaign: Can only withdraw if Campaign Cancelled');
 
     // if campaign is sold out no need to wait for endtime finalize and setup liquidity
     require(block.timestamp >= saleInfo.saleEndTime || totalCoinReceived>= saleInfo.hardCap  , "CAMPAIGN: ongoing sales");
 
-    require(buyInAllTiers[msg.sender] > 0, "CAMPAIGN: No COIN to claim");
+    require(buyInAllTiers[usr] > 0, "CAMPAIGN: No COIN to claim");
+
+    if(totalCoinReceived < saleInfo.softCap){
+      status= CampaignStatus.FAILED ;
+    }
     
     
-    uint256 amount =  buyInAllTiers[msg.sender];
-    buyInAllTiers[msg.sender] = 0;
+    uint256 amount =  buyInAllTiers[usr];
+    buyInAllTiers[usr] = 0;
     uint256 amountTokens =  amount * saleInfo.listRate;
     
     if(status== CampaignStatus.FAILED){
         // return back funds
-        payable(msg.sender).transfer(amount);
-        emit Refunded(msg.sender, amount);
+        payable(usr).transfer(amount);
+        emit Refunded(usr, amount);
         
     }else{
       IERC20 _token = IERC20(saleInfo.tokenAddress);
       // Transfer Tokens to User
-      _token.safeTransfer(msg.sender, amountTokens);
+      _token.safeTransfer(usr, amountTokens);
       
-      emit Withdrawn(msg.sender, amountTokens);
+      emit Withdrawn(usr, amountTokens);
     }    
   }
 
@@ -525,7 +531,7 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
   function withdrawOwnerTokens () public   onlyOwner {
     
     
-    require(status== CampaignStatus.FAILED, 'Campaign: Can only withdraw if Campaign Cancelled');
+    require(status== CampaignStatus.FAILED || status== CampaignStatus.CANCELLED, 'Campaign: Can only withdraw if Campaign Cancelled or Failed');
 
     
     require(block.timestamp >= saleInfo.saleEndTime , "CAMPAIGN: Can only withdraw after End date");
@@ -547,8 +553,8 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
       require(status != CampaignStatus.FAILED, "CAMPAIGN: campaign will be refunded");
       require(status != CampaignStatus.CANCELLED, "CAMPAIGN: campaign was cancelled");
       //
-      if(totalCoinReceived < saleInfo.softCap){
-          status== CampaignStatus.FAILED ;
+      if(totalCoinReceived < saleInfo.softCap){ // set to failed and stop
+          status= CampaignStatus.FAILED ;
           return;
       }
 
