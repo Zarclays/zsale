@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 contract CoinVestingVault is Initializable  {
     
 
-    uint256 constant internal SECONDS_PER_DAY = 86400;
+    uint256 constant public SECONDS_PER_DAY = 86400;
 
     struct Grant {
         uint256 startTime;

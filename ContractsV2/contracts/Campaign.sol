@@ -161,47 +161,61 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
     string[6] memory founderInfo,
     DexLockerFactory dexLockerFactory 
   ) public payable initializer {
-      campaignKey=capAndDate[9];
-      _campaignFactory= addresses[1];
-      _dexLockerFactory=dexLockerFactory;
-      
-      // require(releaseTime > block.timestamp, "CAMPAIGN: release time above current time");
-      require(capAndDate[3] > capAndDate[2], "CAMPAIGN: Sale End time above start time");
-      require(liquidityAllocationAndRates[0] >= 5100, "CAMPAIGN: Liquidity allowed is > 51 %");
-        
-        
-      // //block scopin to avoid stack too deep 
-      {
-        
-        // saleInfo= CampaignSaleInfo();
-        saleInfo.tokenAddress=addresses[2];
-        saleInfo.softCap=capAndDate[0];
-        saleInfo.hardCap=capAndDate[1];
-        if(capAndDate[2] <= block.timestamp){
-          saleInfo.saleStartTime=block.timestamp;
-        }else{
-          saleInfo.saleStartTime=capAndDate[2];
-        }
-        
-        saleInfo.saleEndTime=capAndDate[3];
-        saleInfo.liquidityPercent=liquidityAllocationAndRates[0];
-        saleInfo.listRate=liquidityAllocationAndRates[2];
-        saleInfo.dexListRate=liquidityAllocationAndRates[3];
-      }        
-
-      {    
-        dexRouterAddress=_dexRouterAddress; 
-         
-      }
-        
-      otherInfo= CampaignOtherInfo(false, false,false,'', _refundType,founderInfo[0],founderInfo[1],founderInfo[2],founderInfo[3],founderInfo[4], founderInfo[5]);
+    _setDefaultValues();
+    campaignKey=capAndDate[9];
+    _campaignFactory= addresses[1];
+    _dexLockerFactory=dexLockerFactory;
+    
+    // require(releaseTime > block.timestamp, "CAMPAIGN: release time above current time");
+    require(capAndDate[3] > capAndDate[2], "CAMPAIGN: Sale End time above start time");
+    require(liquidityAllocationAndRates[0] >= 5100, "CAMPAIGN: Liquidity allowed is > 51 %");
       
       
-      _updateTierDetails (capAndDate[4], capAndDate[5], capAndDate[6],capAndDate[7], capAndDate[8]);
+    // //block scopin to avoid stack too deep 
+    {
+      
+      // saleInfo= CampaignSaleInfo();
+      saleInfo.tokenAddress=addresses[2];
+      saleInfo.softCap=capAndDate[0];
+      saleInfo.hardCap=capAndDate[1];
+      // if(capAndDate[2] <= block.timestamp){
+      //   saleInfo.saleStartTime=block.timestamp;
+      // }else{
+      //   saleInfo.saleStartTime=capAndDate[2];
+      // }
+      saleInfo.saleStartTime=capAndDate[2];
+      
+      saleInfo.saleEndTime=capAndDate[3];
+      saleInfo.liquidityPercent=liquidityAllocationAndRates[0];
+      saleInfo.listRate=liquidityAllocationAndRates[2];
+      saleInfo.dexListRate=liquidityAllocationAndRates[3];
+    }        
 
-      _transferOwnership(addresses[0]);
+    {    
+      dexRouterAddress=_dexRouterAddress; 
+        
+    }
+      
+    otherInfo= CampaignOtherInfo(false, false,false,'', _refundType,founderInfo[0],founderInfo[1],founderInfo[2],founderInfo[3],founderInfo[4], founderInfo[5]);
+    
+    
+    _updateTierDetails (capAndDate[4], capAndDate[5], capAndDate[6],capAndDate[7], capAndDate[8]);
 
-      _updateLockDetails(liquidityAllocationAndRates[1], _useTokenOrRaisedFundVesting[0], teamTokenVestingDetails,_useTokenOrRaisedFundVesting[1], raisedFundVestingDetails );
+    _transferOwnership(addresses[0]);
+
+    _updateLockDetails(liquidityAllocationAndRates[1], _useTokenOrRaisedFundVesting[0], teamTokenVestingDetails,_useTokenOrRaisedFundVesting[1], raisedFundVestingDetails );
+  }
+
+  //needed since initializable contracts do not have constructors
+  function _setDefaultValues() private {
+    status = CampaignStatus.CREATED;
+
+    _admin= 0xB7e16f5fa9941B84baCd1601F277B00911Aed339; //zsales admin - can setkyc and audited
+    zsalesTokenAddress = 0x97CEe927A48dc119Fd0b0b1047a879153975e893;
+    zsaleFee = 200;  //2%   - percent of native currency to take
+    zsaleTokenFee = 200;  //2% - percent fee of token to take
+    zsalesWalletAddress = 0xB7e16f5fa9941B84baCd1601F277B00911Aed339 ; // receives commissions
+    tier1TimeLineInHours = 2; // e.g 2 hours before startime
   }
   
   // function to update other details not initialized in constructor - this is bcos solidity limits how many variables u can pass in at once
@@ -219,7 +233,7 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
     DexLocker dexLocker = DexLocker(payable(_dexLockerFactory.createDexLocker(dexRouterAddress,saleInfo.tokenAddress,address(this), msg.sender) ) );
     
 
-    dexLocker.setupLock(saleInfo.liquidityPercent / 100,saleInfo.hardCap, liquidityReleaseTime,  saleInfo.dexListRate,useTokenVesting, teamTokenVestingDetails, _useRaisedFundsVesting,  raisedFundVestingDetails);
+    dexLocker.setupLock(saleInfo.liquidityPercent,saleInfo.softCap,saleInfo.hardCap, liquidityReleaseTime,  saleInfo.dexListRate,useTokenVesting, teamTokenVestingDetails, _useRaisedFundsVesting,  raisedFundVestingDetails);
 
     _dexLockerAddress= payable(dexLocker);
 
@@ -239,6 +253,7 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
     string memory twitter,
     string memory telegram
   ) external onlyOwner {
+
     require(block.timestamp <= saleInfo.saleStartTime, 'CAMPAIGN: Can only updateTierDetails before Sale StartTime');
 
     otherInfo.logoUrl= logoUrl;
@@ -298,7 +313,7 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
       saleInfo.saleEndTime = newEndDate;
   }
 
-  function end() public view returns (uint256) {
+  function getEndDate() public view returns (uint256) {
     return saleInfo.saleEndTime;
   }
 
@@ -379,7 +394,9 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
   }
 
   
-  
+  function getHardCap() public view returns (uint) {
+    return saleInfo.hardCap;
+  }
 
   
   function setKYC(bool kyc) public onlyAdmin  {
@@ -435,9 +452,6 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
     require(status != CampaignStatus.FAILED , "Campaign: Failed, Refunded is activated");
     require(status == CampaignStatus.TOKENS_SUBMITTED , "Campaign: Tokens not submitted");
     require(totalCoinReceived < saleInfo.hardCap, 'Campaign: Sale Sold out');
-
-    console.log("block.timestamp:", block.timestamp);
-    console.log("saleInfo.saleStartTime:", saleInfo.saleStartTime);
 
     //require(block.timestamp >= saleInfo.saleStartTime, "Campaign:The sale is not started yet "); // solhint-disable
     require(block.timestamp <= saleInfo.saleEndTime, "Campaign:The sale is closed"); // solhint-disable
@@ -549,44 +563,49 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
     * Setup liquidity and transfer all amounts according to defined percents, if softcap not reached set Refunded flag
     */
   function finalizeAndSetupLiquidity() public {
-      require(totalCoinReceived>= saleInfo.hardCap || block.timestamp > end() , "Campaign: not sold out or time not elapsed yet" );
-      require(status != CampaignStatus.FAILED, "CAMPAIGN: campaign will be refunded");
-      require(status != CampaignStatus.CANCELLED, "CAMPAIGN: campaign was cancelled");
-      //
-      if(totalCoinReceived < saleInfo.softCap){ // set to failed and stop
-          status= CampaignStatus.FAILED ;
-          return;
-      }
+    require(totalCoinReceived>= saleInfo.hardCap || block.timestamp > saleInfo.saleEndTime , "Campaign: not sold out or time not elapsed yet" );
+    require(status != CampaignStatus.FAILED, "CAMPAIGN: campaign will be refunded");
+    require(status != CampaignStatus.CANCELLED, "CAMPAIGN: campaign was cancelled");
+    //
+    if(totalCoinReceived < saleInfo.softCap){ // set to failed and stop
+        status= CampaignStatus.FAILED ;
+        return;
+    }
 
-      IERC20 _token = IERC20(saleInfo.tokenAddress);
+    
+    IERC20 _token = IERC20(saleInfo.tokenAddress);
 
-      
-      uint256 currentCoinBalance = address(this).balance;
-      require(currentCoinBalance > 0, "CAMPAIGN: Coin balance needs to be above zero" );
-      uint256 liquidityAmount = currentCoinBalance * saleInfo.liquidityPercent / 10000;
-      uint256 tokensAmount = _token.balanceOf(address(this));
-      require(tokensAmount >= liquidityAmount * saleInfo.dexListRate  , "CAMPAIGN: Not sufficient tokens amount");
-      // uint256 teamAmount = currentCoinBalance.mul(_teamPercent).div(_totalPercent);
+    
+    uint256 currentCoinBalance = address(this).balance;
+    require(currentCoinBalance > 0, "CAMPAIGN: Coin balance needs to be above zero" );
+    uint256 liquidityAmount = (currentCoinBalance * saleInfo.liquidityPercent) / 10000;
+    uint256 tokensAmount = _token.balanceOf(address(this));
+    require(tokensAmount >= liquidityAmount * saleInfo.dexListRate  , "CAMPAIGN: Not sufficient tokens amount");
+    
 
-      uint256 zsaleFeeAmount = currentCoinBalance * zsaleFee / 10000;
-      uint256 zsaleTokenFeeAmount = currentCoinBalance * zsaleTokenFee/ 10000;
-      
-      //Fees
-      payable(zsalesWalletAddress).transfer(zsaleFeeAmount);
-     _token.safeTransfer(zsalesWalletAddress, zsaleTokenFeeAmount);
-      // payable(_teamWallet).transfer(teamAmount);
+    uint256 zsaleFeeAmount = currentCoinBalance * zsaleFee / 10000;
+    uint256 zsaleTokenFeeAmount = currentCoinBalance * zsaleTokenFee/ 10000;
+    
+    //Fees
+    payable(zsalesWalletAddress).transfer(zsaleFeeAmount);
+    _token.safeTransfer(zsalesWalletAddress, zsaleTokenFeeAmount);
+    // payable(_teamWallet).transfer(teamAmount);
 
-      //liquidity pair
-      payable(_dexLockerAddress).transfer(liquidityAmount);
-      _token.safeTransfer(_dexLockerAddress, liquidityAmount * saleInfo.dexListRate );
+    
+    //liquidity pair
+    // payable(_dexLockerAddress).transfer(liquidityAmount);
+    (bool success,) = _dexLockerAddress.call{ value: liquidityAmount }("");
+    require(success, "CAMPAIGN: Transfer to DExLocker failed");//use call , since dexlocker is a proxy
+    
+    _token.safeTransfer(_dexLockerAddress, liquidityAmount * saleInfo.dexListRate );
 
-      DexLocker locker = DexLocker(_dexLockerAddress);    
-      if(useRaisedFundsVesting){
-        locker.startRaisedFundsLock( totalCoinReceived );
-      }
-      locker.addLiquidity();
-      
-      status=CampaignStatus.LIQUIDITY_SETUP;
+    DexLocker locker = DexLocker(_dexLockerAddress);    
+    if(useRaisedFundsVesting){
+      locker.startRaisedFundsLock( totalCoinReceived );
+    }
+    locker.addLiquidity(currentCoinBalance);
+    
+    status=CampaignStatus.LIQUIDITY_SETUP;
   }
 
   

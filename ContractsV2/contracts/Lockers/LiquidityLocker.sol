@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import {IDexRouter, IDexFactory} from "../IDexRouter.sol";
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "hardhat/console.sol";
 
 
 
@@ -29,8 +30,10 @@ contract LiquidityLocker{
 
     uint256 constant private MAX_INT = 2**256 - 1;
 
-    uint256 public totalTokensExpected ;
-    uint256 public totalEthExpected ;
+    uint256 public minTokensExpected ;
+    uint256 public maxTokensExpected ;
+    uint256 public minEthExpected ;
+    uint256 public maxEthExpected ;
     
 
     address private _token;
@@ -42,7 +45,7 @@ contract LiquidityLocker{
     bool private _campaignSucceded;
 
 
-    constructor(address dexRouterAddress, address token, address owner, uint256 price,uint256 releaseTime, uint liquidityPercentOfRaisedFunds,uint maxRaisedFunds) {
+    constructor(address dexRouterAddress, address token, address owner, uint256 price,uint256 releaseTime, uint liquidityPercentOfRaisedFunds,uint minRaisedFunds, uint maxRaisedFunds) {
         require(releaseTime > block.timestamp, "LiquidityLocker: release time is before current time");
         _releaseTime = releaseTime;
         _dexRouter = IDexRouter(dexRouterAddress);
@@ -52,8 +55,12 @@ contract LiquidityLocker{
         _price = price;
         _owner = owner;
         _token = token;
-        totalEthExpected = (liquidityPercentOfRaisedFunds* maxRaisedFunds)  / 100;
-        totalTokensExpected = _price * totalEthExpected;
+        minEthExpected = (liquidityPercentOfRaisedFunds* minRaisedFunds)  / 10000;
+        minTokensExpected = _price * minEthExpected;
+
+        maxEthExpected = (liquidityPercentOfRaisedFunds * maxRaisedFunds)  / 10000;
+        maxTokensExpected = _price * maxEthExpected;
+
     }
 
     receive() external payable {
@@ -73,9 +80,9 @@ contract LiquidityLocker{
       
       uint256 tokensAmount = _price * etherBalance;
       uint256 tokensAmountMin = tokensAmount - (_price * etherBalance);
-      require(etherBalance >= totalEthExpected, "LiquidityLocker: no ether to add liquidity"); 
+      require(etherBalance >= minEthExpected, "LiquidityLocker: no ether to add liquidity"); 
             
-      require( IERC20(_token).balanceOf(address(this)) >= totalTokensExpected, "LiquidityLocker: no token balance to add liquidity");        
+      require( IERC20(_token).balanceOf(address(this)) >= minTokensExpected, "LiquidityLocker: no token balance to add liquidity");        
       
       lpTokenPairAddress = _dexFactory.getPair(_token, _dexRouter.WETH() );
       if(lpTokenPairAddress==address(0)){
@@ -85,7 +92,7 @@ contract LiquidityLocker{
       IERC20(_token).approve(address(_dexRouter), MAX_INT);
       IERC20(_token).approve(lpTokenPairAddress, MAX_INT);
       
-      _dexRouter.addLiquidityETH{value: totalEthExpected}(_token, tokensAmount , tokensAmount, totalEthExpected, address(this), block.timestamp + 100);
+      _dexRouter.addLiquidityETH{value: minEthExpected}(_token, tokensAmount , tokensAmount, minEthExpected, address(this), block.timestamp + 100);
 
         
     }

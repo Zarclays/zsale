@@ -9,12 +9,14 @@ import "./TokenLocker.sol";
 import "./CoinVestingVault.sol";
 import "./LiquidityLocker.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
-// import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "hardhat/console.sol";
 
 
 
 // locks liquidity for LP tokens and handles team vseting
 contract DexLocker is Initializable{
+    using SafeERC20 for IERC20;
 
      // timestamp when token release is enabled
     uint256 private _lpReleaseTime;
@@ -38,6 +40,7 @@ contract DexLocker is Initializable{
     TokenLocker private _tokenLocker;
     CoinVestingVault private _coinVault;
     LiquidityLocker private _liquidityLocker;
+    uint private _liquidityPercentOfRaisedFunds;
 
     /**
     Maps to 
@@ -61,7 +64,7 @@ contract DexLocker is Initializable{
     }
 
     
-    function setupLock(uint liquidityPercentOfRaisedFunds,uint maxRaisedFunds, uint256 lpReleaseTime,  uint256 dexListPrice, bool useTeamTokenVesting, VestSchedule[8] memory teamTokenVestingDetails, bool useRaisedFundsVesting, uint256[3] memory raisedFundVestingDetails 
+    function setupLock(uint liquidityPercentOfRaisedFunds,uint minRaisedFunds,uint maxRaisedFunds, uint256 lpReleaseTime,  uint256 dexListPrice, bool useTeamTokenVesting, VestSchedule[8] memory teamTokenVestingDetails, bool useRaisedFundsVesting, uint256[3] memory raisedFundVestingDetails 
     ) public {
         require(msg.sender == _deployer, "DexLocker: Only Deployer is allowed ");
 
@@ -71,14 +74,17 @@ contract DexLocker is Initializable{
 
         _lpReleaseTime = lpReleaseTime;
         _dexListPrice = dexListPrice;
+        _liquidityPercentOfRaisedFunds = liquidityPercentOfRaisedFunds;
 
         // _teamTokenVestingDetails=teamTokenVestingDetails; 
 
         totalTokensExpectedToBeLocked = 0;
         
-        _liquidityLocker = new LiquidityLocker(address(_dexRouter),_token, _owner, dexListPrice, lpReleaseTime, liquidityPercentOfRaisedFunds, maxRaisedFunds);
+        _liquidityLocker = new LiquidityLocker(address(_dexRouter),_token, _owner, dexListPrice, lpReleaseTime, liquidityPercentOfRaisedFunds, minRaisedFunds,maxRaisedFunds);
 
-        totalTokensExpectedToBeLocked = _liquidityLocker.totalTokensExpected();
+        totalTokensExpectedToBeLocked = _liquidityLocker.maxTokensExpected();
+        console.log('_liquidityLocker.maxTokensExpected(): ',_liquidityLocker.maxTokensExpected());
+        console.log('totalTokensExpectedToBeLocked: ',totalTokensExpectedToBeLocked);
 
         if(useTeamTokenVesting){
             
@@ -86,11 +92,11 @@ contract DexLocker is Initializable{
         }
        
         
-        
-
         for (uint8 i=0; i < 8 /*100%*/; i++) {
             totalTokensExpectedToBeLocked += teamTokenVestingDetails[i].releaseAmount; 
         }
+
+        console.log('totalTokensExpectedToBeLocked 2: ',totalTokensExpectedToBeLocked);
 
         _useRaisedFundsVesting=useRaisedFundsVesting;
         if(_useRaisedFundsVesting){
@@ -112,7 +118,7 @@ contract DexLocker is Initializable{
             _coinVault = CoinVestingVault(payable(newCoinVaultCloneAddress) );
             // _coinVault.initialize(_owner, _startTime,_amount, _vestingDurationInDays,_vestingCliffInDays);
 
-             _coinVault.initialize(_owner,block.timestamp, _raisedFundVestingDetails[0] * _raisedAmount /1000, _raisedFundVestingDetails[1],_raisedFundVestingDetails[2]);
+             _coinVault.initialize(_owner,block.timestamp, _raisedFundVestingDetails[0] * _raisedAmount /10000, _raisedFundVestingDetails[1],_raisedFundVestingDetails[2]);
 
             
         }
@@ -132,7 +138,21 @@ contract DexLocker is Initializable{
     *  Approve token for router, require contract to have the necessary tokens
     *
      */
-    function addLiquidity() public {
+    function addLiquidity(uint256 raisedFunds) public {
+        console.log('liquidityLockerAddress():',liquidityLockerAddress());
+        console.log('liquidityLocker raisedFunds:',raisedFunds);
+        console.log('liquidityLocker _liquidityPercentOfRaisedFunds:',_liquidityPercentOfRaisedFunds);
+        uint liquidityAmount = (raisedFunds * _liquidityPercentOfRaisedFunds)/10000;
+        // (bool success,) = liquidityLockerAddress().call{ value: liquidityAmount }("");
+        // require(success, "DEXLocker: Transfer to liquidityLocker failed");//use call , since dexlocker is a proxy
+
+        console.log('balance:',address(this).balance);
+        console.log('liquidityAmount:',liquidityAmount);
+        payable(liquidityLockerAddress()).transfer(liquidityAmount);
+        
+        console.log('_dexListPrice:',_dexListPrice);
+        IERC20(_token).safeTransfer(liquidityLockerAddress(), liquidityAmount * _dexListPrice );
+
         _liquidityLocker.setCampaignSucceded(true);
         _liquidityLocker.addLiquidity();
     }

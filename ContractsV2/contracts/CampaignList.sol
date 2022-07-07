@@ -35,6 +35,9 @@ contract CampaignList is Context,Ownable  {
 
     ConfirmAddress addressConfirmer;
 
+    uint zsaleFee = 200;  //2%   - percent of native currency to take
+    uint zsaleTokenFee = 200;  //2% - percent fee of token to take
+
     mapping(address => uint256[]) private ownersCampaign; //owneraddress -> campaignIndex
     
 
@@ -117,8 +120,12 @@ contract CampaignList is Context,Ownable  {
         require(ct.owner()== _msgSender(), 'CAMPAIGNList: Transfer token - Not Owner');
 
         uint256 amount = ct.totalTokensExpectedToBeLocked();
+
+        // add zsale fee
+        uint256 feeAmount = zsaleTokenFee/ 10000 *  ct.getHardCap();
+
         IERC20 _token = IERC20(ct.tokenAddress());
-        _token.safeTransferFrom(_msgSender(), address(this), amount);
+        _token.safeTransferFrom(_msgSender(), address(this), amount + feeAmount);
 
         _token.safeTransfer( campaignAddress, amount);
         ct.startReceivingBids();

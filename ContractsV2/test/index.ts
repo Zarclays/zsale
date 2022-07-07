@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import {advanceTimeTo, getCurrentBlockTimeStamp, takeSnapshot, revertToSnapshot} from './utils';
 
 
 
@@ -12,16 +13,19 @@ describe("CampaignList", function () {
   const twoHoursTime = now.setHours(now.getHours()+2);
   const fourHoursLater = now.setHours(now.getHours()+4);
   const thirtyDaysLater = now.setDate(now.getDate()+30);
-  let CampaignFactoryArtifact = undefined;
-  let TokenArtifact = undefined;
+  let CampaignFactoryArtifact: any = undefined;
+  let TokenArtifact: any = undefined;
   let CampaignArtifact:any  = undefined;
   let DexLockerFactoryArtifact = undefined;
 
-  const router = '0xeD37AEDD777B44d34621Fe5cb1CF594dc39C8192';
+//   const router = '0xeD37AEDD777B44d34621Fe5cb1CF594dc39C8192';
+  const router = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
   let  campaignFactory: any;
   let campaign:any;
   let  token: any;
   let campaignAddress: string;
+  const softCap = ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei');
+  const hardCap = ethers.utils.formatUnits( ethers.utils.parseEther("0.2"), 'wei')
   
 
   before('Initialize and Deploy SmartContracts', async () => {
@@ -53,7 +57,7 @@ describe("CampaignList", function () {
       let coinVault = await CoinVestingVaultArtifact.deploy();
       await coinVault.deployed();
       console.log('coinVesting Implemntation Deployed at  ', coinVault.address );
-
+      
       const dexLockerFactory = await DexLockerFactoryArtifact.deploy(dexLockerImplementation.address, coinVault.address);
       await dexLockerFactory.deployed();
       
@@ -63,13 +67,60 @@ describe("CampaignList", function () {
       
   });
 
+  async function createNewCampaign(start: any,end: any){
+    const [owner] = await ethers.getSigners();
+    const token = await TokenArtifact.deploy();
+    await token.deployed();
+    const createCampaignTx = await campaignFactory.createNewCampaign(token.address,
+        [
+          softCap,
+          hardCap, 
+          start ,//  Math.floor(new Date().getTime() / 1000) , // twoHoursTime, thirtySecondsTime
+          end , 
+          ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
+          ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
+          ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
+          ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei'),
+          ethers.utils.formatUnits( ethers.utils.parseEther("1"), 'wei'),
+          '0'
+        ] 
+          ,0,router,[6000,30, 1000,800],
+        //founderinfo
+        //[formData.logo,'',formData.website, formData.twitter, formData.telegram, formData.discord ]
+        ['https://place-hold.it/110','dsec', 'https://testtoken.org','https://twitter.com/test','https://testtoken.org', 'http://discord.me'],
+        [true,false],
+          //teamtokenvesting
+          [
+          {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.05"), hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.02"), hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.05"), hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: ethers.utils.parseEther("0.02"), hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false},
+          {releaseDate: fourHoursLater, releaseAmount: '0', hasBeenClaimed: false}
+        ],
+        
+        [0,0,0],
+        
+          
+        {  
+          value: ethers.utils.parseEther("0.0001") 
+        });
+    let txResult =   await createCampaignTx.wait();
+    
+    const campaignAddress = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['createdCampaignAddress'];
+    console.log('New CampaignAddress: ', campaignAddress );
+    return  CampaignArtifact.attach(campaignAddress);
+  }
+
 
   it("Should create new campaign", async function () {
     const [owner] = await ethers.getSigners();
     const createCampaignTx = await campaignFactory.createNewCampaign(token.address,
         [
-          ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
-          ethers.utils.formatUnits( ethers.utils.parseEther("0.2"), 'wei'), 
+          softCap,
+          hardCap, 
           Math.floor(thirtySecondsTime/1000),//  Math.floor(new Date().getTime() / 1000) , // twoHoursTime, thirtySecondsTime
           Math.floor(thirtyDaysLater/1000), 
           ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),
@@ -103,10 +154,10 @@ describe("CampaignList", function () {
           value: ethers.utils.parseEther("0.0001") 
         });
     let txResult =   await createCampaignTx.wait();
-    // campaignAddress = txResult.events[2].args['createdCampaignAddress'];
+    
     campaignAddress = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['createdCampaignAddress'];
-    console.log('CcampaignAddress: ', campaignAddress );
-
+    console.log('CampaignAddress: ', campaignAddress );
+    campaign = CampaignArtifact.attach(campaignAddress);
     expect(await campaignFactory.campaignSize()).to.equal(1);
   });
 
@@ -119,7 +170,13 @@ describe("CampaignList", function () {
     let error;
     try{
       const [owner] = await ethers.getSigners();
-      let cmp = CampaignArtifact.attach(campaignAddress);
+      const now = new Date();
+      
+      const timeLater = now.setSeconds(now.getSeconds() + (60*30));
+        
+      let cmp = await createNewCampaign(Math.floor(timeLater/1000),Math.floor(thirtyDaysLater/1000.0));
+
+      // console.log('getCurrentBlockTimeStamp:', await getCurrentBlockTimeStamp()); 
       
       const updateCampaignTx = await cmp.updateCampaignDetails('logourl', 'desc', 'websiteurl','twitter','telegram');
         
@@ -139,7 +196,7 @@ describe("CampaignList", function () {
 
   });
 
-  it('campaignlist sould return correct campaign address for token address', async() => {
+  it('campaignlist should return correct campaign address for token address', async() => {
         const returnedAddress = await campaignFactory.tryGetCampaignByTokenAddress(token.address);
         expect(returnedAddress).to.equal(campaignAddress);
   });
@@ -148,6 +205,7 @@ describe("CampaignList", function () {
 
       
       let createError;
+      const initialSize = await campaignFactory.campaignSize();
       try{
         const createCampaignTx = await campaignFactory.createNewCampaign(token.address,
         [ethers.utils.formatUnits( ethers.utils.parseEther("0.1"), 'wei'),ethers.utils.formatUnits( ethers.utils.parseEther("0.2"), 'wei'), twoHoursTime, fourHoursLater, 
@@ -196,54 +254,12 @@ describe("CampaignList", function () {
         createError=err;
       }
       expect(createError).to.not.equal(undefined);
-      expect(await campaignFactory.campaignSize()).to.equal(1);
+      expect(initialSize  - await campaignFactory.campaignSize()).to.equal(0);
       
 
   });
 
-  // it('submits initial token to contract successfully', async() => {
-
-    
-  //   let error;
-  //   try{
-
-  //     const [owner] = await ethers.getSigners();
-  //     let cmp = CampaignArtifact.attach(campaignAddress);
-
-  //     let campaignStatus = await cmp.getCampaignStatus();
-  //     console.log('campaignStatus at start :', campaignStatus)
-
-  //     let vestingTokens = await cmp.totalTokensExpectedToBeLocked();
-  //     console.log(' vestingTokens:', vestingTokens.toString(), ', decimal: ', await token.decimals())
-
-  //     // Arrpove contract with correct allowance
-      
-  //     let txAllowance = await token.approve(cmp.address, vestingTokens);
-  //     await txAllowance.wait();
-      
-  //     const transferTokenTx = await cmp.transferTokens();        
-  //     let txResult =   await transferTokenTx.wait();
-
-  //     console.log('owner balance after:', (await token.balanceOf(owner.address)).toString())
-  //     console.log('campaign balance after:', (await token.balanceOf(cmp.address)).toString())
-
-  //     console.log('txResult.status:', txResult.status)
-  //     expect(txResult.status).to.equal(1);
-
-  //     campaignStatus = await cmp.getCampaignStatus();
-  //     console.log('campaignStatus after:', campaignStatus)
-  //     expect(campaignStatus).to.equal(1);
-
-  //   }catch(err){
-      
-  //     console.error(err)
-  //     error=err;
-  //   }
-  //   expect(error).to.equal(undefined);
-    
-    
-
-  // });
+  
 
   it('submits initial token to contract successfully', async() => {
 
@@ -252,11 +268,12 @@ describe("CampaignList", function () {
     try{
       
       const [owner] = await ethers.getSigners();
-      let cmp = CampaignArtifact.attach(campaignAddress);
+      let cmp = campaign; //CampaignArtifact.attach(campaignAddress);
 
       let campaignStatus = await cmp.getCampaignStatus();
       
       let vestingTokens = await cmp.totalTokensExpectedToBeLocked();
+      console.log('totalTokensExpectedToBeLocked: ', ethers.utils.formatUnits(vestingTokens) ); 
       
       // Arrpove contract with correct allowance
       
@@ -288,11 +305,15 @@ describe("CampaignList", function () {
 
     
     let error;
+    let snapshotId;
     try{
       this.timeout(5000)
       const [owner2, newSigner] = await ethers.getSigners();
       const b4Balance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));
       
+      snapshotId = await takeSnapshot();
+      await advanceTimeTo(Math.floor(thirtySecondsTime/1000) );
+
       const tx = {
         // from: newSigner.address,
         to: campaignAddress,
@@ -300,6 +321,7 @@ describe("CampaignList", function () {
       };
 
       const txRes = await newSigner.sendTransaction(tx);
+      await txRes.wait();
           
       const afterBalance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));
       
@@ -310,6 +332,154 @@ describe("CampaignList", function () {
       
       console.error(err)
       error=err;
+    }finally{
+      if(snapshotId){
+          await revertToSnapshot(snapshotId);
+      }
+      
+    }
+    expect(error).to.equal(undefined);
+    
+    
+
+  });
+
+  it('allows to finalize succesfully when at least softcap is hit', async() => {//softcap already transferred in previoud step
+
+    
+    let error, snapshotId;
+    try{
+      this.timeout(5000)
+      const [owner, newSigner] = await ethers.getSigners();
+      
+      const b4Balance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));      
+      snapshotId = await takeSnapshot();
+      await advanceTimeTo(Math.floor(thirtySecondsTime/1000) );
+      
+      const txTransferRes = await newSigner.sendTransaction({
+        // from: newSigner.address,
+        to: campaignAddress,
+        value: ethers.utils.parseEther('0.1') // utils.formatUnits( utils.parseEther(amount.toString()), 'wei')
+      });
+      await txTransferRes.wait();
+
+      const balance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));      
+      expect(parseFloat( balance)).to.gte(parseFloat('0.1'));
+      
+      const endTime = await campaign.getEndDate();
+      advanceTimeTo( parseInt( ethers.utils.formatUnits(endTime.add( 1), '0')) );
+
+      
+      const gasFeeData = await ethers.provider.getFeeData();
+      const tx = await campaign.finalizeAndSetupLiquidity({
+        
+        maxFeePerGas: gasFeeData.maxFeePerGas,// should use geasprice for bsc, since it doesnt support eip 1559 yet
+        maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas
+      });
+
+      const txRes = await tx.wait();          
+      
+      expect(txRes.confirmations).to.gt(0);
+      expect(txRes.status).to.equal(1);
+
+      const campaignStatus = await campaign.getCampaignStatus();      
+      expect(campaignStatus).to.equal(4);
+
+    }catch(err){
+      
+      console.error(err)
+      error=err;
+    }finally{
+      if(snapshotId){
+          await revertToSnapshot(snapshotId);
+      }
+      
+    }
+    expect(error).to.equal(undefined);
+    
+    
+
+  });
+
+  it('accepts whitelist succesfully', async() => {
+
+    
+    let error;
+    let snapshotId;
+    try{
+      this.timeout(5000)
+      const [owner2, newSigner] = await ethers.getSigners();
+      const b4Balance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));
+      
+      snapshotId = await takeSnapshot();
+      await advanceTimeTo(Math.floor(thirtySecondsTime/1000) );
+
+      const tx = {
+        // from: newSigner.address,
+        to: campaignAddress,
+        value: ethers.utils.parseEther('0.10') // utils.formatUnits( utils.parseEther(amount.toString()), 'wei')
+      };
+
+      const txRes = await newSigner.sendTransaction(tx);
+      await txRes.wait();
+          
+      const afterBalance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));
+      
+      expect(parseFloat( afterBalance)).to.gt(parseFloat(b4Balance));
+      expect(txRes.confirmations).to.gt(0);
+
+    }catch(err){
+      
+      console.error(err)
+      error=err;
+    }finally{
+      if(snapshotId){
+          await revertToSnapshot(snapshotId);
+      }
+      
+    }
+    expect(error).to.equal(undefined);
+    
+    
+
+  });
+
+  it('checks whitelist succesfully', async() => {
+
+    
+    let error;
+    let snapshotId;
+    try{
+      this.timeout(5000)
+      const [owner2, newSigner] = await ethers.getSigners();
+      const b4Balance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));
+      
+      snapshotId = await takeSnapshot();
+      await advanceTimeTo(Math.floor(thirtySecondsTime/1000) );
+
+      const tx = {
+        // from: newSigner.address,
+        to: campaignAddress,
+        value: ethers.utils.parseEther('0.10') // utils.formatUnits( utils.parseEther(amount.toString()), 'wei')
+      };
+
+      const txRes = await newSigner.sendTransaction(tx);
+      await txRes.wait();
+          
+      const afterBalance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));
+      
+      expect(parseFloat( afterBalance)).to.gt(parseFloat(b4Balance));
+      expect(txRes.confirmations).to.gt(0);
+
+    }catch(err){
+      
+      console.error(err)
+      error=err;
+    }finally{
+      if(snapshotId){
+          await revertToSnapshot(snapshotId);
+      }
+      
     }
     expect(error).to.equal(undefined);
     
@@ -322,55 +492,55 @@ describe("CampaignList", function () {
 
 
 
-describe("ConfirmAddress", async function () {
+// describe("ConfirmAddress", async function () {
   
   
 
  
-  let ConfirmAddressArtifact ;
+//   let ConfirmAddressArtifact ;
   
 
-  const router = '0xeD37AEDD777B44d34621Fe5cb1CF594dc39C8192';
-  let userAccount :any ;
-  let confirmAddContract :any;
+//   const router = '0xeD37AEDD777B44d34621Fe5cb1CF594dc39C8192';
+//   let userAccount :any ;
+//   let confirmAddContract :any;
   
 
-  before('Initialize and Deploy SmartContracts', async () => {
+//   before('Initialize and Deploy SmartContracts', async () => {
       
-    ConfirmAddressArtifact = await ethers.getContractFactory("ConfirmAddress");
-    userAccount = (await ethers.getSigners())[0];
+//     ConfirmAddressArtifact = await ethers.getContractFactory("ConfirmAddress");
+//     userAccount = (await ethers.getSigners())[0];
 
     
-    confirmAddContract = await ConfirmAddressArtifact.deploy();
-    await confirmAddContract.deployed();
-    console.log('Confirm Address Deployed at  ', confirmAddContract.address );
+//     confirmAddContract = await ConfirmAddressArtifact.deploy();
+//     await confirmAddContract.deployed();
+//     console.log('Confirm Address Deployed at  ', confirmAddContract.address );
       
-  });
+//   });
 
 
-  it("Should return true when a contract address is sent to it", async function () {
-    const TokenArtifact = await ethers.getContractFactory("Token");
-    const token = await TokenArtifact.deploy();
-    await token.deployed();
+//   it("Should return true when a contract address is sent to it", async function () {
+//     const TokenArtifact = await ethers.getContractFactory("Token");
+//     const token = await TokenArtifact.deploy();
+//     await token.deployed();
     
-    let addToCheck = token.address;
-    let isContractCheck = await confirmAddContract.isContract(addToCheck);
-    expect(isContractCheck).to.equal(true);
-  });
+//     let addToCheck = token.address;
+//     let isContractCheck = await confirmAddContract.isContract(addToCheck);
+//     expect(isContractCheck).to.equal(true);
+//   });
 
   
   
 
-  it('Should return false when a non-contract address is sent to it', async() => {
-    let addToCheck = userAccount.address;
-    let isContractCheck = await confirmAddContract.isContract(addToCheck);
-    expect(isContractCheck).to.equal(false);
+//   it('Should return false when a non-contract address is sent to it', async() => {
+//     let addToCheck = userAccount.address;
+//     let isContractCheck = await confirmAddContract.isContract(addToCheck);
+//     expect(isContractCheck).to.equal(false);
     
 
-  });
+//   });
 
 
 
-});
+// });
 
 
