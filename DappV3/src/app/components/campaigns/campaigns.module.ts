@@ -15,6 +15,7 @@ import { NgxSimpleCountdownModule } from 'ngx-simple-countdown';
 import { ModalModule } from '@coreui/angular';
 import { CampaignListItemComponent } from './campaign-list-item/campaign-list-item.component';
 import { AvatarModule } from '@coreui/angular';
+import { HttpClientModule } from '@angular/common/http';
 // import { CardModule } from '@coreui/angular';
 // import { GridModule } from '@coreui/angular';
 
@@ -38,7 +39,8 @@ import { AvatarModule } from '@coreui/angular';
     TooltipModule,
     NgxSimpleCountdownModule,
     ModalModule,
-    AvatarModule
+    AvatarModule,
+    HttpClientModule 
     // CardModule,
     // GridModule
   ]

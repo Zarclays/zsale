@@ -15,6 +15,13 @@ import { ToasterComponent, ToasterPlacement } from '@coreui/angular';
 import { AppToastComponent } from 'src/app/views/notifications/toasters/toast-simple/toast.component';
 import { NgxSpinnerService } from "ngx-spinner";
 import { ValidateEndDateLaterThanStartDate , ValidateDateIsNotInPast} from '../../../validators/create-launchpad-validators';
+import { MerkleTree } from 'merkletreejs';
+// import keccak256 = require("keccak256");
+// import * as keccak256 from 'keccak256';
+const keccak256 = require('keccak256');
+
+import { environment } from 'src/environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-campaign-details',
@@ -24,7 +31,9 @@ import { ValidateEndDateLaterThanStartDate , ValidateDateIsNotInPast} from '../.
 export class CampaignDetailsComponent implements OnInit {
   mainFormGroup!: FormGroup;
   postponeSaleFormGroup!: FormGroup;
+  whitelistFormGroup!: FormGroup;
 
+  formSubscriptions: Subscription[]=[];
 
   campaignId: string|undefined;
   campaign: Campaign|undefined;
@@ -64,7 +73,11 @@ export class CampaignDetailsComponent implements OnInit {
        //'less': 'End date cannot be less than Start date'
        // 'pattern'   :   'Contact No. should only contain Numbers '
      },
- 
+     'whitelistAddresses': {
+       'required': 'Required',
+       'minLength': 'Minimum Length not reached',
+        'maxLength': 'Maximum Length exceeded'
+     }
    };
 
    placement = ToasterPlacement.TopCenter;
@@ -74,6 +87,7 @@ export class CampaignDetailsComponent implements OnInit {
   };
 
   postponeSaleModalVisible=false;
+  whitelistModalVisible=false;
 
   @ViewChild(ToasterComponent) toaster!: ToasterComponent;
 
@@ -87,7 +101,8 @@ export class CampaignDetailsComponent implements OnInit {
     private router: Router,
     private campaignService: CampaignService,
     private fb: FormBuilder,
-    private spinner: NgxSpinnerService) {
+    private spinner: NgxSpinnerService,
+    private http: HttpClient) {
       
     }
 
@@ -95,7 +110,7 @@ export class CampaignDetailsComponent implements OnInit {
     // this.router.routeReuseStrategy.shouldReuseRoute = () => false;
 
     this.route.params.subscribe((params: Params) => {
-      console.log('Loading')
+      
       this.userChain = params['chain'];
       this.campaignId = params['campaignId']!;
       
@@ -122,6 +137,8 @@ export class CampaignDetailsComponent implements OnInit {
             endDate: [this.campaign.saleEndTime, [Validators.required,ValidateDateIsNotInPast, ValidateEndDateLaterThanStartDate]],
       
           })
+
+          
 
           this.validationMessages['amount'].min = `Amount must be at least ${ this.campaign.minAllocationPerUser} `
           this.validationMessages['amount'].max = `Amount must be at most ${this.campaign.maxAllocationPerUserTierTwo} `
@@ -154,7 +171,36 @@ export class CampaignDetailsComponent implements OnInit {
 
     this.titleService.setTitle('Participate in Campaign | ZSale');
 
+    this.whitelistFormGroup = this.fb.group({
+          
+      enable: [false, [Validators.required]],
+      addresses: ['', [Validators.required, Validators.minLength(32), Validators.maxLength(42000) /*42 * 1000*/]],
+
+    })
   }
+
+  
+  onFormChanges(): void {
+    
+    this.formSubscriptions.push(  
+      this.whitelistFormGroup.get('enable')!.valueChanges.subscribe(val => {
+        if(val===true){
+          this.whitelistFormGroup.get('addresses')!.enable()
+          
+        }else{
+          this.whitelistFormGroup.get('addresses')!.disable()
+        }
+        
+      }) 
+    );
+
+
+
+    //defaults
+    this.whitelistFormGroup.get('enable')!.disable();
+
+  }
+
 
   formatEtherDateToJs(value: any){
     return formatEtherDateToJs(value);
@@ -179,6 +225,9 @@ export class CampaignDetailsComponent implements OnInit {
 
   ngOnDestroy(){
     this.web3ServiceConnect$!.unsubscribe();
+    this.formSubscriptions.forEach( sub=>{
+      sub.unsubscribe();
+    });
   }
 
 
@@ -198,10 +247,39 @@ export class CampaignDetailsComponent implements OnInit {
         nonce: this.web3Service.ethersProvider!.getTransactionCount(this.web3Service.accounts[0], "latest"),
         value: utils.parseEther(amount.toString()), 
         maxFeePerGas: gasFeeData.maxFeePerGas,// should use geasprice for bsc, since it doesnt support eip 1559 yet
-        maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas
+        maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas,
+        data: undefined
         // gasLimit: utils.hexlify(500000), // 100000
         // gasPrice: gasPrice,
     };
+
+    if(this.campaign!.useWhiteList === true){
+      try{
+
+        const signer = this.web3Service.ethersSigner;      
+        const ethAddress = await signer!.getAddress();
+        const messageSignature = await signer!.signMessage(ethAddress);
+        
+        const c = {
+            id: this.campaignId,
+            chain: this.userChain,
+            address: this.web3Service.accounts[0],
+            signatureHash: messageSignature
+        };
+
+        const data =  await this.http.post<any>(`${environment.BaseApiUrl}/campaigns/proof`, c).toPromise();
+        tx.data = data.proof;
+
+      }catch(eerr) {
+          console.error(eerr);
+          this.submittingBid=false;
+          this.showToast('Oops!','Something went wrong', 'danger');
+          return;
+      }
+    }
+
+    
+
     const txRes = await this.web3Service.signer!.sendTransaction(tx);    
     // console.log("Send finished!" , txRes)
     this.showToast('Success!','Your bid has been sent succesfully!');
@@ -248,6 +326,95 @@ export class CampaignDetailsComponent implements OnInit {
         this.showToast('Oops!','Campaign Postponement Failed', 'danger');
 
       }
+
+  }
+
+  showWhitelist(){
+    //this.spinner.show();
+    this.whitelistModalVisible=true;
+
+
+  }
+
+  closeWhitelistModal(){
+    this.whitelistModalVisible=false;
+  }
+
+
+  async submitWhitelist(){
+    this.spinner.show();
+    const campaignContract = this.campaignContract ;// await this.campaignService.getCampaignContractWithSigner(this.campaign!.campaignAddress)
+    const gasFeeData = (await this.web3Service.getFeeData())!; 
+
+    let tx ;
+
+    if(this.whitelistFormGroup.get('enable')!.value === true){
+      const signer = this.web3Service.ethersSigner;      
+      const ethAddress = await signer!.getAddress();
+      const messageSignature = await signer!.signMessage(ethAddress);
+
+      const addresses = this.whitelistFormGroup.get('addresses')!.value.split(/[, \n]+/).map((m: string) => m.trim());
+      
+
+      const campaign = {
+          id: this.campaignId,
+          chain: this.userChain,
+          address: this.web3Service.accounts[0],
+          addresses: addresses,
+          signatureHash: messageSignature,
+          campaignContractAddress: this.campaign!.saleAddress
+      };
+      
+      try{
+        await this.http.post<any>(`${environment.BaseApiUrl}/campaigns/whitelist`, campaign).toPromise();
+        const leafNodes = campaign.addresses.map((i: string) => {        
+            const packed = ethers.utils.solidityPack(["address"], [ i]);
+            return keccak256(packed);          
+          });
+          
+          // Generate merkleTree from leafNodes
+          const merkleTree = new MerkleTree(leafNodes, keccak256, { sortPairs: true });
+          // Get root hash from merkle tree
+          const merkleRoot = merkleTree.getRoot();
+
+          tx = await campaignContract.submitTier2Whitelist( merkleRoot, {
+            maxFeePerGas: gasFeeData.maxFeePerGas,// should use geasprice for bsc, since it doesnt support eip 1559 yet
+            maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas
+          });
+      }catch(eerr) {
+        console.error(eerr);
+        this.spinner.hide();
+        this.whitelistModalVisible=false;
+        this.showToast('Oops!','Campaign Whitelisting Failed', 'danger');
+        return;
+      }
+
+      
+    }else{
+      tx = await campaignContract.disableTier2Whitelist( {
+        maxFeePerGas: gasFeeData.maxFeePerGas,// should use geasprice for bsc, since it doesnt support eip 1559 yet
+        maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas
+      });
+    }
+
+     
+    try{
+      
+
+      
+      let txRes = await tx.wait();           
+      // console.log("Send finished!" , txRes)
+      this.showToast('Success!','Campaign  whitelisting succesful!');
+      this.spinner.hide();
+      this.whitelistModalVisible=false;
+      window.location.reload(); 
+    }catch(err){
+      console.error(err);
+      this.spinner.hide();
+      this.whitelistModalVisible=false;
+      this.showToast('Oops!','Campaign whitelisting Failed', 'danger');
+
+    }
 
   }
 

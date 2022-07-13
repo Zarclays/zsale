@@ -43,6 +43,8 @@
     "ethers": "^5.6.8",
     "evm-chains": "^0.2.0",
     "fortmatic": "^2.3.0",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.2.31",
     "next-tick": "^1.1.0",
     "ng2-date-picker": "^13.1.1",
     "ngx-bootstrap": "^8.0.0",

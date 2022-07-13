@@ -331,3 +331,55 @@
     <button cButton color="primary" *ngIf="postponeSaleFormGroup" [disabled]="postponeSaleFormGroup.invalid " (click)="submitPostpone()">Postpone</button>
   </c-modal-footer>
 </c-modal>
+
+
+
+
+<c-modal id="addWhitelistModal" [visible]="whitelistModalVisible" >
+    <c-modal-header>
+      <h5 cModalTitle>Manage Whitelist</h5>
+      <button (click)="closeWhitelistModal()" cButtonClose>x</button>
+    </c-modal-header>
+  
+    <c-modal-body>
+      <form *ngIf="whitelistFormGroup"  [formGroup]="whitelistFormGroup" class="whitelist-form needs-validation"  novalidate [validated]="false"  cForm>
+          <div class="row">
+              <div class="col-12">
+                <c-form-check [switch]="true" class="my-3">
+                    <input cFormCheckInput checked type="checkbox" formControlName="enable" />
+                    <label cFormCheckLabel>Use Whitelist</label>
+                </c-form-check>
+
+              </div>
+              <div class="col-12" *ngIf="whitelistFormGroup.get('enable').value === true">
+                  <div [cFormFloating]="true" class="my-3" >
+                    <textarea cFormControl style="height: 100px;" rows="6" id="list" placeholder="" formControlName="desc" type="text" sizing="lg" [ngClass]="{ 'is-invalid': whitelistFormGroup.get('addresses').touched && whitelistFormGroup.get('addresses').invalid, 'is-valid': whitelistFormGroup.get('addresses').touched && whitelistFormGroup.get('addresses').valid }">
+                    </textarea>
+                    <label cLabel for="list">Addresses (Enter each address on a separate line)</label>
+                      
+                    <div cFormText class="mt-2">
+                        You can whitelist a maximum of 1,000 addresses. <br/>
+                        You can only whitelist once
+                    </div>
+  
+                      <div class="error-message" *ngIf="whitelistFormGroup.get('addresses').invalid && whitelistFormGroup.get('addresses').touched">
+                          <div *ngFor="let error of  objectKeys(whitelistFormGroup.get('addresses')?.errors)">                                        
+                          {{validationMessages.whitelistAddresses[error]}}
+                          </div>
+                      </div>
+  
+                  </div>
+              </div>
+              
+  
+          </div>
+      </form>
+    </c-modal-body>
+  
+    <c-modal-footer>
+      <button (click)="closeWhitelistModal()" cButton color="secondary">
+        Close
+      </button>
+      <button cButton color="primary" *ngIf="whitelistFormGroup" [disabled]="whitelistFormGroup.invalid " (click)="submitWhitelist()">Submit</button>
+    </c-modal-footer>
+  </c-modal>

@@ -75,6 +75,7 @@ export class CampaignService {
         useWhiteList: cmp.useWhiteList,
 
         saleAddress: cmpAddress, 
+        campaignAddress: cmpAddress,
         name,
         symbol,
         totalSupply,            
@@ -83,7 +84,7 @@ export class CampaignService {
         minAllocationPerUser: utils.formatUnits(minAllocationPerUser,decimals),
         maxAllocationPerUserTierOne: utils.formatUnits(maxAllocationPerUserTierOne,decimals) ,
         maxAllocationPerUserTierTwo: utils.formatUnits(maxAllocationPerUserTierTwo,decimals),
-        campaignAddress: cmpAddress,
+        
         logoUrl,
         hasKYC,
         isAudited,

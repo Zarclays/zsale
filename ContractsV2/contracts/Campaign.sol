@@ -16,7 +16,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import './Lockers/DexLockerFactory.sol';
 import './Lockers/DexLocker.sol';
 import "./Lockers/VestSchedule.sol";
-
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "hardhat/console.sol";
 
 
@@ -116,11 +116,13 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
   uint public maxAllocationPerUserTierTwo; 
   
  
-  // address array for tier one whitelist
-  address[] private whitelistTierOne;  // every tokenholder is automatically whitelisted
+  // // address array for tier one whitelist
+  // address[] private whitelistTierOne;  // every tokenholder is automatically whitelisted
   
-  // address array for tier two whitelist
-  address[] private whitelistTierTwo; 
+  // // address array for tier two whitelist
+  // address[] private whitelistTierTwo; 
+
+  bytes32 private _whitelistTierTwoMerkleRoot;
   
 
   uint public campaignKey;
@@ -321,60 +323,37 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
     return DexLocker(_dexLockerAddress).totalTokensExpectedToBeLocked();
   }
 
-  // //add the address in Whitelist tier One to invest
-  // function addWhitelistOne(address _address) public onlyOwner {
-
-  //   //Every token holder is automatically whitelisted, so no needfor this
-
-  //   require(_address != address(0), "Invalid address");
-  //   whitelistTierOne.push(_address);
-  // }
-
+ 
   function setZSalesTokenAddress(address _tokenAddress) public onlyAdmin {
     zsalesTokenAddress = _tokenAddress;
   }
 
   //add the address in Whitelist tier two to invest
-  function addWhitelistTwo(address _address) public onlyOwner {
-    require(_address != address(0), "Invalid address");
-    whitelistTierTwo.push(_address);
+  function disableTier2Whitelist() public onlyOwner {    
+    otherInfo.useWhiteList= false;
+  }
+
+  //add the address in Whitelist tier two to invest
+  function submitTier2Whitelist(bytes32 whitelistMerkleRoot) public onlyOwner {
+    require(block.timestamp < saleInfo.saleStartTime, 'CAMPAIGN: Can only alter whitelisting before Sale StartTime');
+    otherInfo.useWhiteList= true;
+    _whitelistTierTwoMerkleRoot=whitelistMerkleRoot;
   }
 
   // check the address is a Token Holder
   function isAllowedInTier1(address _address) public view returns(bool) {
+
     IERC20 token = IERC20(zsalesTokenAddress);
     return token.balanceOf(_address) > 0;
   }
 
-  function setWhiteListMode(bool allowed) public onlyOwner  {
-      require(block.timestamp< saleInfo.saleStartTime, 'CAMPAIGN: Can only alter whitelisting before Sale StartTime');
-      otherInfo.useWhiteList= allowed;
-  }
-
-  // check the address in whitelist tier one
-  function isInTier1WhiteList(address _address) public view returns(bool) {
-    uint i;
-    uint length = whitelistTierOne.length;
-    for (i = 0; i < length; i++) {
-      address _addressArr = whitelistTierOne[i];
-      if (_addressArr == _address) {
-        return true;
-      }
-    }
-    return false;
-  }
 
   // check the address in whitelist tier two
-  function isInTier2WhiteList(address _address) public view returns(bool) {
-    uint i;
-    uint length = whitelistTierTwo.length;
-    for (i = 0; i < length; i++) {
-      address _addressArr = whitelistTierTwo[i];
-      if (_addressArr == _address) {
-        return true;
-      }
-    }
-    return false;
+  function isInTier2WhiteList(bytes32[] memory proof, address claimer) public view returns(bool) {
+    
+    bytes32 _leaf = keccak256(abi.encodePacked(claimer));
+    return MerkleProof.verify(proof, _whitelistTierTwoMerkleRoot, _leaf);
+    
   }
 
   /**
@@ -445,8 +424,34 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
     tier1TimeLineInHours=newValue;
   }
 
+  function bytesToBytes32Array(bytes memory data)
+        public
+        pure
+        returns (bytes32[] memory)
+  {
+      // Find 32 bytes segments nb
+      uint256 dataNb = data.length / 32;
+      // Create an array of dataNb elements
+      bytes32[] memory dataList = new bytes32[](dataNb);
+      // Start array index at 0
+      uint256 index = 0;
+      // Loop all 32 bytes segments
+      for (uint256 i = 32; i <= data.length; i = i + 32) {
+          bytes32 temp;
+          // Get 32 bytes from data
+          assembly {
+              temp := mload(add(data, i))
+          }
+          // Add extracted 32 bytes to list
+          dataList[index] = temp;
+          index++;
+      }
+      // Return data list
+      return (dataList);
+  }
+
   // send coin to the contract address
-  receive() external payable {
+  fallback(bytes calldata data) external payable returns (bytes memory) {
     uint256 bid = msg.value;
     require(status != CampaignStatus.CANCELLED, 'Campaign: Sale Cancelled');
     require(status != CampaignStatus.FAILED , "Campaign: Failed, Refunded is activated");
@@ -463,19 +468,24 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
     require(bid > 0, "Campaign: Coin value sent needs to be above zero");
     require( bid >= minAllocationPerUser ,"Campaign:You are investing less than Min Buy limit!");
           
+    address sender = _msgSender();
+
     if(block.timestamp >= saleInfo.saleStartTime) {
         if(otherInfo.useWhiteList){
-          require(isInTier2WhiteList(msg.sender), "Campaign: You are not in whitelist");
+          // get proof from msg.data
+          bytes32[] memory proof = bytesToBytes32Array(data);
+          
+          require(proof.length == 4 && isInTier2WhiteList(proof,sender ), "Campaign: You are not in whitelist");
         }
         require(totalCoinInTierTwo + bid <= tierTwohardCap, "Campaign: purchase would exceed Tier two max cap");
-        require(buyInTwoTier[msg.sender] + bid <= maxAllocationPerUserTierTwo ,"Campaign:You are investing more than your tier-2 limit!");
-        buyInTwoTier[msg.sender] += bid;
-        buyInAllTiers[msg.sender] += bid;
+        require(buyInTwoTier[sender] + bid <= maxAllocationPerUserTierTwo ,"Campaign:You are investing more than your tier-2 limit!");
+        buyInTwoTier[sender] += bid;
+        buyInAllTiers[sender] += bid;
         totalCoinReceived += bid;
         totalCoinInTierTwo += bid;
         totalParticipants++;
     
-        emit ValueReceived(msg.sender, bid);
+        emit ValueReceived(sender, bid);
 
         
     }
@@ -497,7 +507,7 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
       revert("Campaign:The sale is not started yet");
     }
 
-    
+    return '';
   }
 
   /**
