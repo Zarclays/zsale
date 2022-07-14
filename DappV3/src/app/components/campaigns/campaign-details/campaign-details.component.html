@@ -69,6 +69,17 @@
                           <div><em>locked till {{formatEtherDateToJs( campaign.liquidityReleaseTime)}}</em></div>
                         </div>
                     </li>
+
+
+                    <li class="list-group-item d-flex justify-content-between align-items-start py-4">
+                        <div class="ms-2 me-auto">
+                        <div class="fw-bold">Uses Whitelist?</div>
+                        
+                        </div>
+                        <div > {{(campaign.useWhiteList? 'Yes': 'No')}} </div>
+                    </li>
+
+
                   </ul>
 
               </div>
@@ -247,6 +258,15 @@
 
                             <button *ngIf="isOwner && campaign.saleStartTime.getTime() > now" class="mx-2 my-2 btn btn-danger btn-sm"  (click)="cancelSale()"  >Cancel Sale</button>
 
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button *ngIf="isOwner && campaign.saleStartTime.getTime() > now" class="mx-2 my-2 btn btn-warning btn-sm"  (click)="showWhitelist()"  >
+                                    Manage Whitelist  
+                                </button>
+
+                                <button class="btn btn-dark"  (click)="viewCurrentWhitelist()" *ngIf="campaign.useWhiteList">View List</button>
+                            </div>
+                            
+
 
 
                             <button *ngIf="isOwner && campaign.saleEndTime.getTime() <  now" class="mx-2 my-2 btn btn-success btn-sm"  (click)="finalizeSale()"  >Finalize Sale</button>
@@ -342,6 +362,15 @@
     </c-modal-header>
   
     <c-modal-body>
+    
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-info">
+                    You will be asked to sign a message with your Wallet before sending the Whitelist transaction, this allows us to authenticate that you are the one sending the whitelist on our API Server 
+                </div>
+            </div>
+        </div>
+
       <form *ngIf="whitelistFormGroup"  [formGroup]="whitelistFormGroup" class="whitelist-form needs-validation"  novalidate [validated]="false"  cForm>
           <div class="row">
               <div class="col-12">
@@ -353,13 +382,14 @@
               </div>
               <div class="col-12" *ngIf="whitelistFormGroup.get('enable').value === true">
                   <div [cFormFloating]="true" class="my-3" >
-                    <textarea cFormControl style="height: 100px;" rows="6" id="list" placeholder="" formControlName="desc" type="text" sizing="lg" [ngClass]="{ 'is-invalid': whitelistFormGroup.get('addresses').touched && whitelistFormGroup.get('addresses').invalid, 'is-valid': whitelistFormGroup.get('addresses').touched && whitelistFormGroup.get('addresses').valid }">
+                    <textarea cFormControl style="height: 100px;font-size: 12px" rows="6" id="list" placeholder="" formControlName="addresses" type="text" sizing="lg" [ngClass]="{ 'is-invalid': whitelistFormGroup.get('addresses').touched && whitelistFormGroup.get('addresses').invalid, 'is-valid': whitelistFormGroup.get('addresses').touched && whitelistFormGroup.get('addresses').valid }">
                     </textarea>
                     <label cLabel for="list">Addresses (Enter each address on a separate line)</label>
                       
                     <div cFormText class="mt-2">
                         You can whitelist a maximum of 1,000 addresses. <br/>
-                        You can only whitelist once
+                        
+                        <div class="alert alert-info">Submitting a new whitelist will overwrite any existing whitelist</div>
                     </div>
   
                       <div class="error-message" *ngIf="whitelistFormGroup.get('addresses').invalid && whitelistFormGroup.get('addresses').touched">
@@ -377,9 +407,46 @@
     </c-modal-body>
   
     <c-modal-footer>
+        
       <button (click)="closeWhitelistModal()" cButton color="secondary">
         Close
       </button>
       <button cButton color="primary" *ngIf="whitelistFormGroup" [disabled]="whitelistFormGroup.invalid " (click)="submitWhitelist()">Submit</button>
+    </c-modal-footer>
+  </c-modal>
+
+
+  <c-modal id="viewWhitelistModal" [visible]="viewWhitelistModalVisible" >
+    <c-modal-header>
+      <h5 cModalTitle>View Whitelist</h5>
+      <button (click)="closeViewWhitelistModal()" cButtonClose>x</button>
+    </c-modal-header>
+  
+    <c-modal-body>
+    
+        <div class="row" *ngIf="whitelist">
+            <div class="col">
+
+                <ol class="list-group list-group-numbered mt-4" >
+                    <li *ngIf="whitelist.length<1" class="list-group-item ">
+                        No Address in Whitelist
+                    </li>
+                    <li *ngFor="let add of whitelist" class="list-group-item " style="font-weight: bold;">
+                        {{add}}
+                    </li>
+
+
+                </ol>
+            </div>
+        </div>
+
+    </c-modal-body>
+  
+    <c-modal-footer>
+        
+      <button (click)="closeViewWhitelistModal()" cButton color="secondary">
+        Close
+      </button>
+      
     </c-modal-footer>
   </c-modal>

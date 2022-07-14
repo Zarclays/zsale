@@ -1,18 +1,18 @@
 import { Component, OnInit , ViewChild} from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap, Router,Params } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { Web3Service } from 'src/app/services/web3.service';
-import { CampaignService } from 'src/app/components/campaigns/campaign.service';
-import { Campaign } from 'src/app/models/campaign';
-import contractList from 'src/app/models/contract-list';
-import {getDateFromEther, formatEtherDateToJs, formatDateToJsString} from 'src/app/utils/date';
-import {formatPercent} from 'src/app/utils/numbers'
+import { firstValueFrom, Subscription } from 'rxjs';
+import { Web3Service } from '../../../services/web3.service';
+import { CampaignService } from '../../../components/campaigns/campaign.service';
+import { Campaign } from '../../../models/campaign';
+import contractList from '../../../models/contract-list';
+import {getDateFromEther, formatEtherDateToJs, formatDateToJsString} from '../../../utils/date';
+import {formatPercent} from '../../../utils/numbers'
 import {ethers, utils} from 'ethers';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 // import { cilList, cilShieldAlt } from '@coreui/icons';
 import { ToasterComponent, ToasterPlacement } from '@coreui/angular';
-import { AppToastComponent } from 'src/app/views/notifications/toasters/toast-simple/toast.component';
+import { AppToastComponent } from '../../../views/notifications/toasters/toast-simple/toast.component';
 import { NgxSpinnerService } from "ngx-spinner";
 import { ValidateEndDateLaterThanStartDate , ValidateDateIsNotInPast} from '../../../validators/create-launchpad-validators';
 import { MerkleTree } from 'merkletreejs';
@@ -20,7 +20,7 @@ import { MerkleTree } from 'merkletreejs';
 // import * as keccak256 from 'keccak256';
 const keccak256 = require('keccak256');
 
-import { environment } from 'src/environments/environment';
+import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -89,6 +89,9 @@ export class CampaignDetailsComponent implements OnInit {
   postponeSaleModalVisible=false;
   whitelistModalVisible=false;
 
+  whitelist? : string[] = undefined;
+  viewWhitelistModalVisible = false;
+
   @ViewChild(ToasterComponent) toaster!: ToasterComponent;
 
   campaignContract: ethers.Contract;
@@ -138,6 +141,13 @@ export class CampaignDetailsComponent implements OnInit {
       
           })
 
+          this.whitelistFormGroup = this.fb.group({
+          
+            enable: [this.campaign.useWhiteList, []],
+            addresses: ['', [Validators.required, Validators.minLength(32), Validators.maxLength(42000) /*42 * 1000*/]],
+      
+          })
+
           
 
           this.validationMessages['amount'].min = `Amount must be at least ${ this.campaign.minAllocationPerUser} `
@@ -171,12 +181,7 @@ export class CampaignDetailsComponent implements OnInit {
 
     this.titleService.setTitle('Participate in Campaign | ZSale');
 
-    this.whitelistFormGroup = this.fb.group({
-          
-      enable: [false, [Validators.required]],
-      addresses: ['', [Validators.required, Validators.minLength(32), Validators.maxLength(42000) /*42 * 1000*/]],
-
-    })
+    
   }
 
   
@@ -355,18 +360,23 @@ export class CampaignDetailsComponent implements OnInit {
 
       const addresses = this.whitelistFormGroup.get('addresses')!.value.split(/[, \n]+/).map((m: string) => m.trim());
       
-
+      
+      var uniqueAddresses = addresses.filter((value: any, index: number, self: any) => {
+        return self.indexOf(value) === index;
+      });
+      
       const campaign = {
           id: this.campaignId,
           chain: this.userChain,
           address: this.web3Service.accounts[0],
-          addresses: addresses,
+          addresses: uniqueAddresses,
           signatureHash: messageSignature,
           campaignContractAddress: this.campaign!.saleAddress
       };
       
       try{
-        await this.http.post<any>(`${environment.BaseApiUrl}/campaigns/whitelist`, campaign).toPromise();
+        // await this.http.post<any>(`${environment.BaseApiUrl}/campaigns/whitelist`, campaign).toPromise();
+        await firstValueFrom(this.http.post<any>(`${environment.BaseApiUrl}/campaigns/whitelist`, campaign));
         const leafNodes = campaign.addresses.map((i: string) => {        
             const packed = ethers.utils.solidityPack(["address"], [ i]);
             return keccak256(packed);          
@@ -416,6 +426,29 @@ export class CampaignDetailsComponent implements OnInit {
 
     }
 
+  }
+
+  
+
+  async viewCurrentWhitelist(){
+    this.spinner.show();
+    this.viewWhitelistModalVisible= true;
+
+    if(this.whitelist ){
+      this.spinner.hide();
+      
+    }else{
+      let result = await firstValueFrom(this.http.get<any>(`${environment.BaseApiUrl}/campaigns/list/${this.userChain}/${this.campaignId}`));
+      this.whitelist = result.addresses;
+
+      this.spinner.hide();
+    }
+    
+
+  }
+
+  closeViewWhitelistModal(){
+    this.viewWhitelistModalVisible=false;
   }
 
 

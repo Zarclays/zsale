@@ -33,11 +33,11 @@ const contractList: ContractListArray =  {
     },
     31337: {// Hardhat test
         chainId: 31337,
-        campaignList: '0x0165878A594ca255338adfa4d48449f69242Eb8F',        
+        campaignList: '0xcC4c41415fc68B2fBf70102742A83cDe435e0Ca7',        
         routers:[
             {
                 name: 'Swap',
-                address: '0xb2869F895FC24790e81EF05a3AeF0F23897eC33b'
+                address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D' //'0xb2869F895FC24790e81EF05a3AeF0F23897eC33b'
             }
         ]
     }, 
