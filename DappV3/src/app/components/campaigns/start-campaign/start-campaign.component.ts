@@ -206,7 +206,7 @@ export class StartCampaignComponent implements OnInit {
     private location: Location,
     private spinner: NgxSpinnerService,
     private router: Router) { 
-
+      
   }
 
   ngOnInit(): void {
@@ -343,7 +343,7 @@ export class StartCampaignComponent implements OnInit {
 
         try{
           const allowance = await this.web3Service.getERC20ApprovalAllowance(this.tokenAddress, contractList[currentChainId].campaignList);
-          // console.log('Current Allowance:', utils.formatUnits( allowance,  'ether'))
+          
           this.isTokenApproved= allowance.gt(constants.Zero);
           
         }catch(err){
@@ -499,8 +499,6 @@ export class StartCampaignComponent implements OnInit {
     if(this.mainFormGroup.get('campaignInfoFG.useTokenVesting')?.value === true){
       let arr = this.tokenVestings.controls.map((v,ix)=>{ 
         let n = new Date(now.getTime()) ;
-        console.log('' , this.tokenVestings.controls[ix].get('amount')?.value.toString() )
-        
         return {
           releaseDate:  Math.floor( n.setDate(n.getDate() + +this.tokenVestings.controls[ix].get('releaseDate')?.value) / 1000), 
           releaseAmount: utils.parseEther(this.tokenVestings.controls[ix].get('amount')?.value.toString()), 
@@ -590,29 +588,19 @@ export class StartCampaignComponent implements OnInit {
       
       //Wait for the transaction to be mined...
       const txResult = await tx.wait();
-
-      console.log('txResult: ', txResult)
-
       this.showToast('Success!','Campaign Created succesfully');
 
 
       this.campaignAddress = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['createdCampaignAddress'];
-      this.campaignIndex = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['index'];
-      
-      
+      this.campaignIndex = (txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['index']).toString();
+            
       this.wizard.goToNextStep();
 
     }catch(err){
       console.error('error creating campaign: ', err)
-      this.showToast('Oops!','Campaign Created Failed', 'danger');
-      
+      this.showToast('Oops!','Campaign Created Failed', 'danger');      
     }
-
-    
-
     this.spinner.hide();
-
-    
   }
 
 
@@ -626,16 +614,13 @@ export class StartCampaignComponent implements OnInit {
     if(this.campaignAddress && this.campaignIndex){
       try{
         this.showToast('Working!','Transferring Tokens to Campaign');
-        // console.log('camp: ', this.campaignAddress)
-
-        
         const transferTokenTx = await campaignListContract.transferTokens(this.campaignAddress);        
         let transfrTxResult =   await transferTokenTx.wait();
 
         this.spinner.hide();
 
         this.showToast('Success!','Tokens Transferred Successfully. You will be redirected.');
-
+        
         this.router.navigate(['/campaigns', currentChain.shortName,'p',  this.campaignIndex]);
       }catch(err){
         console.error('error transferring Tokens to campaign: ', err)
@@ -649,6 +634,7 @@ export class StartCampaignComponent implements OnInit {
 
     
   }
+
 
   /*Colors 
   primary = 'primary',

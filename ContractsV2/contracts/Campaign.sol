@@ -451,7 +451,7 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
   }
 
   // send coin to the contract address
-  fallback(bytes calldata data) external payable returns (bytes memory) {
+  function submitBid(bytes32[] calldata proof) public payable  {
     uint256 bid = msg.value;
     require(status != CampaignStatus.CANCELLED, 'Campaign: Sale Cancelled');
     require(status != CampaignStatus.FAILED , "Campaign: Failed, Refunded is activated");
@@ -473,9 +473,9 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
     if(block.timestamp >= saleInfo.saleStartTime) {
         if(otherInfo.useWhiteList){
           // get proof from msg.data
-          bytes32[] memory proof = bytesToBytes32Array(data);
+          // bytes32[] memory proof = bytesToBytes32Array(data);
           
-          require(proof.length == 4 && isInTier2WhiteList(proof,sender ), "Campaign: You are not in whitelist");
+          require(/*proof.length == 4 &&*/ isInTier2WhiteList(proof,sender ), "Campaign: You are not in whitelist");
         }
         require(totalCoinInTierTwo + bid <= tierTwohardCap, "Campaign: purchase would exceed Tier two max cap");
         require(buyInTwoTier[sender] + bid <= maxAllocationPerUserTierTwo ,"Campaign:You are investing more than your tier-2 limit!");
@@ -507,7 +507,7 @@ contract Campaign is Initializable,Ownable, ReentrancyGuard {
       revert("Campaign:The sale is not started yet");
     }
 
-    return '';
+    // return '';
   }
 
   /**

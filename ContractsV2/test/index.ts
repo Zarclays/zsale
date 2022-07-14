@@ -1,7 +1,8 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import {advanceTimeTo, getCurrentBlockTimeStamp, takeSnapshot, revertToSnapshot} from './utils';
-
+const { MerkleTree } = require('merkletreejs');
+const keccak256 = require('keccak256');
 
 describe("Test", async function () {
   
@@ -166,8 +167,12 @@ describe("CampaignList", function () {
     
     const campaignAddress = txResult.events.filter((f: any)=>f.event=='CampaignCreated')[0].args['createdCampaignAddress'];
     console.log('New CampaignAddress: ', campaignAddress );
-    return  CampaignArtifact.attach(campaignAddress);
+    return  {
+      campaign: CampaignArtifact.attach(campaignAddress),
+      token: token
+    };
   }
+
 
 
   it("Should create new campaign", async function () {
@@ -229,7 +234,7 @@ describe("CampaignList", function () {
       
       const timeLater = now.setSeconds(now.getSeconds() + (60*30));
         
-      let cmp = await createNewCampaign(Math.floor(timeLater/1000),Math.floor(thirtyDaysLater/1000.0));
+      let { campaign:cmp, token} = await createNewCampaign(Math.floor(timeLater/1000),Math.floor(thirtyDaysLater/1000.0));
 
       // console.log('getCurrentBlockTimeStamp:', await getCurrentBlockTimeStamp()); 
       
@@ -328,8 +333,7 @@ describe("CampaignList", function () {
       let campaignStatus = await cmp.getCampaignStatus();
       
       let vestingTokens = await cmp.totalTokensExpectedToBeLocked();
-      console.log('totalTokensExpectedToBeLocked: ', ethers.utils.formatUnits(vestingTokens) ); 
-      
+            
       // Arrpove contract with correct allowance
       
       let txAllowance = await token.approve(campaignFactory.address, vestingTokens);
@@ -356,7 +360,7 @@ describe("CampaignList", function () {
 
   });
 
-  it('accepts bids succesfully', async() => {
+  it('accepts bids succesfully for non whitelisted sale', async() => {
 
     
     let error;
@@ -368,17 +372,95 @@ describe("CampaignList", function () {
       
       snapshotId = await takeSnapshot();
       await advanceTimeTo(Math.floor(thirtySecondsTime/1000) );
+      let cmp = CampaignArtifact.attach(campaignAddress);
 
-      const tx = {
-        // from: newSigner.address,
-        to: campaignAddress,
-        value: ethers.utils.parseEther('0.10') // utils.formatUnits( utils.parseEther(amount.toString()), 'wei')
-      };
+      let campaignContractAsNewSigner = cmp.connect(newSigner);
 
-      const txRes = await newSigner.sendTransaction(tx);
-      await txRes.wait();
+      let tx = await campaignContractAsNewSigner.submitBid([], {
+        value: ethers.utils.parseEther('0.1')
+      } );
+      let txRes = await tx.wait(); 
           
       const afterBalance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));
+      
+      expect(parseFloat( afterBalance)).to.gt(parseFloat(b4Balance));
+      expect(txRes.confirmations).to.gt(0);
+
+    }catch(err){
+      
+      console.error(err)
+      error=err;
+    }finally{
+      if(snapshotId){
+          await revertToSnapshot(snapshotId);
+      }
+      
+    }
+    expect(error).to.equal(undefined);
+    
+    
+
+  });
+
+  it('accepts bids succesfully for whitelisted sale', async() => {
+
+    
+    let error;
+    let snapshotId;
+    try{
+      this.timeout(5000)
+      const [owner, owner2, newSigner,tSigner,fSigner] = await ethers.getSigners();
+
+      
+      const now = new Date();
+      
+      const timeLater = now.setSeconds(now.getSeconds() + (60*30));
+        
+      let {campaign:cmp,token} = await createNewCampaign(Math.floor(timeLater/1000),Math.floor(thirtyDaysLater/1000.0));
+       //add eligible droppers
+      const whitelist=[owner.address, owner2.address, newSigner.address,tSigner.address,fSigner.address];
+            
+      let vestingTokens = await cmp.totalTokensExpectedToBeLocked();
+      let txAllowance = await token.approve(campaignFactory.address, vestingTokens);
+      let txR = await txAllowance.wait();      
+      expect(txR.status).to.equal(1);
+
+      const transferTokenTx = await campaignFactory.transferTokens(cmp.address);        
+      let txResult =   await transferTokenTx.wait();
+
+      // Get elligble addresses - use address 0 - 10
+      const leafNodes = whitelist.map((i,ix) => {        
+        const packed = ethers.utils.solidityPack(["address"], [ i])
+        // return keccak256(i, toWei(ix));
+        return keccak256(packed);        
+      })
+
+      
+      // Generate merkleTree from leafNodes
+      const merkleTree = new MerkleTree(leafNodes, keccak256, { sortPairs: true });
+      // Get root hash from merkle tree
+      const merkleRoot = merkleTree.getRoot();
+      
+      let tx2 = await cmp.submitTier2Whitelist( merkleRoot, {
+      });
+      await tx2.wait();
+
+      const b4Balance = ethers.utils.formatUnits(await ethers.provider.getBalance(cmp.address));
+      
+      snapshotId = await takeSnapshot();
+      await advanceTimeTo(Math.floor(timeLater/1000) );
+
+      const packed = ethers.utils.solidityPack(["address"], [ newSigner.address])
+      const proof = merkleTree.getHexProof(keccak256(packed))
+
+      let campaignContractAsNewSigner = cmp.connect(newSigner);
+
+      let tx = await campaignContractAsNewSigner.submitBid(proof, {
+        value: ethers.utils.parseEther('0.1')
+      } );
+      let txRes = await tx.wait();
+          
+      const afterBalance = ethers.utils.formatUnits(await ethers.provider.getBalance(cmp.address));
       
       expect(parseFloat( afterBalance)).to.gt(parseFloat(b4Balance));
       expect(txRes.confirmations).to.gt(0);
@@ -460,38 +542,39 @@ describe("CampaignList", function () {
 
     
     let error;
-    let snapshotId;
+    
     try{
       this.timeout(5000)
-      const [owner2, newSigner] = await ethers.getSigners();
-      const b4Balance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));
-      
-      snapshotId = await takeSnapshot();
-      await advanceTimeTo(Math.floor(thirtySecondsTime/1000) );
+      const [owner, owner2, newSigner,tSigner,fSigner] = await ethers.getSigners();
+     
+      const now = new Date();      
+      const timeLater = now.setSeconds(now.getSeconds() + (60*30));
+        
+      let {campaign:cmp,token} = await createNewCampaign(Math.floor(timeLater/1000),Math.floor(thirtyDaysLater/1000.0));
+       //add eligible droppers
+      const whitelist=[owner.address, owner2.address, newSigner.address,tSigner.address,fSigner.address];
+       
+      const leafNodes = whitelist.map((i,ix) => {        
+        const packed = ethers.utils.solidityPack(["address"], [ i])
+        // return keccak256(i, toWei(ix));
+        return keccak256(packed);        
+      })
 
-      const tx = {
-        // from: newSigner.address,
-        to: campaignAddress,
-        value: ethers.utils.parseEther('0.10') // utils.formatUnits( utils.parseEther(amount.toString()), 'wei')
-      };
-
-      const txRes = await newSigner.sendTransaction(tx);
-      await txRes.wait();
-          
-      const afterBalance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));
+      // Generate merkleTree from leafNodes
+      const merkleTree = new MerkleTree(leafNodes, keccak256, { sortPairs: true });
+      // Get root hash from merkle tree
+      const merkleRoot = merkleTree.getRoot();
       
-      expect(parseFloat( afterBalance)).to.gt(parseFloat(b4Balance));
+      let tx2 = await cmp.submitTier2Whitelist( merkleRoot, {
+      });
+      await tx2.wait();
+
       expect(txRes.confirmations).to.gt(0);
 
     }catch(err){
       
       console.error(err)
       error=err;
-    }finally{
-      if(snapshotId){
-          await revertToSnapshot(snapshotId);
-      }
-      
     }
     expect(error).to.equal(undefined);
     
@@ -499,48 +582,7 @@ describe("CampaignList", function () {
 
   });
 
-  it('checks whitelist succesfully', async() => {
 
-    
-    let error;
-    let snapshotId;
-    try{
-      this.timeout(5000)
-      const [owner2, newSigner] = await ethers.getSigners();
-      const b4Balance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));
-      
-      snapshotId = await takeSnapshot();
-      await advanceTimeTo(Math.floor(thirtySecondsTime/1000) );
-
-      const tx = {
-        // from: newSigner.address,
-        to: campaignAddress,
-        value: ethers.utils.parseEther('0.10') // utils.formatUnits( utils.parseEther(amount.toString()), 'wei')
-      };
-
-      const txRes = await newSigner.sendTransaction(tx);
-      await txRes.wait();
-          
-      const afterBalance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));
-      
-      expect(parseFloat( afterBalance)).to.gt(parseFloat(b4Balance));
-      expect(txRes.confirmations).to.gt(0);
-
-    }catch(err){
-      
-      console.error(err)
-      error=err;
-    }finally{
-      if(snapshotId){
-          await revertToSnapshot(snapshotId);
-      }
-      
-    }
-    expect(error).to.equal(undefined);
-    
-    
-
-  });
 
 
 });

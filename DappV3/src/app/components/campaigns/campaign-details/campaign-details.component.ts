@@ -106,7 +106,6 @@ export class CampaignDetailsComponent implements OnInit {
     private fb: FormBuilder,
     private spinner: NgxSpinnerService,
     private http: HttpClient) {
-      
     }
 
   ngOnInit(): void {
@@ -243,54 +242,103 @@ export class CampaignDetailsComponent implements OnInit {
     const amount = this.mainFormGroup.get('amount')?.value;
     const campaignContract = this.campaignContract ;// await this.campaignService.getCampaignContractWithSigner(this.campaign!.campaignAddress)
     // not defining `data` field will use the default value - empty data
+    this.spinner.show();
 
-    const gasFeeData = (await this.web3Service.getFeeData())!;  
-
-    const tx = {
-        from: this.web3Service.accounts[0],
-        to: this.campaign!.campaignAddress,
-        nonce: this.web3Service.ethersProvider!.getTransactionCount(this.web3Service.accounts[0], "latest"),
-        value: utils.parseEther(amount.toString()), 
-        maxFeePerGas: gasFeeData.maxFeePerGas,// should use geasprice for bsc, since it doesnt support eip 1559 yet
-        maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas,
-        data: undefined
-        // gasLimit: utils.hexlify(500000), // 100000
-        // gasPrice: gasPrice,
-    };
-
-    if(this.campaign!.useWhiteList === true){
-      try{
-
-        const signer = this.web3Service.ethersSigner;      
-        const ethAddress = await signer!.getAddress();
-        const messageSignature = await signer!.signMessage(ethAddress);
-        
-        const c = {
+    const gasFeeData = (await this.web3Service.getFeeData())!;
+    let proof =[];
+    try{
+      if(this.campaign!.useWhiteList === true){
+        try{  
+          const c = {
             id: this.campaignId,
             chain: this.userChain,
-            address: this.web3Service.accounts[0],
-            signatureHash: messageSignature
-        };
-
-        const data =  await this.http.post<any>(`${environment.BaseApiUrl}/campaigns/proof`, c).toPromise();
-        tx.data = data.proof;
-
-      }catch(eerr) {
-          console.error(eerr);
-          this.submittingBid=false;
-          this.showToast('Oops!','Something went wrong', 'danger');
-          return;
+            address: this.web3Service.accounts[0]
+          };
+          //const data =  await this.http.post<any>(`${environment.BaseApiUrl}/campaigns/proof`, c).toPromise();
+          const data =  await firstValueFrom(this.http.post<any>(`${environment.BaseApiUrl}/campaigns/proof`, c));
+                
+          proof = data.proof;
+  
+        }catch(eerr) {
+            console.error(eerr);
+            this.submittingBid=false;
+            this.showToast('Oops!','Something went wrong', 'danger');
+            return;
+        }
       }
+
+      let tx = await campaignContract.submitBid(proof, {
+        value: utils.parseEther(amount.toString()),
+        maxFeePerGas: gasFeeData.maxFeePerGas,// should use geasprice for bsc, since it doesnt support eip 1559 yet
+        maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas
+      } );
+      let txRes = await tx.wait();           
+      
+      this.showToast('Success!','Your bid has been sent succesfully!');
+      // alert('Your bid has been sent succesfully');
+      this.submittingBid=false;
+
+      window.location.reload(); 
+    }catch(err){
+      console.error(err);
+      this.spinner.hide();
+      this.submittingBid=false;
+      
+      this.showToast('Oops!','Your Bid Failed', 'danger');
+
     }
+
+
+
+
+
+    // const tx = {
+    //     from: this.web3Service.accounts[0],
+    //     to: this.campaign!.campaignAddress,
+    //     nonce: this.web3Service.ethersProvider!.getTransactionCount(this.web3Service.accounts[0], "latest"),
+    //     value: utils.parseEther(amount.toString()), 
+    //     maxFeePerGas: gasFeeData.maxFeePerGas,// should use geasprice for bsc, since it doesnt support eip 1559 yet
+    //     maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas,
+    //     data: undefined
+    //     // gasLimit: utils.hexlify(500000), // 100000
+    //     // gasPrice: gasPrice,
+    // };
+
+    // if(this.campaign!.useWhiteList === true){
+    //   try{
+
+    //     const signer = this.web3Service.ethersSigner;      
+    //     const ethAddress = await signer!.getAddress();
+    //     const messageSignature = await signer!.signMessage(ethAddress);
+        
+    //     const c = {
+    //         id: this.campaignId,
+    //         chain: this.userChain,
+    //         address: this.web3Service.accounts[0],
+    //         signatureHash: messageSignature
+    //     };
+
+    //     const data =  await this.http.post<any>(`${environment.BaseApiUrl}/campaigns/proof`, c).toPromise();
+    //     console.log(data);
+        
+    //     tx.data = ethers.utils.hexlify(data.proof);
+
+    //   }catch(eerr) {
+    //       console.error(eerr);
+    //       this.submittingBid=false;
+    //       this.showToast('Oops!','Something went wrong', 'danger');
+    //       return;
+    //   }
+    // }
 
     
 
-    const txRes = await this.web3Service.signer!.sendTransaction(tx);    
-    // console.log("Send finished!" , txRes)
-    this.showToast('Success!','Your bid has been sent succesfully!');
-    // alert('Your bid has been sent succesfully');
-    this.submittingBid=false;
-    window.location.reload(); // navigate(`/campaigns/${campaignId}`);
+    // const txRes = await this.web3Service.signer!.sendTransaction(tx);    
+    // // console.log("Send finished!" , txRes)
+    // this.showToast('Success!','Your bid has been sent succesfully!');
+    // // alert('Your bid has been sent succesfully');
+    // this.submittingBid=false;
+    // window.location.reload(); // navigate(`/campaigns/${campaignId}`);
 
     // this.router.navigate(['/campaigns', currentChain.shortName,'p',  this.campaignIndex]);
   }
@@ -303,6 +351,8 @@ export class CampaignDetailsComponent implements OnInit {
 
 
   }
+
+ 
 
   closePostponeModal(){
     this.postponeSaleModalVisible=false;
@@ -319,7 +369,7 @@ export class CampaignDetailsComponent implements OnInit {
           maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas
         } );
         let txRes = await tx.wait();           
-        // console.log("Send finished!" , txRes)
+        
         this.showToast('Success!','Your Campaign  has been postponed succesfully!');
         this.spinner.hide();
         this.postponeSaleModalVisible=false;
@@ -413,7 +463,7 @@ export class CampaignDetailsComponent implements OnInit {
 
       
       let txRes = await tx.wait();           
-      // console.log("Send finished!" , txRes)
+      
       this.showToast('Success!','Campaign  whitelisting succesful!');
       this.spinner.hide();
       this.whitelistModalVisible=false;
@@ -464,7 +514,7 @@ export class CampaignDetailsComponent implements OnInit {
           // maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas
         } );
         let txRes = await tx.wait();           
-        // console.log("Send finished!" , txRes)
+        
         this.showToast('Success!','Your Campaign  has been cancelled succesfully!');
         this.spinner.hide();        
         window.location.reload(); 
@@ -489,7 +539,7 @@ export class CampaignDetailsComponent implements OnInit {
           // maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas
         } );
         let txRes = await tx.wait();           
-        // console.log("Send finished!" , txRes)
+        
         this.showToast('Success!','Your Campaign  has been finalized succesfully!');
         this.spinner.hide();        
         window.location.reload(); 
@@ -516,7 +566,7 @@ export class CampaignDetailsComponent implements OnInit {
           // maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas
         } );
         let txRes = await tx.wait();           
-        // console.log("Send finished!" , txRes)
+        
         this.showToast('Success!','Campaign  funds has been sent to you succesfully!');
         this.spinner.hide();        
         window.location.reload(); 
@@ -543,7 +593,6 @@ export class CampaignDetailsComponent implements OnInit {
         } );
         
         let txRes = await tx.wait();           
-        // console.log("Send finished!" , txRes)
         this.showToast('Success!','Campaign  funds has been sent to you succesfully!');
         this.spinner.hide();        
         window.location.reload(); 

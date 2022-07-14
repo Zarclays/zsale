@@ -36,6 +36,8 @@
     "hardhat-contract-sizer": "^2.4.0",
     "hardhat-deploy": "^0.10.5",
     "hardhat-gas-reporter": "^1.0.4",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.2.31",
     "prettier": "^2.3.2",
     "prettier-plugin-solidity": "^1.0.0-beta.13",
     "solhint": "^3.3.6",
