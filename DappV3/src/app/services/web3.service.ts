@@ -151,8 +151,10 @@ export class Web3Service {
 
   createProviderHooks(provider: any) {
     // Subscribe to accounts change
-    provider.on('accountsChanged', (accounts: string[]) => {
-      this.onConnectChange.emit(true);    
+    provider.on('accountsChanged', async (accounts: string[]) => {
+      this._accountsObservable.next(await this.ethersProvider!.listAccounts());
+      this.onConnectChange.emit(true);  
+      
     });
 
     // Subscribe to chainId change
@@ -176,6 +178,13 @@ export class Web3Service {
       console.log('disconnect')
       this.onConnectChange.emit(false);
     });
+
+    // this.ethersProvider!.on("block", async (blockNum: number)=> {
+    //   console.log("On Blocked - Block ",blockNum + ": " +new Date(Date.now()))
+    //   const timestamp = (await this.ethersProvider!.getBlock(blockNum)).timestamp;
+
+    //       console.log('Block timestamp: ', timestamp, ', date stamp: ', new Date().getTime()/1000 )
+    // })
   }
 
 

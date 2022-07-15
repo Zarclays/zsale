@@ -8,7 +8,7 @@ import { Campaign } from '../../../models/campaign';
 import contractList from '../../../models/contract-list';
 import {getDateFromEther, formatEtherDateToJs, formatDateToJsString} from '../../../utils/date';
 import {formatPercent} from '../../../utils/numbers'
-import {ethers, utils} from 'ethers';
+import {Contract, ethers, utils} from 'ethers';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 // import { cilList, cilShieldAlt } from '@coreui/icons';
 import { ToasterComponent, ToasterPlacement } from '@coreui/angular';
@@ -19,7 +19,7 @@ import { MerkleTree } from 'merkletreejs';
 // import keccak256 = require("keccak256");
 // import * as keccak256 from 'keccak256';
 const keccak256 = require('keccak256');
-
+const CampaignListAbi = require('../../../../assets/CampaignList.json');
 import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 
@@ -168,6 +168,14 @@ export class CampaignDetailsComponent implements OnInit {
           }
 
           this.campaignContract = await this.campaignService.getCampaignContractWithSigner(this.campaign!.campaignAddress)
+
+
+          const blockNumber = 15076474 ; // number of the block you want to get timestamp of
+          const provider = this.web3Service.ethersProvider;
+
+          const timestamp = (await provider!.getBlock(blockNumber)).timestamp;
+
+          console.log('timestamp: ', timestamp, ', date stamp: ', new Date().getTime()/1000 )
               
         }
         
@@ -262,7 +270,8 @@ export class CampaignDetailsComponent implements OnInit {
         }catch(eerr) {
             console.error(eerr);
             this.submittingBid=false;
-            this.showToast('Oops!','Something went wrong', 'danger');
+            this.spinner.hide();
+            this.showToast('Oops!','Something went wrong or you are not in whitelist', 'danger');
             return;
         }
       }
@@ -287,60 +296,6 @@ export class CampaignDetailsComponent implements OnInit {
       this.showToast('Oops!','Your Bid Failed', 'danger');
 
     }
-
-
-
-
-
-    // const tx = {
-    //     from: this.web3Service.accounts[0],
-    //     to: this.campaign!.campaignAddress,
-    //     nonce: this.web3Service.ethersProvider!.getTransactionCount(this.web3Service.accounts[0], "latest"),
-    //     value: utils.parseEther(amount.toString()), 
-    //     maxFeePerGas: gasFeeData.maxFeePerGas,// should use geasprice for bsc, since it doesnt support eip 1559 yet
-    //     maxPriorityFeePerGas: gasFeeData.maxPriorityFeePerGas,
-    //     data: undefined
-    //     // gasLimit: utils.hexlify(500000), // 100000
-    //     // gasPrice: gasPrice,
-    // };
-
-    // if(this.campaign!.useWhiteList === true){
-    //   try{
-
-    //     const signer = this.web3Service.ethersSigner;      
-    //     const ethAddress = await signer!.getAddress();
-    //     const messageSignature = await signer!.signMessage(ethAddress);
-        
-    //     const c = {
-    //         id: this.campaignId,
-    //         chain: this.userChain,
-    //         address: this.web3Service.accounts[0],
-    //         signatureHash: messageSignature
-    //     };
-
-    //     const data =  await this.http.post<any>(`${environment.BaseApiUrl}/campaigns/proof`, c).toPromise();
-    //     console.log(data);
-        
-    //     tx.data = ethers.utils.hexlify(data.proof);
-
-    //   }catch(eerr) {
-    //       console.error(eerr);
-    //       this.submittingBid=false;
-    //       this.showToast('Oops!','Something went wrong', 'danger');
-    //       return;
-    //   }
-    // }
-
-    
-
-    // const txRes = await this.web3Service.signer!.sendTransaction(tx);    
-    // // console.log("Send finished!" , txRes)
-    // this.showToast('Success!','Your bid has been sent succesfully!');
-    // // alert('Your bid has been sent succesfully');
-    // this.submittingBid=false;
-    // window.location.reload(); // navigate(`/campaigns/${campaignId}`);
-
-    // this.router.navigate(['/campaigns', currentChain.shortName,'p',  this.campaignIndex]);
   }
 
 
@@ -502,6 +457,39 @@ export class CampaignDetailsComponent implements OnInit {
   }
 
 
+
+  async transferTokens(){
+    const currentChain = (await this.web3Service.getCurrentChain())!;
+    const currentChainId = currentChain.chainId;
+  
+    this.spinner.show();
+    const campaignListContract = new Contract(contractList[currentChainId].campaignList, CampaignListAbi, this.web3Service.signer);
+    
+    if(this.campaign?.campaignAddress ){
+      try{
+        this.showToast('Working!','Transferring Tokens to Campaign');
+        const transferTokenTx = await campaignListContract.transferTokens(this.campaign?.campaignAddress);        
+        let transfrTxResult =   await transferTokenTx.wait();
+
+        this.spinner.hide();
+
+        this.showToast('Success!','Tokens Transferred Successfully.Page will be reloaded.');
+        
+        window.location.reload(); 
+      }catch(err){
+        console.error('error transferring Tokens to campaign: ', err)
+        this.showToast('Oops!','Transferring Tokens to Campaign Created Failed', 'danger');
+      }
+      
+    }
+    
+
+    this.spinner.hide();
+
+    
+  }
+
+
   async cancelSale() {
     if(window.confirm('Are you sure you want to Cancel this Campaign?')){
       this.spinner.show();
@@ -609,7 +597,7 @@ export class CampaignDetailsComponent implements OnInit {
 
 
   onCountdownfinish(){
-
+    window.location.reload(); 
   }
 
 

@@ -462,12 +462,19 @@ export class StartCampaignComponent implements OnInit {
   async approveToken(){
     /** spinner starts on init */
     this.spinner.show();
+    try{
+      
+      const currentChainId = await this.web3Service.getCurrentChainId();
+      const result = await this.web3Service.approveERC20Contract(this.tokenAddress, contractList[currentChainId].campaignList, constants.MaxUint256)
 
-    const currentChainId = await this.web3Service.getCurrentChainId();
-    const result = await this.web3Service.approveERC20Contract(this.tokenAddress, contractList[currentChainId].campaignList, constants.MaxUint256)
-
-    this.isTokenApproved= result=='succeeded';
-    this.spinner.hide();
+      this.isTokenApproved= result=='succeeded';
+    }catch(err){
+      this.showToast('Oops!','Something went wrong!', 'danger');
+    }
+    finally{
+      this.spinner.hide();
+    }
+    
   }
 
 

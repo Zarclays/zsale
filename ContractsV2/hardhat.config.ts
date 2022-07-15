@@ -43,7 +43,14 @@ const config: HardhatUserConfig = {
       allowUnlimitedContractSize: false,
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
-        blockNumber: 15076411
+        // blockNumber: 15076411
+      },
+      mining: {
+        auto: false,
+        interval: 5000,
+        mempool: {
+          order: "fifo"
+        }
       }
     },
     ropsten: {

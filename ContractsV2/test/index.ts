@@ -493,12 +493,14 @@ describe("CampaignList", function () {
       snapshotId = await takeSnapshot();
       await advanceTimeTo(Math.floor(thirtySecondsTime/1000) );
       
-      const txTransferRes = await newSigner.sendTransaction({
-        // from: newSigner.address,
-        to: campaignAddress,
-        value: ethers.utils.parseEther('0.1') // utils.formatUnits( utils.parseEther(amount.toString()), 'wei')
-      });
-      await txTransferRes.wait();
+      let cmp = CampaignArtifact.attach(campaignAddress);
+
+      let campaignContractAsNewSigner = cmp.connect(newSigner);
+
+      let txTransfer = await campaignContractAsNewSigner.submitBid([], {
+        value: ethers.utils.parseEther('0.1')
+      } );
+      let txResTransfer = await txTransfer.wait(); 
 
       const balance = ethers.utils.formatUnits(await ethers.provider.getBalance(campaignAddress));      
       expect(parseFloat( balance)).to.gte(parseFloat('0.1'));
@@ -567,7 +569,7 @@ describe("CampaignList", function () {
       
       let tx2 = await cmp.submitTier2Whitelist( merkleRoot, {
       });
-      await tx2.wait();
+      const txRes = await tx2.wait();
 
       expect(txRes.confirmations).to.gt(0);
 
