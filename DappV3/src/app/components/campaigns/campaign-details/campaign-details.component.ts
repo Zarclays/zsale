@@ -168,14 +168,6 @@ export class CampaignDetailsComponent implements OnInit {
           }
 
           this.campaignContract = await this.campaignService.getCampaignContractWithSigner(this.campaign!.campaignAddress)
-
-
-          const blockNumber = 15076474 ; // number of the block you want to get timestamp of
-          const provider = this.web3Service.ethersProvider;
-
-          const timestamp = (await provider!.getBlock(blockNumber)).timestamp;
-
-          console.log('timestamp: ', timestamp, ', date stamp: ', new Date().getTime()/1000 )
               
         }
         

@@ -27,6 +27,11 @@ npx solhint 'contracts/**/*.sol'
 npx solhint 'contracts/**/*.sol' --fix
 ```
 
+# Static Analysis 
+```
+slither .
+```
+
 # Deploy
 
 You can deploy in the localhost network following these steps:
