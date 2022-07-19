@@ -66,7 +66,7 @@ export const navItems: INavData[] = [
   },
   {
     name: 'Docs',
-    // url: ''
+    url: '/docs/',
     iconComponent: { name: 'cil-drop'},
     badge: {
       color: 'secondary',

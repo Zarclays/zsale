@@ -90,6 +90,12 @@ const routes: Routes = [
         path: 'tokens',
         loadChildren: () =>
           import('./components/tokens/tokens.module').then((m) => m.TokensModule)
+      },
+
+      {
+        path: 'docs',
+        loadChildren: () =>
+          import('./components/docs/docs.module').then((m) => m.DocsModule)
       }
     ]
   },
